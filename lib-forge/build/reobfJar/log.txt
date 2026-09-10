@@ -1,0 +1,631 @@
+Java Launcher: C:\Program Files\Java\jdk-17\bin\java.exe
+Arguments: '--input, C:\Users\User\Documents\проєкти\коди плагінів і модів\shaurma-project\shaurma-lib\lib-forge\build\libs\shaurma-lib-forge-0.1.0-SNAPSHOT-slim.jar, --output, C:\Users\User\Documents\проєкти\коди плагінів і модів\shaurma-project\shaurma-lib\lib-forge\build\reobfJar\output.jar, --names, C:\Users\User\Documents\проєкти\коди плагінів і модів\shaurma-project\shaurma-lib\lib-forge\build\reobfJar\mappings.tsrg, --lib, C:\Users\User\.gradle\caches\forge_gradle\deobf_dependencies\software\bernie\geckolib\geckolib-forge-1.20.1\4.7.2_mapped_official_1.20.1\geckolib-forge-1.20.1-4.7.2_mapped_official_1.20.1.jar, --lib, C:\Users\User\.gradle\caches\forge_gradle\deobf_dependencies\dev\kosmx\player-anim\player-animation-lib-forge\1.0.2-rc1+1.20_mapped_official_1.20.1\player-animation-lib-forge-1.0.2-rc1+1.20_mapped_official_1.20.1.jar, --lib, C:\Users\User\Documents\проєкти\коди плагінів і модів\shaurma-project\shaurma-lib\lib-common\build\libs\lib-common-0.1.0-SNAPSHOT.jar, --lib, C:\Users\User\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.3.0_mapped_official_1.20.1\forge-1.20.1-47.3.0_mapped_official_1.20.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.yaml\snakeyaml\2.2\3af797a25458550a16bf89acc8e4ab2b7f2bfce0\snakeyaml-2.2.jar, --lib, C:\Users\User\.gradle\caches\forge_gradle\minecraft_repo\versions\1.20.1\client-extra.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlloader\1.20.1-47.3.0\547850469c8a336b4c60cb8619f6cd421e9e5f55\fmlloader-1.20.1-47.3.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\JarJarSelector\0.3.19\376cc9c8ea60720cf027c01fc033de915699801c\JarJarSelector-0.3.19.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\JarJarMetadata\0.3.19\83feaa9b770e6ac0e96ee4fc23fa89325c5fe2\JarJarMetadata-0.3.19.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\31.1-jre\60458f877d055d0c9114d9e1a2efb737b4bc282c\guava-31.1-jre.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.findbugs\jsr305\3.0.2\25ea2e8b0c338a877313bd4672d3fe056ea78f0d\jsr305-3.0.2.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\ca.weblite\java-objc-bridge\1.1\1227f9e0666314f9de41477e3ec277e542ed7f7b\java-objc-bridge-1.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\forgespi\7.0.1\3b4972a0cdb135853dba219be61a79b22cff1309\forgespi-7.0.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mergetool\1.1.5\f3da18e12c696d35a47c82cbb2cc8b5aa15e1154\mergetool-1.1.5-api.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.jetbrains\annotations\24.0.1\13c5c75c4206580aa4d683bffee658caae6c9f43\annotations-24.0.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\cpw.mods\securejarhandler\2.1.10\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\securejarhandler-2.1.10.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\coremods\5.1.6\62fab3c3d59d37f8e15af311cb638c6f6123423\coremods-5.1.6.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\cpw.mods\modlauncher\10.0.9\6d9443f56f50bb85cea383686ff9c867391458b\modlauncher-10.0.9.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.openjdk.nashorn\nashorn-core\15.3\43977e804697048fc8d81d333a36c17d07a5b3dd\nashorn-core-15.3.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-commons\9.7\e86dda4696d3c185fcc95d8d311904e7ce38a53f\asm-commons-9.7.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-util\9.7\c0655519f24d92af2202cb681cd7c1569df6ead6\asm-util-9.7.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-analysis\9.7\e4a258b7eb96107106c0599f0061cfc1832fe07a\asm-analysis-9.7.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-tree\9.7\e446a17b175bfb733b87c5c2560ccb4e57d69f1a\asm-tree-9.7.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm\9.7\73d7b3086e14beb604ced229c302feff6449723\asm-9.7.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\accesstransformers\8.0.4\272d240aa73f42195b2a68e2ebd8b701ecf41f63\accesstransformers-8.0.4.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\antlr4\4.9.1\e92af8ab33e428461927b484e90bb155a4f3a052\antlr4-4.9.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\antlr4-runtime\4.9.1\428664f05d2b7f7b7610204b5aa7c1763f62011a\antlr4-runtime-4.9.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.3.0\3b6be96aba3e323f3c918e8ef6a96312d82d76ad\fmlcore-1.20.1-47.3.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\eventbus\6.0.5\699143dd438431d06b57416944f7cedbe52e1475\eventbus-6.0.5.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\unsafe\0.2.0\54d7a0a5e8fdb71b973025caa46f341ae5904f39\unsafe-0.2.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.electronwill.night-config\toml\3.6.4\51d6cefb2b55ee55ee26b16391212fb2c7dfb4f4\toml-3.6.4.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.electronwill.night-config\core\3.6.4\510f174abbf1c947494db50ef2445683bd52c230\core-3.6.4.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.maven\maven-artifact\3.8.5\4433f50c07debefaed0553bd0068f4f48d449313\maven-artifact-3.8.5.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.jodah\typetools\0.6.3\a01aaa6ddaea9ec07ec4f209487b7a46a526283a\typetools-0.6.3.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecrell\terminalconsoleappender\1.2.0\96d02cd3b384ff015a8fef4223bcb4ccf1717c95\terminalconsoleappender-1.2.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.jline\jline-reader\3.12.1\4382ab1382c7b6f379377ed5f665dc2f6e1218bc\jline-reader-3.12.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.jline\jline-terminal\3.12.1\c777448314e050d980a6b697c140f3bfe9eb7416\jline-terminal-3.12.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.spongepowered\mixin\0.8.5\9d1c0c3a304ae6697ecd477218fa61b850bf57fc\mixin-0.8.5.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\cpw.mods\bootstraplauncher\1.1.2\c546e00443d8432cda6baa1c860346980742628\bootstraplauncher-1.1.2.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\JarJarFileSystems\0.3.19\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\JarJarFileSystems-0.3.19.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlearlydisplay\1.20.1-47.3.0\91e33682894f35862e9ce29d633e3258120952f0\fmlearlydisplay-1.20.1-47.3.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.3.0\d7ebc62120f202109e300e084ca1a31a7b946a62\javafmllanguage-1.20.1-47.3.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.3.0\1bf3e845ea0ce750096da8c71c8364b188ab74d4\lowcodelanguage-1.20.1-47.3.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.3.0\6093682e943ddccbabf70539319d7f2fe64db2e7\mclanguage-1.20.1-47.3.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.github.oshi\oshi-core\6.2.2\54f5efc19bca95d709d9a37d19ffcbba3d21c1a6\oshi-core-6.2.2.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.10\dd9b193aef96e973d5a11ab13cd17430c2e4306b\gson-2.10.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\failureaccess\1.0.1\1dcf1de382a0bf95a3d8b0849546c88bac1292c9\failureaccess-1.0.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.ibm.icu\icu4j\71.1\9e7d3304c23f9ba5cb71915f7cce23231a57a445\icu4j-71.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\authlib\4.0.43\2ff9d747a77570a07a60d32ac77eb6162ad2a2d9\authlib-4.0.43.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\blocklist\1.0.10\5c685c5ffa94c4cd39496c7184c1d122e515ecef\blocklist-1.0.10.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\brigadier\1.1.8\5244ce82c3337bba4a196a3ce858bfaecc74404a\brigadier-1.1.8.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\datafixerupper\6.0.8\3ba4a30557a9b057760af4011f909ba619fc5125\datafixerupper-6.0.8.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\logging\1.1.1\832b8e6674a9b325a5175a3a6267dfaf34c85139\logging-1.1.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\patchy\2.2.10\da05971b07cbb379d002cf7eaec6a2048211fefc\patchy-2.2.10.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\text2speech\1.17.9\3cad216e3a7f0c19b4b394388bc9ffc446f13b14\text2speech-1.17.9.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpclient\4.5.13\e5f6cae5ca7ecaac1ec2827a9e2d65ae2869cada\httpclient-4.5.13.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-codec\commons-codec\1.15\49d94806b6e3dc933dacbd8acb0fdbab8ebd1e5d\commons-codec-1.15.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-io\commons-io\2.11.0\a2503f302b11ebde7ebc3df41daebe0e4eea3689\commons-io-2.11.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-logging\commons-logging\1.2\4bfc12adfe4842bf07b657f0369c4cb522955686\commons-logging-1.2.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-handler\4.1.82.Final\644041d1fa96a5d3130a29e8978630d716d76e38\netty-handler-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-codec\4.1.82.Final\b77200379acb345a9ffdece1c605e591ac3e4e0a\netty-codec-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-transport-classes-epoll\4.1.82.Final\e7c7dd18deac93105797f30057c912651ea76521\netty-transport-classes-epoll-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-transport-native-unix-common\4.1.82.Final\3e895b35ca1b8a0eca56cacff4c2dde5d2c6abce\netty-transport-native-unix-common-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-transport\4.1.82.Final\e431a218d91acb6476ccad5f5aafde50aa3945ca\netty-transport-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-buffer\4.1.82.Final\a544270cf1ae8b8077082f5036436a9a9971ea71\netty-buffer-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-resolver\4.1.82.Final\38f665ae8dcd29032eea31245ba7806bed2e0fa8\netty-resolver-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-common\4.1.82.Final\22d148e85c3f5ebdacc0ce1f5aabb1d420f73f3\netty-common-4.1.82.Final.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\it.unimi.dsi\fastutil\8.5.9\bb7ea75ecdb216654237830b3a96d87ad91f8cc5\fastutil-8.5.9.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.java.dev.jna\jna-platform\5.12.1\97406a297c852f4a41e688a176ec675f72e8329\jna-platform-5.12.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.java.dev.jna\jna\5.12.1\b1e93a735caea94f503e95e6fe79bf9cdc1e985d\jna-5.12.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\net.sf.jopt-simple\jopt-simple\5.0.4\4fdac2fbe92dfad86aa6e9301736f6b4342a3f5c\jopt-simple-5.0.4.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-compress\1.21\4ec95b60d4e86b5c95a0e919cb172a0af98011ef\commons-compress-1.21.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-lang3\3.12.0\c6842c86792ff03b9f1d1fe2aab8dc23aa6c6f0e\commons-lang3-3.12.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpcore\4.4.15\7f2e0c573eaa7a74bac2e89b359e1f73d92a0a1d\httpcore-4.4.15.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.logging.log4j\log4j-core\2.19.0\3b6eeb4de4c49c0fe38a4ee27188ff5fee44d0bb\log4j-core-2.19.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.logging.log4j\log4j-slf4j2-impl\2.19.0\5c04bfdd63ce9dceb2e284b81e96b6a70010ee10\log4j-slf4j2-impl-2.19.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.logging.log4j\log4j-api\2.19.0\ea1b37f38c327596b216542bc636cfdc0b8036fa\log4j-api-2.19.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.joml\joml\1.10.5\22566d58af70ad3d72308bab63b8339906deb649\joml-1.10.5.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\cbac1b8d30cb4795149c1ef540f912671a8616d0\lwjgl-glfw-3.3.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\ed892f945cf7e79c8756796f32d00fa4ceaf573b\lwjgl-glfw-3.3.1-natives-windows.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\beda65ee503443e60aa196d58ed31f8d001dc22a\lwjgl-glfw-3.3.1-natives-windows-arm64.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\b997e3391d6ce8f05487e7335d95c606043884a1\lwjgl-glfw-3.3.1-natives-windows-x86.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\a817bcf213db49f710603677457567c37d53e103\lwjgl-jemalloc-3.3.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\948a89b76a16aa324b046ae9308891216ffce5f9\lwjgl-jemalloc-3.3.1-natives-windows.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\cae85c4edb219c88b6a0c26a87955ad98dc9519d\lwjgl-jemalloc-3.3.1-natives-windows-arm64.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\fb476c8ec110e1c137ad3ce8a7f7bfe6b11c6324\lwjgl-jemalloc-3.3.1-natives-windows-x86.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\2623a6b8ae1dfcd880738656a9f0243d2e6840bd\lwjgl-openal-3.3.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\30a474d0e57193d7bc128849a3ab66bc9316fdb1\lwjgl-openal-3.3.1-natives-windows.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\40d65f1a7368a2aa47336f9cb69f5a190cf9975a\lwjgl-openal-3.3.1-natives-windows-arm64.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\888349f7b1be6fbae58bf8edfb9ef12def04c4e3\lwjgl-openal-3.3.1-natives-windows-x86.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\831a5533a21a5f4f81bbc51bb13e9899319b5411\lwjgl-opengl-3.3.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\c1807e9bd571402787d7e37e3029776ae2513bb8\lwjgl-opengl-3.3.1-natives-windows.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\527d78f1e9056aff3ed02ce93019c73c5e8f1721\lwjgl-opengl-3.3.1-natives-windows-arm64.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\deef3eb9b178ff2ff3ce893cc72ae741c3a17974\lwjgl-opengl-3.3.1-natives-windows-x86.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\b119297cf8ed01f247abe8685857f8e7fcf5980f\lwjgl-stb-3.3.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\86315914ac119efdb02dc9e8e978ade84f1702af\lwjgl-stb-3.3.1-natives-windows.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\fde63cdd2605c00636721a6c8b961e41d1f6b247\lwjgl-stb-3.3.1-natives-windows-arm64.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\a8d41f419eecb430b7c91ea2ce2c5c451cae2091\lwjgl-stb-3.3.1-natives-windows-x86.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\ff1914111ef2e3e0110ef2dabc8d8cdaad82347\lwjgl-tinyfd-3.3.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\a5d830475ec0958d9fdba1559efa99aef211e6ff\lwjgl-tinyfd-3.3.1-natives-windows.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\83a5e780df610829ff3a737822b4f931cffecd91\lwjgl-tinyfd-3.3.1-natives-windows-arm64.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\842eedd876fae354abc308c98a263f6bbc9e8a4d\lwjgl-tinyfd-3.3.1-natives-windows-x86.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\ae58664f88e18a9bb2c77b063833ca7aaec484cb\lwjgl-3.3.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\36c37f16ab611b3aa11f3bcf80b1d509b4ce6b\lwjgl-3.3.1-natives-windows.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\f46cadcf95675908fd3a550d63d9d709cb68998\lwjgl-3.3.1-natives-windows-arm64.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\3b14f4beae9dd39791ec9e12190a9380cd8a3ce6\lwjgl-3.3.1-natives-windows-x86.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.machinezoo.noexception\noexception\1.7.1\b65330c98e38a1f915fa54a6e5eca496505e3f0a\noexception-1.7.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.slf4j\slf4j-api\2.0.1\f48d81adce2abf5ad3cfe463df517952749e03bc\slf4j-api-2.0.1.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.codehaus.plexus\plexus-utils\3.3.0\cf43b5391de623b36fe066a21127baef82c64022\plexus-utils-3.3.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\b421526c5f297295adef1c886e5246c39d4ac629\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.checkerframework\checker-qual\3.12.0\d5692f0526415fcc6de94bb5bfbd3afd9dd3b3e5\checker-qual-3.12.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.errorprone\error_prone_annotations\2.11.0\c5a0ace696d3f8b1c1d8cc036d8c03cc0cbe6b69\error_prone_annotations-2.11.0.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.j2objc\j2objc-annotations\1.3\ba035118bc8bac37d7eff77700720999acd9986d\j2objc-annotations-1.3.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\ST4\4.3\92f2c1ad8d84abcbeead6cf7f2c53a04166293c2\ST4-4.3.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\antlr-runtime\3.5.2\cd9cd41361c155f3af0f653009dcecb08d8b4afd\antlr-runtime-3.5.2.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.abego.treelayout\org.abego.treelayout.core\1.0.3\457216e8e6578099ae63667bb1e4439235892028\org.abego.treelayout.core-1.0.3.jar, --lib, C:\Users\User\.gradle\caches\modules-2\files-2.1\org.glassfish\javax.json\1.0.4\3178f73569fd7a1e5ffc464e680f7a8cc784b85a\javax.json-1.0.4.jar, --disable-abstract-param'
+Classpath:
+ - C:\Users\User\.gradle\caches\forge_gradle\maven_downloader\net\minecraftforge\renamer\2.0.4\renamer-2.0.4-all.jar
+Working directory: C:\Users\User\Documents\проєкти\коди плагінів і модів\shaurma-project\shaurma-lib\lib-forge\build\reobfJar
+Main class: net.minecraftforge.renamer.Main
+====================================
+Forge Renamer v2.0.4
+lib: C:\Users\User\.gradle\caches\forge_gradle\deobf_dependencies\software\bernie\geckolib\geckolib-forge-1.20.1\4.7.2_mapped_official_1.20.1\geckolib-forge-1.20.1-4.7.2_mapped_official_1.20.1.jar
+lib: C:\Users\User\.gradle\caches\forge_gradle\deobf_dependencies\dev\kosmx\player-anim\player-animation-lib-forge\1.0.2-rc1+1.20_mapped_official_1.20.1\player-animation-lib-forge-1.0.2-rc1+1.20_mapped_official_1.20.1.jar
+lib: C:\Users\User\Documents\￐﾿￑ﾀ￐ﾾ￑ﾔ￐ﾺ￑ﾂ￐ﾸ\￐ﾺ￐ﾾ￐ﾴ￐ﾸ ￐﾿￐ﾻ￐ﾰ￐ﾳ￑ﾖ￐ﾽ￑ﾖ￐ﾲ ￑ﾖ ￐ﾼ￐ﾾ￐ﾴ￑ﾖ￐ﾲ\shaurma-project\shaurma-lib\lib-common\build\libs\lib-common-0.1.0-SNAPSHOT.jar
+lib: C:\Users\User\.gradle\caches\forge_gradle\minecraft_user_repo\net\minecraftforge\forge\1.20.1-47.3.0_mapped_official_1.20.1\forge-1.20.1-47.3.0_mapped_official_1.20.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.yaml\snakeyaml\2.2\3af797a25458550a16bf89acc8e4ab2b7f2bfce0\snakeyaml-2.2.jar
+lib: C:\Users\User\.gradle\caches\forge_gradle\minecraft_repo\versions\1.20.1\client-extra.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlloader\1.20.1-47.3.0\547850469c8a336b4c60cb8619f6cd421e9e5f55\fmlloader-1.20.1-47.3.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\JarJarSelector\0.3.19\376cc9c8ea60720cf027c01fc033de915699801c\JarJarSelector-0.3.19.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\JarJarMetadata\0.3.19\83feaa9b770e6ac0e96ee4fc23fa89325c5fe2\JarJarMetadata-0.3.19.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\guava\31.1-jre\60458f877d055d0c9114d9e1a2efb737b4bc282c\guava-31.1-jre.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.findbugs\jsr305\3.0.2\25ea2e8b0c338a877313bd4672d3fe056ea78f0d\jsr305-3.0.2.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\ca.weblite\java-objc-bridge\1.1\1227f9e0666314f9de41477e3ec277e542ed7f7b\java-objc-bridge-1.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\forgespi\7.0.1\3b4972a0cdb135853dba219be61a79b22cff1309\forgespi-7.0.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mergetool\1.1.5\f3da18e12c696d35a47c82cbb2cc8b5aa15e1154\mergetool-1.1.5-api.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.jetbrains\annotations\24.0.1\13c5c75c4206580aa4d683bffee658caae6c9f43\annotations-24.0.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\cpw.mods\securejarhandler\2.1.10\51e6a22c6c716beb11e244bf5b8be480f51dd6b5\securejarhandler-2.1.10.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\coremods\5.1.6\62fab3c3d59d37f8e15af311cb638c6f6123423\coremods-5.1.6.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\cpw.mods\modlauncher\10.0.9\6d9443f56f50bb85cea383686ff9c867391458b\modlauncher-10.0.9.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.openjdk.nashorn\nashorn-core\15.3\43977e804697048fc8d81d333a36c17d07a5b3dd\nashorn-core-15.3.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-commons\9.7\e86dda4696d3c185fcc95d8d311904e7ce38a53f\asm-commons-9.7.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-util\9.7\c0655519f24d92af2202cb681cd7c1569df6ead6\asm-util-9.7.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-analysis\9.7\e4a258b7eb96107106c0599f0061cfc1832fe07a\asm-analysis-9.7.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm-tree\9.7\e446a17b175bfb733b87c5c2560ccb4e57d69f1a\asm-tree-9.7.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.ow2.asm\asm\9.7\73d7b3086e14beb604ced229c302feff6449723\asm-9.7.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\accesstransformers\8.0.4\272d240aa73f42195b2a68e2ebd8b701ecf41f63\accesstransformers-8.0.4.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\antlr4\4.9.1\e92af8ab33e428461927b484e90bb155a4f3a052\antlr4-4.9.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\antlr4-runtime\4.9.1\428664f05d2b7f7b7610204b5aa7c1763f62011a\antlr4-runtime-4.9.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.3.0\3b6be96aba3e323f3c918e8ef6a96312d82d76ad\fmlcore-1.20.1-47.3.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\eventbus\6.0.5\699143dd438431d06b57416944f7cedbe52e1475\eventbus-6.0.5.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\unsafe\0.2.0\54d7a0a5e8fdb71b973025caa46f341ae5904f39\unsafe-0.2.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.electronwill.night-config\toml\3.6.4\51d6cefb2b55ee55ee26b16391212fb2c7dfb4f4\toml-3.6.4.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.electronwill.night-config\core\3.6.4\510f174abbf1c947494db50ef2445683bd52c230\core-3.6.4.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.maven\maven-artifact\3.8.5\4433f50c07debefaed0553bd0068f4f48d449313\maven-artifact-3.8.5.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.jodah\typetools\0.6.3\a01aaa6ddaea9ec07ec4f209487b7a46a526283a\typetools-0.6.3.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecrell\terminalconsoleappender\1.2.0\96d02cd3b384ff015a8fef4223bcb4ccf1717c95\terminalconsoleappender-1.2.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.jline\jline-reader\3.12.1\4382ab1382c7b6f379377ed5f665dc2f6e1218bc\jline-reader-3.12.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.jline\jline-terminal\3.12.1\c777448314e050d980a6b697c140f3bfe9eb7416\jline-terminal-3.12.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.spongepowered\mixin\0.8.5\9d1c0c3a304ae6697ecd477218fa61b850bf57fc\mixin-0.8.5.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\cpw.mods\bootstraplauncher\1.1.2\c546e00443d8432cda6baa1c860346980742628\bootstraplauncher-1.1.2.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\JarJarFileSystems\0.3.19\2464eb7d6b9ddb9db36a82cf8a95193e5c6fe020\JarJarFileSystems-0.3.19.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlearlydisplay\1.20.1-47.3.0\91e33682894f35862e9ce29d633e3258120952f0\fmlearlydisplay-1.20.1-47.3.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.3.0\d7ebc62120f202109e300e084ca1a31a7b946a62\javafmllanguage-1.20.1-47.3.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.3.0\1bf3e845ea0ce750096da8c71c8364b188ab74d4\lowcodelanguage-1.20.1-47.3.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.3.0\6093682e943ddccbabf70539319d7f2fe64db2e7\mclanguage-1.20.1-47.3.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.github.oshi\oshi-core\6.2.2\54f5efc19bca95d709d9a37d19ffcbba3d21c1a6\oshi-core-6.2.2.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.code.gson\gson\2.10\dd9b193aef96e973d5a11ab13cd17430c2e4306b\gson-2.10.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\failureaccess\1.0.1\1dcf1de382a0bf95a3d8b0849546c88bac1292c9\failureaccess-1.0.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.ibm.icu\icu4j\71.1\9e7d3304c23f9ba5cb71915f7cce23231a57a445\icu4j-71.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\authlib\4.0.43\2ff9d747a77570a07a60d32ac77eb6162ad2a2d9\authlib-4.0.43.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\blocklist\1.0.10\5c685c5ffa94c4cd39496c7184c1d122e515ecef\blocklist-1.0.10.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\brigadier\1.1.8\5244ce82c3337bba4a196a3ce858bfaecc74404a\brigadier-1.1.8.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\datafixerupper\6.0.8\3ba4a30557a9b057760af4011f909ba619fc5125\datafixerupper-6.0.8.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\logging\1.1.1\832b8e6674a9b325a5175a3a6267dfaf34c85139\logging-1.1.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\patchy\2.2.10\da05971b07cbb379d002cf7eaec6a2048211fefc\patchy-2.2.10.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.mojang\text2speech\1.17.9\3cad216e3a7f0c19b4b394388bc9ffc446f13b14\text2speech-1.17.9.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpclient\4.5.13\e5f6cae5ca7ecaac1ec2827a9e2d65ae2869cada\httpclient-4.5.13.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-codec\commons-codec\1.15\49d94806b6e3dc933dacbd8acb0fdbab8ebd1e5d\commons-codec-1.15.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-io\commons-io\2.11.0\a2503f302b11ebde7ebc3df41daebe0e4eea3689\commons-io-2.11.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\commons-logging\commons-logging\1.2\4bfc12adfe4842bf07b657f0369c4cb522955686\commons-logging-1.2.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-handler\4.1.82.Final\644041d1fa96a5d3130a29e8978630d716d76e38\netty-handler-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-codec\4.1.82.Final\b77200379acb345a9ffdece1c605e591ac3e4e0a\netty-codec-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-transport-classes-epoll\4.1.82.Final\e7c7dd18deac93105797f30057c912651ea76521\netty-transport-classes-epoll-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-transport-native-unix-common\4.1.82.Final\3e895b35ca1b8a0eca56cacff4c2dde5d2c6abce\netty-transport-native-unix-common-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-transport\4.1.82.Final\e431a218d91acb6476ccad5f5aafde50aa3945ca\netty-transport-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-buffer\4.1.82.Final\a544270cf1ae8b8077082f5036436a9a9971ea71\netty-buffer-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-resolver\4.1.82.Final\38f665ae8dcd29032eea31245ba7806bed2e0fa8\netty-resolver-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\io.netty\netty-common\4.1.82.Final\22d148e85c3f5ebdacc0ce1f5aabb1d420f73f3\netty-common-4.1.82.Final.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\it.unimi.dsi\fastutil\8.5.9\bb7ea75ecdb216654237830b3a96d87ad91f8cc5\fastutil-8.5.9.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.java.dev.jna\jna-platform\5.12.1\97406a297c852f4a41e688a176ec675f72e8329\jna-platform-5.12.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.java.dev.jna\jna\5.12.1\b1e93a735caea94f503e95e6fe79bf9cdc1e985d\jna-5.12.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\net.sf.jopt-simple\jopt-simple\5.0.4\4fdac2fbe92dfad86aa6e9301736f6b4342a3f5c\jopt-simple-5.0.4.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-compress\1.21\4ec95b60d4e86b5c95a0e919cb172a0af98011ef\commons-compress-1.21.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.commons\commons-lang3\3.12.0\c6842c86792ff03b9f1d1fe2aab8dc23aa6c6f0e\commons-lang3-3.12.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.httpcomponents\httpcore\4.4.15\7f2e0c573eaa7a74bac2e89b359e1f73d92a0a1d\httpcore-4.4.15.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.logging.log4j\log4j-core\2.19.0\3b6eeb4de4c49c0fe38a4ee27188ff5fee44d0bb\log4j-core-2.19.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.logging.log4j\log4j-slf4j2-impl\2.19.0\5c04bfdd63ce9dceb2e284b81e96b6a70010ee10\log4j-slf4j2-impl-2.19.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.apache.logging.log4j\log4j-api\2.19.0\ea1b37f38c327596b216542bc636cfdc0b8036fa\log4j-api-2.19.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.joml\joml\1.10.5\22566d58af70ad3d72308bab63b8339906deb649\joml-1.10.5.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\cbac1b8d30cb4795149c1ef540f912671a8616d0\lwjgl-glfw-3.3.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\ed892f945cf7e79c8756796f32d00fa4ceaf573b\lwjgl-glfw-3.3.1-natives-windows.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\beda65ee503443e60aa196d58ed31f8d001dc22a\lwjgl-glfw-3.3.1-natives-windows-arm64.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-glfw\3.3.1\b997e3391d6ce8f05487e7335d95c606043884a1\lwjgl-glfw-3.3.1-natives-windows-x86.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\a817bcf213db49f710603677457567c37d53e103\lwjgl-jemalloc-3.3.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\948a89b76a16aa324b046ae9308891216ffce5f9\lwjgl-jemalloc-3.3.1-natives-windows.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\cae85c4edb219c88b6a0c26a87955ad98dc9519d\lwjgl-jemalloc-3.3.1-natives-windows-arm64.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-jemalloc\3.3.1\fb476c8ec110e1c137ad3ce8a7f7bfe6b11c6324\lwjgl-jemalloc-3.3.1-natives-windows-x86.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\2623a6b8ae1dfcd880738656a9f0243d2e6840bd\lwjgl-openal-3.3.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\30a474d0e57193d7bc128849a3ab66bc9316fdb1\lwjgl-openal-3.3.1-natives-windows.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\40d65f1a7368a2aa47336f9cb69f5a190cf9975a\lwjgl-openal-3.3.1-natives-windows-arm64.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-openal\3.3.1\888349f7b1be6fbae58bf8edfb9ef12def04c4e3\lwjgl-openal-3.3.1-natives-windows-x86.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\831a5533a21a5f4f81bbc51bb13e9899319b5411\lwjgl-opengl-3.3.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\c1807e9bd571402787d7e37e3029776ae2513bb8\lwjgl-opengl-3.3.1-natives-windows.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\527d78f1e9056aff3ed02ce93019c73c5e8f1721\lwjgl-opengl-3.3.1-natives-windows-arm64.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-opengl\3.3.1\deef3eb9b178ff2ff3ce893cc72ae741c3a17974\lwjgl-opengl-3.3.1-natives-windows-x86.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\b119297cf8ed01f247abe8685857f8e7fcf5980f\lwjgl-stb-3.3.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\86315914ac119efdb02dc9e8e978ade84f1702af\lwjgl-stb-3.3.1-natives-windows.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\fde63cdd2605c00636721a6c8b961e41d1f6b247\lwjgl-stb-3.3.1-natives-windows-arm64.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-stb\3.3.1\a8d41f419eecb430b7c91ea2ce2c5c451cae2091\lwjgl-stb-3.3.1-natives-windows-x86.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\ff1914111ef2e3e0110ef2dabc8d8cdaad82347\lwjgl-tinyfd-3.3.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\a5d830475ec0958d9fdba1559efa99aef211e6ff\lwjgl-tinyfd-3.3.1-natives-windows.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\83a5e780df610829ff3a737822b4f931cffecd91\lwjgl-tinyfd-3.3.1-natives-windows-arm64.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl-tinyfd\3.3.1\842eedd876fae354abc308c98a263f6bbc9e8a4d\lwjgl-tinyfd-3.3.1-natives-windows-x86.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\ae58664f88e18a9bb2c77b063833ca7aaec484cb\lwjgl-3.3.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\36c37f16ab611b3aa11f3bcf80b1d509b4ce6b\lwjgl-3.3.1-natives-windows.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\f46cadcf95675908fd3a550d63d9d709cb68998\lwjgl-3.3.1-natives-windows-arm64.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.lwjgl\lwjgl\3.3.1\3b14f4beae9dd39791ec9e12190a9380cd8a3ce6\lwjgl-3.3.1-natives-windows-x86.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.machinezoo.noexception\noexception\1.7.1\b65330c98e38a1f915fa54a6e5eca496505e3f0a\noexception-1.7.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.slf4j\slf4j-api\2.0.1\f48d81adce2abf5ad3cfe463df517952749e03bc\slf4j-api-2.0.1.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.codehaus.plexus\plexus-utils\3.3.0\cf43b5391de623b36fe066a21127baef82c64022\plexus-utils-3.3.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.guava\listenablefuture\9999.0-empty-to-avoid-conflict-with-guava\b421526c5f297295adef1c886e5246c39d4ac629\listenablefuture-9999.0-empty-to-avoid-conflict-with-guava.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.checkerframework\checker-qual\3.12.0\d5692f0526415fcc6de94bb5bfbd3afd9dd3b3e5\checker-qual-3.12.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.errorprone\error_prone_annotations\2.11.0\c5a0ace696d3f8b1c1d8cc036d8c03cc0cbe6b69\error_prone_annotations-2.11.0.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\com.google.j2objc\j2objc-annotations\1.3\ba035118bc8bac37d7eff77700720999acd9986d\j2objc-annotations-1.3.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\ST4\4.3\92f2c1ad8d84abcbeead6cf7f2c53a04166293c2\ST4-4.3.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.antlr\antlr-runtime\3.5.2\cd9cd41361c155f3af0f653009dcecb08d8b4afd\antlr-runtime-3.5.2.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.abego.treelayout\org.abego.treelayout.core\1.0.3\457216e8e6578099ae63667bb1e4439235892028\org.abego.treelayout.core-1.0.3.jar
+lib: C:\Users\User\.gradle\caches\modules-2\files-2.1\org.glassfish\javax.json\1.0.4\3178f73569fd7a1e5ffc464e680f7a8cc784b85a\javax.json-1.0.4.jar
+log: null
+input: C:\Users\User\Documents\￐﾿￑ﾀ￐ﾾ￑ﾔ￐ﾺ￑ﾂ￐ﾸ\￐ﾺ￐ﾾ￐ﾴ￐ﾸ ￐﾿￐ﾻ￐ﾰ￐ﾳ￑ﾖ￐ﾽ￑ﾖ￐ﾲ ￑ﾖ ￐ﾼ￐ﾾ￐ﾴ￑ﾖ￐ﾲ\shaurma-project\shaurma-lib\lib-forge\build\libs\shaurma-lib-forge-0.1.0-SNAPSHOT-slim.jar
+output: C:\Users\User\Documents\￐﾿￑ﾀ￐ﾾ￑ﾔ￐ﾺ￑ﾂ￐ﾸ\￐ﾺ￐ﾾ￐ﾴ￐ﾸ ￐﾿￐ﾻ￐ﾰ￐ﾳ￑ﾖ￐ﾽ￑ﾖ￐ﾲ ￑ﾖ ￐ﾼ￐ﾾ￐ﾴ￑ﾖ￐ﾲ\shaurma-project\shaurma-lib\lib-forge\build\reobfJar\output.jar
+threads: 12
+Names: C:\Users\User\Documents\￐﾿￑ﾀ￐ﾾ￑ﾔ￐ﾺ￑ﾂ￐ﾸ\￐ﾺ￐ﾾ￐ﾴ￐ﾸ ￐﾿￐ﾻ￐ﾰ￐ﾳ￑ﾖ￐ﾽ￑ﾖ￐ﾲ ￑ﾖ ￐ﾼ￐ﾾ￐ﾴ￑ﾖ￐ﾲ\shaurma-project\shaurma-lib\lib-forge\build\reobfJar\mappings.tsrg(reversed: false)
+Fix Annotations: false
+Fix Records: false
+Fix Identifiers: false
+Fix SourceFile: false
+Fix Line Numbers: false
+Strip codesigning signatures: false
+Adding Libraries to Inheritance
+Reading Input: C:\Users\User\Documents\￐﾿￑ﾀ￐ﾾ￑ﾔ￐ﾺ￑ﾂ￐ﾸ\￐ﾺ￐ﾾ￐ﾴ￐ﾸ ￐﾿￐ﾻ￐ﾰ￐ﾳ￑ﾖ￐ﾽ￑ﾖ￐ﾲ ￑ﾖ ￐ﾼ￐ﾾ￐ﾴ￑ﾖ￐ﾲ\shaurma-project\shaurma-lib\lib-forge\build\libs\shaurma-lib-forge-0.1.0-SNAPSHOT-slim.jar
+Adding input to inheritance map
+Processing entries
+Conflicting propagated mapping for dev/shaurmalib/forge/blocks/AnimatedBlockEntityBase/getUpdateTag()Lnet/minecraft/nbt/CompoundTag; from net/minecraft/world/level/block/entity/BlockEntity/getUpdateTag()Lnet/minecraft/nbt/CompoundTag;: getUpdateTag -> m_5995_
+Conflicting propagated mapping for dev/shaurmalib/forge/blocks/AnimatedBlockEntityBase/load(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/level/block/entity/BlockEntity/load(Lnet/minecraft/nbt/CompoundTag;)V: load -> m_142466_
+Conflicting propagated mapping for dev/shaurmalib/forge/blocks/AnimatedBlockEntityBase/saveAdditional(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/level/block/entity/BlockEntity/saveAdditional(Lnet/minecraft/nbt/CompoundTag;)V: saveAdditional -> m_183515_
+Conflicting propagated mapping for dev/shaurmalib/forge/blocks/AnimatedBlockEntityBase/getUpdatePacket()Lnet/minecraft/network/protocol/Packet; from net/minecraft/world/level/block/entity/BlockEntity/getUpdatePacket()Lnet/minecraft/network/protocol/Packet;: getUpdatePacket -> m_58483_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/keyPressed(III)Z from net/minecraft/client/gui/screens/Screen/keyPressed(III)Z: keyPressed -> m_7933_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/isPauseScreen()Z from net/minecraft/client/gui/screens/Screen/isPauseScreen()Z: isPauseScreen -> m_7043_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V from net/minecraft/client/gui/screens/Screen/render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V: render -> m_88315_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/mouseScrolled(DDD)Z from net/minecraft/client/gui/components/events/ContainerEventHandler/mouseScrolled(DDD)Z: mouseScrolled -> m_6050_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/onClose()V from net/minecraft/client/gui/screens/Screen/onClose()V: onClose -> m_7379_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/init()V from net/minecraft/client/gui/screens/Screen/init()V: init -> m_7856_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/mouseClicked(DDI)Z from net/minecraft/client/gui/components/events/ContainerEventHandler/mouseClicked(DDI)Z: mouseClicked -> m_6375_
+Conflicting propagated mapping for dev/shaurmalib/forge/client/chat/ChatHistoryScreen/removed()V from net/minecraft/client/gui/screens/Screen/removed()V: removed -> m_7861_
+Conflicting propagated mapping for net/minecraft/world/entity/LivingEntity/lambda$addAdditionalSaveData$3(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/nbt/Tag;)V from net/minecraft/world/entity/player/Player/lambda$addAdditionalSaveData$3(Lnet/minecraft/nbt/CompoundTag;Lnet/minecraft/nbt/Tag;)V: lambda$addAdditionalSaveData$3 -> m_219754_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/onClimbable()Z from net/minecraft/world/entity/LivingEntity/onClimbable()Z: onClimbable -> m_6147_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/isInWater()Z from net/minecraft/world/entity/Entity/isInWater()Z: isInWater -> m_20069_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/tick()V from net/minecraft/client/player/AbstractClientPlayer/tick()V: tick -> m_8119_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/doWaterSplashEffect()V from net/minecraft/world/entity/player/Player/doWaterSplashEffect()V: doWaterSplashEffect -> m_5841_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/checkFallDamage(DZLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V from net/minecraft/world/entity/LivingEntity/checkFallDamage(DZLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V: checkFallDamage -> m_7840_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/getViewXRot(F)F from net/minecraft/world/entity/Entity/getViewXRot(F)F: getViewXRot -> m_5686_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/isEffectiveAi()Z from net/minecraft/world/entity/Entity/isEffectiveAi()Z: isEffectiveAi -> m_21515_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/getViewYRot(F)F from net/minecraft/world/entity/LivingEntity/getViewYRot(F)F: getViewYRot -> m_5675_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/getPistonPushReaction()Lnet/minecraft/world/level/material/PushReaction; from net/minecraft/world/entity/Entity/getPistonPushReaction()Lnet/minecraft/world/level/material/PushReaction;: getPistonPushReaction -> m_7752_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/updateIsUnderwater()Z from net/minecraft/world/entity/player/Player/updateIsUnderwater()Z: updateIsUnderwater -> m_7602_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/setPose(Lnet/minecraft/world/entity/Pose;)V from net/minecraft/world/entity/Entity/setPose(Lnet/minecraft/world/entity/Pose;)V: setPose -> m_20124_
+Conflicting propagated mapping for dev/shaurmalib/forge/camera/FreeCameraEntity/canCollideWith(Lnet/minecraft/world/entity/Entity;)Z from net/minecraft/world/entity/Entity/canCollideWith(Lnet/minecraft/world/entity/Entity;)Z: canCollideWith -> m_7337_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z from net/minecraft/world/entity/Entity/isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z: isInvulnerableTo -> m_6673_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/entity/Entity/readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V: readAdditionalSaveData -> m_7378_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/isPickable()Z from net/minecraft/world/entity/Entity/isPickable()Z: isPickable -> m_6087_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/tick()V from net/minecraft/world/entity/Entity/tick()V: tick -> m_8119_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult; from net/minecraft/world/entity/Entity/interact(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;)Lnet/minecraft/world/InteractionResult;: interact -> m_6096_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/canCollideWith(Lnet/minecraft/world/entity/Entity;)Z from net/minecraft/world/entity/Entity/canCollideWith(Lnet/minecraft/world/entity/Entity;)Z: canCollideWith -> m_7337_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/isNoGravity()Z from net/minecraft/world/entity/Entity/isNoGravity()Z: isNoGravity -> m_20068_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/defineSynchedData()V from net/minecraft/world/entity/Entity/defineSynchedData()V: defineSynchedData -> m_8097_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/entity/Entity/addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V: addAdditionalSaveData -> m_7380_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/isPushable()Z from net/minecraft/world/entity/Entity/isPushable()Z: isPushable -> m_6094_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase/hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z from net/minecraft/world/entity/Entity/hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z: hurt -> m_6469_
+Conflicting propagated mapping for dev/shaurmalib/forge/fx/ScreenEffectPostChain$1/prepare(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)Ljava/lang/Object; from net/minecraft/server/packs/resources/SimplePreparableReloadListener/prepare(Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)Ljava/lang/Object;: prepare -> m_5944_
+Conflicting propagated mapping for dev/shaurmalib/forge/fx/ScreenEffectPostChain$1/apply(Ljava/lang/Object;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V from net/minecraft/server/packs/resources/SimplePreparableReloadListener/apply(Ljava/lang/Object;Lnet/minecraft/server/packs/resources/ResourceManager;Lnet/minecraft/util/profiling/ProfilerFiller;)V: apply -> m_5787_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/entity/Entity/readAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V: readAdditionalSaveData -> m_7378_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/getPickRadius()F from net/minecraft/world/entity/Entity/getPickRadius()F: getPickRadius -> m_6143_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/isPickable()Z from net/minecraft/world/entity/Entity/isPickable()Z: isPickable -> m_6087_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/tick()V from net/minecraft/world/entity/Entity/tick()V: tick -> m_8119_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/shouldRenderAtSqrDistance(D)Z from net/minecraft/world/entity/Entity/shouldRenderAtSqrDistance(D)Z: shouldRenderAtSqrDistance -> m_6783_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/getAddEntityPacket()Lnet/minecraft/network/protocol/Packet; from net/minecraft/world/entity/Entity/getAddEntityPacket()Lnet/minecraft/network/protocol/Packet;: getAddEntityPacket -> m_5654_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/defineSynchedData()V from net/minecraft/world/entity/Entity/defineSynchedData()V: defineSynchedData -> m_8097_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/entity/Entity/addAdditionalSaveData(Lnet/minecraft/nbt/CompoundTag;)V: addAdditionalSaveData -> m_7380_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/isPushable()Z from net/minecraft/world/entity/Entity/isPushable()Z: isPushable -> m_6094_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/getBoundingBoxForCulling()Lnet/minecraft/world/phys/AABB; from net/minecraft/world/entity/Entity/getBoundingBoxForCulling()Lnet/minecraft/world/phys/AABB;: getBoundingBoxForCulling -> m_6921_
+Conflicting propagated mapping for dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase/hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z from net/minecraft/world/entity/Entity/hurt(Lnet/minecraft/world/damagesource/DamageSource;F)Z: hurt -> m_6469_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockEntityBase/getUpdateTag()Lnet/minecraft/nbt/CompoundTag; from net/minecraft/world/level/block/entity/BlockEntity/getUpdateTag()Lnet/minecraft/nbt/CompoundTag;: getUpdateTag -> m_5995_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockEntityBase/load(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/level/block/entity/BlockEntity/load(Lnet/minecraft/nbt/CompoundTag;)V: load -> m_142466_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockEntityBase/saveAdditional(Lnet/minecraft/nbt/CompoundTag;)V from net/minecraft/world/level/block/entity/BlockEntity/saveAdditional(Lnet/minecraft/nbt/CompoundTag;)V: saveAdditional -> m_183515_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockEntityBase/getUpdatePacket()Lnet/minecraft/network/protocol/Packet; from net/minecraft/world/level/block/entity/BlockEntity/getUpdatePacket()Lnet/minecraft/network/protocol/Packet;: getUpdatePacket -> m_58483_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/onRemove(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V from net/minecraft/world/level/block/state/BlockBehaviour/onRemove(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;Z)V: onRemove -> m_6810_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/getStateForPlacement(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState; from net/minecraft/world/level/block/Block/getStateForPlacement(Lnet/minecraft/world/item/context/BlockPlaceContext;)Lnet/minecraft/world/level/block/state/BlockState;: getStateForPlacement -> m_5573_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/getCollisionShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape; from net/minecraft/world/level/block/state/BlockBehaviour/getCollisionShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;: getCollisionShape -> m_5939_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/getRenderShape(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/block/RenderShape; from net/minecraft/world/level/block/BaseEntityBlock/getRenderShape(Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/block/RenderShape;: getRenderShape -> m_7514_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/canSurvive(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;)Z from net/minecraft/world/level/block/state/BlockBehaviour/canSurvive(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/LevelReader;Lnet/minecraft/core/BlockPos;)Z: canSurvive -> m_7898_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/getShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape; from net/minecraft/world/level/block/state/BlockBehaviour/getShape(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;: getShape -> m_5940_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/createBlockStateDefinition(Lnet/minecraft/world/level/block/state/StateDefinition$Builder;)V from net/minecraft/world/level/block/Block/createBlockStateDefinition(Lnet/minecraft/world/level/block/state/StateDefinition$Builder;)V: createBlockStateDefinition -> m_7926_
+Conflicting propagated mapping for dev/shaurmalib/forge/graffiti/GraffitiBlockBase/use(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult; from net/minecraft/world/level/block/state/BlockBehaviour/use(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/Level;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/phys/BlockHitResult;)Lnet/minecraft/world/InteractionResult;: use -> m_6227_
+Conflicting propagated mapping for dev/shaurmalib/forge/history/MatchHistoryStore/save(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag; from net/minecraft/world/level/saveddata/SavedData/save(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;: save -> m_7176_
+Conflicting propagated mapping for software/bernie/geckolib/renderer/GeoItemRenderer/renderByItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V from net/minecraft/client/renderer/BlockEntityWithoutLevelRenderer/renderByItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V: renderByItem -> m_108829_
+Conflicting propagated mapping for dev/shaurmalib/forge/item/AnimatedGeoItemRenderer/renderByItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V from software/bernie/geckolib/renderer/GeoItemRenderer/renderByItem(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemDisplayContext;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;II)V: renderByItem -> m_108829_
+Conflicting propagated mapping for dev/shaurmalib/forge/leaderboard/HologramLocationStore/save(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag; from net/minecraft/world/level/saveddata/SavedData/save(Lnet/minecraft/nbt/CompoundTag;)Lnet/minecraft/nbt/CompoundTag;: save -> m_7176_
+Conflicting propagated mapping for dev/shaurmalib/forge/menu/AnimatedMenuButton/renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V from net/minecraft/client/gui/components/AbstractButton/renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V: renderWidget -> m_87963_
+Conflicting propagated mapping for dev/shaurmalib/forge/menu/AnimatedMenuTab/renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V from net/minecraft/client/gui/components/AbstractButton/renderWidget(Lnet/minecraft/client/gui/GuiGraphics;IIF)V: renderWidget -> m_87963_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/isPauseScreen()Z from net/minecraft/client/gui/screens/Screen/isPauseScreen()Z: isPauseScreen -> m_7043_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V from net/minecraft/client/gui/screens/Screen/render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V: render -> m_88315_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/mouseScrolled(DDD)Z from net/minecraft/client/gui/components/events/ContainerEventHandler/mouseScrolled(DDD)Z: mouseScrolled -> m_6050_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/init()V from net/minecraft/client/gui/screens/Screen/init()V: init -> m_7856_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/mouseClicked(DDI)Z from net/minecraft/client/gui/components/events/ContainerEventHandler/mouseClicked(DDI)Z: mouseClicked -> m_6375_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/mouseDragged(DDIDD)Z from net/minecraft/client/gui/components/events/ContainerEventHandler/mouseDragged(DDIDD)Z: mouseDragged -> m_7979_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/rebuildWidgets()V from net/minecraft/client/gui/screens/Screen/rebuildWidgets()V: rebuildWidgets -> m_232761_
+Conflicting propagated mapping for dev/shaurmalib/forge/modesettings/ModeSettingsScreen/mouseReleased(DDI)Z from net/minecraft/client/gui/components/events/ContainerEventHandler/mouseReleased(DDI)Z: mouseReleased -> m_6348_
+Conflicting propagated mapping for net/minecraftforge/client/gui/overlay/ForgeGui/clearCache()V from net/minecraft/client/gui/Gui/clearCache()V: clearCache -> m_93091_
+Conflicting propagated mapping for net/minecraftforge/client/gui/overlay/ForgeGui/render(Lnet/minecraft/client/gui/GuiGraphics;F)V from net/minecraft/client/gui/Gui/render(Lnet/minecraft/client/gui/GuiGraphics;F)V: render -> m_280421_
+Conflicting propagated mapping for net/minecraftforge/client/gui/overlay/ForgeGui/renderPortalOverlay(Lnet/minecraft/client/gui/GuiGraphics;F)V from net/minecraft/client/gui/Gui/renderPortalOverlay(Lnet/minecraft/client/gui/GuiGraphics;F)V: renderPortalOverlay -> m_280379_
+Conflicting propagated mapping for net/minecraftforge/client/gui/overlay/ForgeGui/renderJumpMeter(Lnet/minecraft/world/entity/PlayerRideableJumping;Lnet/minecraft/client/gui/GuiGraphics;I)V from net/minecraft/client/gui/Gui/renderJumpMeter(Lnet/minecraft/world/entity/PlayerRideableJumping;Lnet/minecraft/client/gui/GuiGraphics;I)V: renderJumpMeter -> m_280069_
+Adding extras
+Sorting
+Writing Output: C:\Users\User\Documents\￐﾿￑ﾀ￐ﾾ￑ﾔ￐ﾺ￑ﾂ￐ﾸ\￐ﾺ￐ﾾ￐ﾴ￐ﾸ ￐﾿￐ﾻ￐ﾰ￐ﾳ￑ﾖ￐ﾽ￑ﾖ￐ﾲ ￑ﾖ ￐ﾼ￐ﾾ￐ﾴ￑ﾖ￐ﾲ\shaurma-project\shaurma-lib\lib-forge\build\reobfJar\output.jar
+  META-INF/
+  META-INF/MANIFEST.MF
+  META-INF/mods.toml
+  assets/
+  assets/shaurma_lib/
+  assets/shaurma_lib/lang/
+  assets/shaurma_lib/lang/en_us.json
+  assets/shaurma_lib/lang/uk_ua.json
+  dev/
+  dev/shaurmalib/
+  dev/shaurmalib/client/
+  dev/shaurmalib/client/cinematic/
+  dev/shaurmalib/client/cinematic/CineContext.class
+  dev/shaurmalib/client/cinematic/CineCue.class
+  dev/shaurmalib/client/cinematic/CinePresets$CineHooks.class
+  dev/shaurmalib/client/cinematic/CinePresets$Timings.class
+  dev/shaurmalib/client/cinematic/CinePresets.class
+  dev/shaurmalib/client/cinematic/CineRecording$Entry.class
+  dev/shaurmalib/client/cinematic/CineRecording.class
+  dev/shaurmalib/client/cinematic/CineStep$Kind.class
+  dev/shaurmalib/client/cinematic/CineStep.class
+  dev/shaurmalib/client/cinematic/CineTimeline$1.class
+  dev/shaurmalib/client/cinematic/CineTimeline$Builder.class
+  dev/shaurmalib/client/cinematic/CineTimeline.class
+  dev/shaurmalib/common/
+  dev/shaurmalib/common/animation/
+  dev/shaurmalib/common/animation/AnimRecordPhase.class
+  dev/shaurmalib/common/animation/DeltaAngleFrame.class
+  dev/shaurmalib/common/animation/RecordSession.class
+  dev/shaurmalib/common/animation/RecordedDeltaPath.class
+  dev/shaurmalib/common/animation/RecordedPath.class
+  dev/shaurmalib/common/animation/RecordedPathFrame.class
+  dev/shaurmalib/common/blocks/
+  dev/shaurmalib/common/blocks/AnimatedBlockClipSet.class
+  dev/shaurmalib/common/blocks/AnimatedBlockState.class
+  dev/shaurmalib/common/camera/
+  dev/shaurmalib/common/camera/CameraCurveMath.class
+  dev/shaurmalib/common/camera/CameraPose.class
+  dev/shaurmalib/common/camera/DynamicCameraProfile.class
+  dev/shaurmalib/common/camera/Vec3Like.class
+  dev/shaurmalib/common/chat/
+  dev/shaurmalib/common/chat/ChatEntry.class
+  dev/shaurmalib/common/chat/ChatEntryType.class
+  dev/shaurmalib/common/chat/ChatFormatEngine.class
+  dev/shaurmalib/common/chat/ChatHistoryStore.class
+  dev/shaurmalib/common/chat/TeamChatContext.class
+  dev/shaurmalib/common/config/
+  dev/shaurmalib/common/config/CachedYamlLoader$CachedYaml.class
+  dev/shaurmalib/common/config/CachedYamlLoader.class
+  dev/shaurmalib/common/config/ConfigException.class
+  dev/shaurmalib/common/config/ConfigReloadBus$Listener.class
+  dev/shaurmalib/common/config/ConfigReloadBus.class
+  dev/shaurmalib/common/config/ModeConfigDescriptor$Builder.class
+  dev/shaurmalib/common/config/ModeConfigDescriptor.class
+  dev/shaurmalib/common/config/ShaurmaConfigTree.class
+  dev/shaurmalib/common/config/YamlConfigSection.class
+  dev/shaurmalib/common/damage/
+  dev/shaurmalib/common/damage/DamageContext$SourceKind.class
+  dev/shaurmalib/common/damage/DamageContext.class
+  dev/shaurmalib/common/damage/DamageInterceptor.class
+  dev/shaurmalib/common/damage/DamageInterceptorRegistry.class
+  dev/shaurmalib/common/entity/
+  dev/shaurmalib/common/entity/FallDirection.class
+  dev/shaurmalib/common/entity/SkinnableEntityLifetime.class
+  dev/shaurmalib/common/fx/
+  dev/shaurmalib/common/fx/PostChainEffectCauses.class
+  dev/shaurmalib/common/fx/PostChainEffectSpec.class
+  dev/shaurmalib/common/graffiti/
+  dev/shaurmalib/common/graffiti/GraffitiContentMode.class
+  dev/shaurmalib/common/graffiti/GraffitiSpec.class
+  dev/shaurmalib/common/graffiti/GraffitiTextLine$SourceType.class
+  dev/shaurmalib/common/graffiti/GraffitiTextLine.class
+  dev/shaurmalib/common/history/
+  dev/shaurmalib/common/history/MatchPlayerEntry$Builder.class
+  dev/shaurmalib/common/history/MatchPlayerEntry.class
+  dev/shaurmalib/common/history/MatchRecord$Builder.class
+  dev/shaurmalib/common/history/MatchRecord.class
+  dev/shaurmalib/common/item/
+  dev/shaurmalib/common/item/ArmOverride.class
+  dev/shaurmalib/common/item/HandSlot.class
+  dev/shaurmalib/common/item/ItemCameraSessionState.class
+  dev/shaurmalib/common/item/ItemCameraTrack$Builder.class
+  dev/shaurmalib/common/item/ItemCameraTrack$Keyframe.class
+  dev/shaurmalib/common/item/ItemCameraTrack.class
+  dev/shaurmalib/common/item/ItemDefinition$ActivateCallback.class
+  dev/shaurmalib/common/item/ItemDefinition$Builder.class
+  dev/shaurmalib/common/item/ItemDefinition.class
+  dev/shaurmalib/common/item/ItemDefinitionRegistry.class
+  dev/shaurmalib/common/item/PhantomSlotBridge.class
+  dev/shaurmalib/common/item/PlayerItemAccess.class
+  dev/shaurmalib/common/item/UseSessionEngine$AnimationResetter.class
+  dev/shaurmalib/common/item/UseSessionEngine$StepResult.class
+  dev/shaurmalib/common/item/UseSessionEngine$UseSession.class
+  dev/shaurmalib/common/item/UseSessionEngine.class
+  dev/shaurmalib/common/leaderboard/
+  dev/shaurmalib/common/leaderboard/LeaderboardEngine.class
+  dev/shaurmalib/common/leaderboard/LeaderboardEntry.class
+  dev/shaurmalib/common/leaderboard/LeaderboardType$AutoResolver.class
+  dev/shaurmalib/common/leaderboard/LeaderboardType.class
+  dev/shaurmalib/common/leaderboard/MultiRotationTracker.class
+  dev/shaurmalib/common/license/
+  dev/shaurmalib/common/license/LicenseGate.class
+  dev/shaurmalib/common/license/LicenseProvider.class
+  dev/shaurmalib/common/lifecycle/
+  dev/shaurmalib/common/lifecycle/DisconnectPolicy.class
+  dev/shaurmalib/common/lifecycle/IdleBehavior.class
+  dev/shaurmalib/common/lifecycle/JoinPolicy.class
+  dev/shaurmalib/common/lifecycle/MatchLifecycleBus$Listener.class
+  dev/shaurmalib/common/lifecycle/MatchLifecycleBus.class
+  dev/shaurmalib/common/lifecycle/MatchLifecycleState.class
+  dev/shaurmalib/common/lobby/
+  dev/shaurmalib/common/lobby/LobbySpawnPoint.class
+  dev/shaurmalib/common/lobby/LobbySpawnPointProvider.class
+  dev/shaurmalib/common/lock/
+  dev/shaurmalib/common/lock/InteractionLockRegistry.class
+  dev/shaurmalib/common/lock/LockType.class
+  dev/shaurmalib/common/markers/
+  dev/shaurmalib/common/markers/BillboardOrientation$CameraFacingAxes.class
+  dev/shaurmalib/common/markers/BillboardOrientation$FixedYawAxes.class
+  dev/shaurmalib/common/markers/BillboardOrientation$Vec3Component.class
+  dev/shaurmalib/common/markers/BillboardOrientation.class
+  dev/shaurmalib/common/markers/MarkerVisibilityPolicy.class
+  dev/shaurmalib/common/mixin/
+  dev/shaurmalib/common/mixin/MixinId.class
+  dev/shaurmalib/common/mixin/MixinToggleRegistry.class
+  dev/shaurmalib/common/mode/
+  dev/shaurmalib/common/mode/GameModeContract.class
+  dev/shaurmalib/common/modesettings/
+  dev/shaurmalib/common/modesettings/PlayerModeRow.class
+  dev/shaurmalib/common/modesettings/SettingDefinition$Builder.class
+  dev/shaurmalib/common/modesettings/SettingDefinition.class
+  dev/shaurmalib/common/modesettings/SettingOption.class
+  dev/shaurmalib/common/modesettings/SettingsSyncBridge.class
+  dev/shaurmalib/common/overlay/
+  dev/shaurmalib/common/overlay/ActionBarMessageType.class
+  dev/shaurmalib/common/overlay/AlertSpec.class
+  dev/shaurmalib/common/overlay/CountdownDigitEntry.class
+  dev/shaurmalib/common/overlay/Easing.class
+  dev/shaurmalib/common/overlay/OverlayFeed.class
+  dev/shaurmalib/common/overlay/OverlayTimings.class
+  dev/shaurmalib/common/overlay/PunchInEntry.class
+  dev/shaurmalib/common/overlay/ScreenOpenAnimator.class
+  dev/shaurmalib/common/overlay/TimedOverlayEntry.class
+  dev/shaurmalib/common/overlay/WorldTintSpec.class
+  dev/shaurmalib/common/playeranim/
+  dev/shaurmalib/common/playeranim/PoseLayerId.class
+  dev/shaurmalib/common/playeranim/PoseSource.class
+  dev/shaurmalib/common/radio/
+  dev/shaurmalib/common/radio/RadioDialogEntry.class
+  dev/shaurmalib/common/radio/RadioDialogParser$ParseResult.class
+  dev/shaurmalib/common/radio/RadioDialogParser.class
+  dev/shaurmalib/common/radio/RadioDialogRegistry.class
+  dev/shaurmalib/common/radio/RadioLangEntry.class
+  dev/shaurmalib/common/radio/RadioTriggerContext.class
+  dev/shaurmalib/common/rank/
+  dev/shaurmalib/common/rank/PlayerRankEngine$Rank.class
+  dev/shaurmalib/common/rank/PlayerRankEngine.class
+  dev/shaurmalib/common/sound/
+  dev/shaurmalib/common/sound/SoundCategoryId.class
+  dev/shaurmalib/common/sound/SoundCategoryRegistry.class
+  dev/shaurmalib/common/sound/SoundCue$Builder.class
+  dev/shaurmalib/common/sound/SoundCue.class
+  dev/shaurmalib/common/sound/SoundCueRegistry.class
+  dev/shaurmalib/common/sound/SoundStage.class
+  dev/shaurmalib/common/sound/VolumeSource.class
+  dev/shaurmalib/common/spectator/
+  dev/shaurmalib/common/spectator/SpectatorPolicy.class
+  dev/shaurmalib/common/spectator/TargetCycle.class
+  dev/shaurmalib/common/style/
+  dev/shaurmalib/common/style/HotbarLayout.class
+  dev/shaurmalib/common/style/HotbarPanelRenderer$1.class
+  dev/shaurmalib/common/style/HotbarPanelRenderer.class
+  dev/shaurmalib/common/style/StylePalette.class
+  dev/shaurmalib/common/tab/
+  dev/shaurmalib/common/tab/TabCell.class
+  dev/shaurmalib/common/tab/TabColumn.class
+  dev/shaurmalib/common/tab/TabListLineProvider.class
+  dev/shaurmalib/common/tab/TabRow$Builder.class
+  dev/shaurmalib/common/tab/TabRow.class
+  dev/shaurmalib/common/tab/TabTeamBarSpec.class
+  dev/shaurmalib/common/teleport/
+  dev/shaurmalib/common/teleport/TeleportService$TeleportReason.class
+  dev/shaurmalib/common/teleport/TeleportService$TeleportedEvent.class
+  dev/shaurmalib/common/teleport/TeleportService.class
+  dev/shaurmalib/common/teleported/
+  dev/shaurmalib/common/teleported/TeleportedEvent.class
+  dev/shaurmalib/forge/
+  dev/shaurmalib/forge/ShaurmaLib$Builder.class
+  dev/shaurmalib/forge/ShaurmaLib$Handle.class
+  dev/shaurmalib/forge/ShaurmaLib$MixinToggle.class
+  dev/shaurmalib/forge/ShaurmaLib.class
+  dev/shaurmalib/forge/ShaurmaLibMod.class
+  dev/shaurmalib/forge/animation/
+  dev/shaurmalib/forge/animation/AnimationRecordFacade$ActiveRecording.class
+  dev/shaurmalib/forge/animation/AnimationRecordFacade$Mode.class
+  dev/shaurmalib/forge/animation/AnimationRecordFacade$RecordCallbacks.class
+  dev/shaurmalib/forge/animation/AnimationRecordFacade$SaveTarget.class
+  dev/shaurmalib/forge/animation/AnimationRecordFacade.class
+  dev/shaurmalib/forge/animation/RecordedPathJson.class
+  dev/shaurmalib/forge/blocks/
+  dev/shaurmalib/forge/blocks/AnimatedBlockEntityBase$1.class
+  dev/shaurmalib/forge/blocks/AnimatedBlockEntityBase.class
+  dev/shaurmalib/forge/camera/
+  dev/shaurmalib/forge/camera/CameraOwner.class
+  dev/shaurmalib/forge/camera/CameraOwnershipRegistry$OwnershipToken.class
+  dev/shaurmalib/forge/camera/CameraOwnershipRegistry.class
+  dev/shaurmalib/forge/camera/CinematicPathController.class
+  dev/shaurmalib/forge/camera/DynamicCameraController.class
+  dev/shaurmalib/forge/camera/EntitySpectateController.class
+  dev/shaurmalib/forge/camera/FreeCameraEntity.class
+  dev/shaurmalib/forge/camera/FreeFlyCameraController.class
+  dev/shaurmalib/forge/camera/StationaryCameraController.class
+  dev/shaurmalib/forge/camera/motion/
+  dev/shaurmalib/forge/camera/motion/BezierApproachMotion.class
+  dev/shaurmalib/forge/camera/motion/CameraVecAdapter.class
+  dev/shaurmalib/forge/camera/motion/LoopPathMotion.class
+  dev/shaurmalib/forge/camera/motion/PathMotion.class
+  dev/shaurmalib/forge/chat/
+  dev/shaurmalib/forge/chat/ChatModule$ChatDisplaySink.class
+  dev/shaurmalib/forge/chat/ChatModule.class
+  dev/shaurmalib/forge/client/
+  dev/shaurmalib/forge/client/chat/
+  dev/shaurmalib/forge/client/chat/ChatHistoryScreen$1.class
+  dev/shaurmalib/forge/client/chat/ChatHistoryScreen.class
+  dev/shaurmalib/forge/client/chat/ChatScreenInterceptHandler.class
+  dev/shaurmalib/forge/command/
+  dev/shaurmalib/forge/command/ShaurmaCommandRoot$SettingsAction.class
+  dev/shaurmalib/forge/command/ShaurmaCommandRoot$StartAction.class
+  dev/shaurmalib/forge/command/ShaurmaCommandRoot$StopAction.class
+  dev/shaurmalib/forge/command/ShaurmaCommandRoot.class
+  dev/shaurmalib/forge/config/
+  dev/shaurmalib/forge/config/ConfigModule.class
+  dev/shaurmalib/forge/damage/
+  dev/shaurmalib/forge/damage/DamageGuardHooks.class
+  dev/shaurmalib/forge/damage/GunDamageBridge.class
+  dev/shaurmalib/forge/entity/
+  dev/shaurmalib/forge/entity/invisiblezone/
+  dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase$ExternalHitBridge.class
+  dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase$ZoneShapeDescriptor.class
+  dev/shaurmalib/forge/entity/invisiblezone/InvisibleZoneEntityBase.class
+  dev/shaurmalib/forge/entity/skinnable/
+  dev/shaurmalib/forge/entity/skinnable/SkinnableEntityBase.class
+  dev/shaurmalib/forge/fx/
+  dev/shaurmalib/forge/fx/ScreenEffectPostChain$1.class
+  dev/shaurmalib/forge/fx/ScreenEffectPostChain$ChainState.class
+  dev/shaurmalib/forge/fx/ScreenEffectPostChain.class
+  dev/shaurmalib/forge/graffiti/
+  dev/shaurmalib/forge/graffiti/GraffitiBlockBase$1.class
+  dev/shaurmalib/forge/graffiti/GraffitiBlockBase.class
+  dev/shaurmalib/forge/graffiti/GraffitiBlockEntityBase.class
+  dev/shaurmalib/forge/graffiti/GraffitiClientCacheBridge$Listener.class
+  dev/shaurmalib/forge/graffiti/GraffitiClientCacheBridge.class
+  dev/shaurmalib/forge/graffiti/GraffitiCodec.class
+  dev/shaurmalib/forge/graffiti/GraffitiFileStore.class
+  dev/shaurmalib/forge/graffiti/GraffitiSyncManager.class
+  dev/shaurmalib/forge/graffiti/GraffitiTransferManager.class
+  dev/shaurmalib/forge/history/
+  dev/shaurmalib/forge/history/MatchExtraCodec.class
+  dev/shaurmalib/forge/history/MatchHistoryStore.class
+  dev/shaurmalib/forge/item/
+  dev/shaurmalib/forge/item/AnimUtils.class
+  dev/shaurmalib/forge/item/AnimatedGeoItem.class
+  dev/shaurmalib/forge/item/AnimatedGeoItemRenderer.class
+  dev/shaurmalib/forge/item/ItemAnimationEngine.class
+  dev/shaurmalib/forge/item/ItemCameraController.class
+  dev/shaurmalib/forge/item/ItemLeftArmHideEngine.class
+  dev/shaurmalib/forge/item/PlayerItemAccessImpl$Snapshot.class
+  dev/shaurmalib/forge/item/PlayerItemAccessImpl.class
+  dev/shaurmalib/forge/leaderboard/
+  dev/shaurmalib/forge/leaderboard/HologramLocationStore$HologramPoint.class
+  dev/shaurmalib/forge/leaderboard/HologramLocationStore.class
+  dev/shaurmalib/forge/license/
+  dev/shaurmalib/forge/license/LicenseModule.class
+  dev/shaurmalib/forge/lobby/
+  dev/shaurmalib/forge/lobby/LobbyModule.class
+  dev/shaurmalib/forge/lock/
+  dev/shaurmalib/forge/lock/InteractionLockHooks.class
+  dev/shaurmalib/forge/lock/InteractionLockModule.class
+  dev/shaurmalib/forge/lock/PlayerFreezeService.class
+  dev/shaurmalib/forge/markers/
+  dev/shaurmalib/forge/markers/MarkerRenderRules$1.class
+  dev/shaurmalib/forge/markers/MarkerRenderRules$2.class
+  dev/shaurmalib/forge/markers/MarkerRenderRules$CameraFacingDrawer.class
+  dev/shaurmalib/forge/markers/MarkerRenderRules$FixedYawDrawer.class
+  dev/shaurmalib/forge/markers/MarkerRenderRules$Located.class
+  dev/shaurmalib/forge/markers/MarkerRenderRules$YawLocated.class
+  dev/shaurmalib/forge/markers/MarkerRenderRules.class
+  dev/shaurmalib/forge/markers/WorldBillboardPrimitives.class
+  dev/shaurmalib/forge/menu/
+  dev/shaurmalib/forge/menu/AnimatedMenuButton.class
+  dev/shaurmalib/forge/menu/AnimatedMenuTab.class
+  dev/shaurmalib/forge/mixin/
+  dev/shaurmalib/forge/mixin/MixinChatComponent.class
+  dev/shaurmalib/forge/mixin/MixinItemInHandRenderer.class
+  dev/shaurmalib/forge/mixin/MixinSoundEngineDuckOnStart.class
+  dev/shaurmalib/forge/mixin/PostChainAccessor.class
+  dev/shaurmalib/forge/mixin/ShaurmaLibMixinPlugin.class
+  dev/shaurmalib/forge/mixin/SoundEngineAccessor.class
+  dev/shaurmalib/forge/mixin/SoundManagerAccessor.class
+  dev/shaurmalib/forge/mode/
+  dev/shaurmalib/forge/mode/DisconnectHandler.class
+  dev/shaurmalib/forge/mode/GameModeContract.class
+  dev/shaurmalib/forge/mode/GameModeRegistry.class
+  dev/shaurmalib/forge/mode/LifecycleModule.class
+  dev/shaurmalib/forge/mode/ModeCommandContribution.class
+  dev/shaurmalib/forge/mode/ModeContractModule.class
+  dev/shaurmalib/forge/mode/ModeDeactivationListener.class
+  dev/shaurmalib/forge/mode/PlayerJoinFlow$1.class
+  dev/shaurmalib/forge/mode/PlayerJoinFlow.class
+  dev/shaurmalib/forge/mode/PlayerLifecycleModule.class
+  dev/shaurmalib/forge/mode/PlayerReturnFlow$1.class
+  dev/shaurmalib/forge/mode/PlayerReturnFlow$StatePreserver.class
+  dev/shaurmalib/forge/mode/PlayerReturnFlow.class
+  dev/shaurmalib/forge/mode/PostModeSwitchListener.class
+  dev/shaurmalib/forge/modesettings/
+  dev/shaurmalib/forge/modesettings/ModeSettingsModule.class
+  dev/shaurmalib/forge/modesettings/ModeSettingsScreen.class
+  dev/shaurmalib/forge/module/
+  dev/shaurmalib/forge/module/AnimatedBlockModuleHook.class
+  dev/shaurmalib/forge/module/AnimatedItemModuleHook.class
+  dev/shaurmalib/forge/module/ArchitectureSniffer$SnifferResult.class
+  dev/shaurmalib/forge/module/ArchitectureSniffer.class
+  dev/shaurmalib/forge/module/ChatModuleHook.class
+  dev/shaurmalib/forge/module/CinematicModuleHook.class
+  dev/shaurmalib/forge/module/CommandModuleHook.class
+  dev/shaurmalib/forge/module/ConfigTreeHook.class
+  dev/shaurmalib/forge/module/DamageModuleHook.class
+  dev/shaurmalib/forge/module/FMLModuleContext.class
+  dev/shaurmalib/forge/module/FreecamModuleHook.class
+  dev/shaurmalib/forge/module/GraffitiModuleHook.class
+  dev/shaurmalib/forge/module/InteractionLockModuleHook.class
+  dev/shaurmalib/forge/module/InvisibleZoneModuleHook.class
+  dev/shaurmalib/forge/module/LeaderboardModuleHook.class
+  dev/shaurmalib/forge/module/LicenseModuleHook.class
+  dev/shaurmalib/forge/module/LifecycleModuleHook.class
+  dev/shaurmalib/forge/module/MarkersModuleHook.class
+  dev/shaurmalib/forge/module/MatchHistoryModuleHook.class
+  dev/shaurmalib/forge/module/MethodContext.class
+  dev/shaurmalib/forge/module/ModeContractModuleHook.class
+  dev/shaurmalib/forge/module/ModeSettingsModuleHook.class
+  dev/shaurmalib/forge/module/OverlayModuleHook.class
+  dev/shaurmalib/forge/module/RadioModuleHook.class
+  dev/shaurmalib/forge/module/ScreenEffectModuleHook.class
+  dev/shaurmalib/forge/module/SkinnableEntityModuleHook.class
+  dev/shaurmalib/forge/module/SpectatorModuleHook.class
+  dev/shaurmalib/forge/module/StyleModuleHook.class
+  dev/shaurmalib/forge/module/TeleportModuleHook.class
+  dev/shaurmalib/forge/network/
+  dev/shaurmalib/forge/network/ShaurmaLibNetwork.class
+  dev/shaurmalib/forge/network/packets/
+  dev/shaurmalib/forge/network/packets/ChatBroadcastPacket$ClientHandler.class
+  dev/shaurmalib/forge/network/packets/ChatBroadcastPacket.class
+  dev/shaurmalib/forge/network/packets/ChatSendPacket.class
+  dev/shaurmalib/forge/network/packets/GraffitiImageChunkPacket.class
+  dev/shaurmalib/forge/network/packets/GraffitiImageStartPacket.class
+  dev/shaurmalib/forge/network/packets/GraffitiRemovePacket.class
+  dev/shaurmalib/forge/network/packets/GraffitiRequestImagePacket.class
+  dev/shaurmalib/forge/network/packets/GraffitiSyncPacket.class
+  dev/shaurmalib/forge/network/packets/ItemAnimPacket$ClientHandler.class
+  dev/shaurmalib/forge/network/packets/ItemAnimPacket.class
+  dev/shaurmalib/forge/network/packets/PlaySoundPacket.class
+  dev/shaurmalib/forge/network/packets/RadioDialogPacket$ClientHandler.class
+  dev/shaurmalib/forge/network/packets/RadioDialogPacket$LangEntry.class
+  dev/shaurmalib/forge/network/packets/RadioDialogPacket.class
+  dev/shaurmalib/forge/network/packets/RadioDialogStopPacket$ClientHandler.class
+  dev/shaurmalib/forge/network/packets/RadioDialogStopPacket.class
+  dev/shaurmalib/forge/network/packets/StopSoundPacket$ClientHandler.class
+  dev/shaurmalib/forge/network/packets/StopSoundPacket.class
+  dev/shaurmalib/forge/overlay/
+  dev/shaurmalib/forge/overlay/ActionBarMessageSystem$Supplier.class
+  dev/shaurmalib/forge/overlay/ActionBarMessageSystem.class
+  dev/shaurmalib/forge/overlay/AlertNotificationSystem.class
+  dev/shaurmalib/forge/overlay/AnimatedCountdownSystem.class
+  dev/shaurmalib/forge/overlay/OverlayEngine$Entry.class
+  dev/shaurmalib/forge/overlay/OverlayEngine$OverlayRenderable.class
+  dev/shaurmalib/forge/overlay/OverlayEngine.class
+  dev/shaurmalib/forge/overlay/OverlayPanelStyle.class
+  dev/shaurmalib/forge/overlay/VanillaHudCancelModule.class
+  dev/shaurmalib/forge/overlay/WorldTintOverlay$Active.class
+  dev/shaurmalib/forge/overlay/WorldTintOverlay.class
+  dev/shaurmalib/forge/playeranim/
+  dev/shaurmalib/forge/playeranim/PlayerPoseController$LayerEntry.class
+  dev/shaurmalib/forge/playeranim/PlayerPoseController.class
+  dev/shaurmalib/forge/playeranim/PlayerPoseEvents.class
+  dev/shaurmalib/forge/radio/
+  dev/shaurmalib/forge/radio/RadioAudioDucking.class
+  dev/shaurmalib/forge/radio/RadioDialogConfigLoader.class
+  dev/shaurmalib/forge/radio/RadioDialogManager.class
+  dev/shaurmalib/forge/radio/RadioDialogOverlay$TickListener.class
+  dev/shaurmalib/forge/radio/RadioDialogOverlay.class
+  dev/shaurmalib/forge/radio/RadioVoiceVolumeProvider.class
+  dev/shaurmalib/forge/sound/
+  dev/shaurmalib/forge/sound/SoundCategoryDucker$TickListener.class
+  dev/shaurmalib/forge/sound/SoundCategoryDucker.class
+  dev/shaurmalib/forge/sound/SoundCenter.class
+  dev/shaurmalib/forge/spectator/
+  dev/shaurmalib/forge/spectator/SpectatorSessionController$ActiveSession.class
+  dev/shaurmalib/forge/spectator/SpectatorSessionController$SavedState.class
+  dev/shaurmalib/forge/spectator/SpectatorSessionController.class
+  dev/shaurmalib/forge/style/
+  dev/shaurmalib/forge/style/StyleTheme.class
+  dev/shaurmalib/forge/tab/
+  dev/shaurmalib/forge/tab/TabListStyle.class
+  dev/shaurmalib/forge/teleport/
+  dev/shaurmalib/forge/teleport/TeleportReason.class
+  dev/shaurmalib/forge/teleport/TeleportService.class
+  dev/shaurmalib/forge/teleport/TeleportedEvent.class
+  shaurma_lib.mixins.json
+  shaurma_lib.refmap.json

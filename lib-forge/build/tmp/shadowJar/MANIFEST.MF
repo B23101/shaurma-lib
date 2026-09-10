@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Specification-Title: shaurma_lib
+Implementation-Title: lib-forge
+Implementation-Version: 0.1.0-SNAPSHOT
+Implementation-Vendor: shaurma-lib
+MixinConfigs: shaurma_lib.mixins.json
+

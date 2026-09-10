@@ -4,7 +4,6 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
     id 'org.spongepowered.mixin' version '0.7.+'
     id 'com.github.johnrengelman.shadow' version '8.1.1'
-    id 'maven-publish'
 }
 
 base {
@@ -128,48 +127,7 @@ tasks.named('build').configure {
     dependsOn tasks.named('reobfShadowJar')
 }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
-            artifactId = 'shaurma-lib-forge'
-            version = project.version
-            groupId = project.group
-            artifact reobfShadowJar
-            pom {
-                name = 'ShaurmaLib For Forge'
-                description = 'Common library for Forge mods'
-                url = 'https://github.com/OWNER/shaurma-lib'
-                licenses {
-                    license {
-                        name = 'MIT'
-                        url = 'https://mit-license.org/'
-                    }
-                }
-                developers {
-                    developer {
-                        id = 'OWNER'
-                        name = 'OWNER'
-                    }
-                }
-                scm {
-                    connection = 'scm:git:git@github.com:OWNER/shaurma-lib.git'
-                    developerConnection = 'scm:git:git@github.com:OWNER/shaurma-lib.git'
-                    url = 'https://github.com/OWNER/shaurma-lib'
-                }
-            }
-        }
-    }
-    repositories {
-        maven {
-            name = 'github'
-            url = 'https://maven.pkg.github.com/OWNER/shaurma-lib'
-            credentials {
-                username = System.getenv('GITHUB_ACTOR') ?: project.findProperty('gpr.user') ?: ''
-                password = System.getenv('GITHUB_TOKEN') ?: project.findProperty('gpr.key') ?: ''
-            }
-        }
-    }
-}
+
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
