@@ -1,0 +1,78 @@
+// lib-common — ЧИСТИЙ модуль без Forge-специфічних імпортів (план, п. 0 і 2.1).
+//
+// Правило (перевіряється Architecture Sniffer таскою нижче):
+//   жоден клас у цьому модулі не імпортує net.minecraftforge.*
+//
+// Тут живе: конфіги (SnakeYAML-обгортки над YAML-деревом на диску),
+// доменні контракти (GameModeContract, ModeConfigDescriptor, MatchLifecycleState,
+// LicenseProvider) і чисті обчислення. net.minecraft.* (офіційні Mojang класи)
+// можна імпортувати — вони спільні для Forge і Fabric, це і є основа майбутньої
+// Fabric-портованості без переписування бізнес-логіки.
+//
+// lib-common НЕ компілюється як окремий jar із залежностями — це вихідний код,
+// який компілюється РАЗОМ у lib-forge (через `implementation project(':lib-common')`).
+
+plugins {
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+}
+
+minecraft {
+    // Той самий mappings channel/версія що і lib-forge та snipers_shaurma —
+    // без цього lib-common не може компілюватись окремим jar-ом, а саме так
+    // його споживає lib-forge через `implementation project(':lib-common')`.
+    mappings channel: 'official', version: '1.20.1'
+}
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://maven.minecraftforge.net/' }
+}
+
+dependencies {
+    // net.minecraft.* (ServerLevel/ServerPlayer/Component/Vec3/...) — офіційні
+    // Mojang-класи, спільні для Forge і Fabric, тому вони законно імпортуються
+    // в lib-common (план, п. 0). Без цього класспасу модуль не компілюється.
+    // Як і в lib-forge — це compile-time залежність, у jar не потрапляє.
+    minecraft "net.minecraftforge:forge:1.20.1-47.3.0"
+
+    // SnakeYAML потрібен для ShaurmaConfigTree/YamlConfigSection.
+    // compileOnly тут, бо реальне вшивання (shade) відбувається на боці lib-forge,
+    // так само як зараз snipers_shaurma сама вшиває snakeyaml через shadowJar.
+    compileOnly 'org.yaml:snakeyaml:2.2'
+}
+
+// ── Architecture Sniffer ────────────────────────────────────────────────
+// Гарантія майбутньої Fabric-портованості: жоден .java файл у lib-common
+// не повинен містити "net.minecraftforge" імпорт. Порушення = build fail.
+tasks.register('architectureSniffer') {
+    group = 'verification'
+    description = 'Перевіряє що lib-common не містить Forge-специфічних імпортів'
+    doLast {
+        def importPattern = java.util.regex.Pattern.compile('^\\s*import\\s+net\\.minecraftforge\\..*;\\s*$')
+        def offenders = []
+        fileTree('src/main/java').matching { include '**/*.java' }.forEach { file ->
+            file.eachLine { line ->
+                // Лише реальні import-рядки — не докстрінги/коментарі/рядкові
+                // літерали, що ЗГАДУЮТЬ "net.minecraftforge" як текст (наприклад
+                // самі докстрінги ChatEntry/RadioLangEntry, що пояснюють це
+                // правило). Наївний line.contains('net.minecraftforge') хибно
+                // спрацьовував саме на них — build падав без жодного реального
+                // порушення.
+                if (importPattern.matcher(line).matches()) {
+                    offenders << "${file.path}: ${line.trim()}"
+                }
+            }
+        }
+        if (!offenders.isEmpty()) {
+            throw new GradleException(
+                "Architecture Sniffer: знайдено Forge-імпорти у lib-common " +
+                "(порушує Fabric-портованість):\n" + offenders.join('\n')
+            )
+        }
+        println "Architecture Sniffer: OK, 0 Forge-імпортів у lib-common (${fileTree('src/main/java').matching { include '**/*.java' }.files.size()} файлів перевірено)."
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn 'architectureSniffer'
+}

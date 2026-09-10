@@ -1,0 +1,9 @@
+{
+  "gui.shaurma_lib.chat.title": "Чат",
+  "gui.shaurma_lib.chat.input_hint": "Повідомлення...",
+  "gui.shaurma_lib.chat.mode_global": "Надсилання: Global",
+  "gui.shaurma_lib.chat.mode_team": "Надсилання: Team",
+  "gui.shaurma_lib.chat.btn_global": "Global",
+  "gui.shaurma_lib.chat.btn_team": "Team",
+  "gui.shaurma_lib.chat.empty_history": "Повідомлень ще немає."
+}

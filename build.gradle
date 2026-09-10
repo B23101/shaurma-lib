@@ -1,0 +1,30 @@
+// shaurma-lib — кореневий build.gradle.
+//
+// Реальна збірка відбувається в підмодулях:
+//   lib-common — чистий Java, 0 forge-імпортів (Architecture Sniffer це перевіряє)
+//   lib-forge  — Forge 1.20.1 mod-jar, той самий toolchain що і в snipers_shaurma
+//                (mappings official 1.20.1, mixin 0.8.5, shadow 8.1.1, Java 17)
+//
+// Тут лежить лише спільне для обох підмодулів.
+
+allprojects {
+    group = 'dev.shaurmalib'
+    version = '0.1.0-SNAPSHOT'
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(17)
+        withSourcesJar()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    repositories {
+        mavenCentral()
+    }
+}

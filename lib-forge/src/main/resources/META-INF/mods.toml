@@ -1,0 +1,55 @@
+modLoader = "javafml"
+loaderVersion = "[47,)"
+license = "All rights reserved"
+issueTrackerURL = "https://github.com/your-org/shaurma-lib/issues"
+
+[[mods]]
+modId = "shaurma_lib"
+version = "${file.jarVersion}"
+displayName = "Shaurma Lib"
+description = '''
+Спільна бібліотека для моду Snipers Shaurma та будь-якого іншого режиму
+(наприклад maniac-mode), що будується на тій же архітектурі: конфіги,
+TeleportService, контракт режимів (GameModeContract), match-lifecycle,
+ліцензійний гейт, анімовані предмети — і далі за етапами плану.
+
+Нічого не активується автоматично — кожен споживач явно викликає
+ShaurmaLib.init(...) у своєму @Mod-конструкторі і перелічує потрібні
+модулі через withXxx(...). Не запитаний модуль не реєструє жодних
+event-listeners, network-каналів чи конфігів.
+'''
+authors = "shaurma-lib contributors"
+
+[[dependencies.shaurma_lib]]
+    modId = "forge"
+    mandatory = true
+    versionRange = "[47,)"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.shaurma_lib]]
+    modId = "minecraft"
+    mandatory = true
+    versionRange = "[1.20.1,1.20.2)"
+    ordering = "NONE"
+    side = "BOTH"
+
+# GeckoLib і PlayerAnimator — опційні на рівні mods.toml (mandatory=false),
+# бо конкретний withXxx(...) модуль, який їх реально потребує (item.animated,
+# playeranim, blocks.animated), ще не підключений на цьому етапі плану.
+# Коли ці модулі буде додано (Етап 3-4), залежність стане mandatory=true —
+# зараз тримати її обов'язковою означало б, що жоден споживач не може
+# підключити лише config+teleport+mode+lifecycle+license без GeckoLib у classpath.
+[[dependencies.shaurma_lib]]
+    modId = "geckolib"
+    mandatory = false
+    versionRange = "[4.0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.shaurma_lib]]
+    modId = "playeranimator"
+    mandatory = false
+    versionRange = "[1.0,)"
+    ordering = "AFTER"
+    side = "BOTH"

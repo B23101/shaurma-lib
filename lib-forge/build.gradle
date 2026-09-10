@@ -1,0 +1,176 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'maven-publish'
+}
+
+base {
+    archivesName = 'shaurma-lib-forge'
+}
+
+minecraft {
+    // Той самий mappings channel/версія що і snipers_shaurma — обов'язково,
+    // інакше mixin refmap і навіть прості типи в сигнатурах (ServerLevel,
+    // ServerPlayer, ...) не гарантовано збігаються між lib і споживачем.
+    mappings channel: 'official', version: '1.20.1'
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.allowAccessTransformer', 'true'
+            mods {
+                "shaurma_lib" {
+                    source sourceSets.main
+                }
+            }
+        }
+        client {}
+        server { args '--nogui' }
+    }
+}
+
+mixin {
+    add sourceSets.main, "shaurma_lib.refmap.json"
+}
+
+repositories {
+    mavenCentral()
+    // GeckoLib — потрібен для item.animated / blocks.animated / entity.skinnable модулів.
+    maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+    // PlayerAnimationLib (KosmX) — потрібен для playeranim модуля.
+    maven { url 'https://maven.kosmx.dev/' }
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:1.20.1-47.3.0"
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    // lib-common — джерело контрактів/даних, компілюється разом у цей jar.
+    implementation project(':lib-common')
+
+    // SnakeYAML — вшивається (shade) так само, як зараз у snipers_shaurma,
+    // щоб і lib, і мод-споживач не тягли дублікат/конфлікт версій рантайму.
+    shade 'org.yaml:snakeyaml:2.2'
+
+    // GeckoLib і PlayerAnimator: compileOnly, бо це "provided"-залежності —
+    // кожен мод-споживач (snipers_shaurma, maniac-mode) сам додає їх версію
+    // у своєму build.gradle через fg.deobf(...), lib-forge лише компілюється
+    // проти їхнього API, не вшиває і не форсує конкретну версію.
+    compileOnly fg.deobf("software.bernie.geckolib:geckolib-forge-1.20.1:4.7.2")
+    compileOnly fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:1.0.2-rc1+1.20")
+}
+
+// lib-common компілюється окремим jar-ом, але в продакшн-артефакт lib-forge
+// його класи мають ПОТРАПЛЯТИ (план: "lib-common — це вихідний код, який
+// компілюється РАЗОМ у lib-forge") — інакше в /mods лежить jar без жодного
+// dev.shaurmalib.common.* класу і перший же виклик будь-якого модуля кидає
+// NoClassDefFoundError. Shadow-конфігурація тягне лише shade-залежності
+// (snakeyaml), тому класи lib-common додаються явно через sourceSets.output
+// в обидва артефакти (slim jar і shadowJar).
+def commonOutput = project(':lib-common').sourceSets.main.output
+
+tasks.named('jar', Jar).configure {
+    archiveClassifier = 'slim'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from commonOutput
+    manifest {
+        attributes([
+                "Specification-Title"   : "shaurma_lib",
+                "Implementation-Title"  : project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor" : "shaurma-lib",
+                // Див. коментар у snipers_shaurma/build.gradle: без явного
+                // MixinConfigs у маніфесті продакшн-jar Mixin Service Forge
+                // 1.20.1 не гарантовано підхоплює shaurma_lib.mixins.json.
+                "MixinConfigs"          : "shaurma_lib.mixins.json"
+        ])
+    }
+}
+
+shadowJar {
+    archiveClassifier = ''
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    configurations = [project.configurations.shade]
+    from commonOutput
+    relocate 'org.yaml.snakeyaml', 'dev.shaurmalib.libs.snakeyaml'
+    mergeServiceFiles()
+    manifest {
+        attributes([
+                "Specification-Title"   : "shaurma_lib",
+                "Implementation-Title"  : project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor" : "shaurma-lib",
+                "MixinConfigs"          : "shaurma_lib.mixins.json"
+        ])
+    }
+}
+
+reobf {
+    shadowJar {}
+}
+
+tasks.named('shadowJar').configure {
+    dependsOn tasks.named('jar')
+}
+tasks.named('build').configure {
+    dependsOn tasks.named('reobfShadowJar')
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = 'shaurma-lib-forge'
+            version = project.version
+            groupId = project.group
+            artifact reobfShadowJar
+            pom {
+                name = 'ShaurmaLib For Forge'
+                description = 'Common library for Forge mods'
+                url = 'https://github.com/OWNER/shaurma-lib'
+                licenses {
+                    license {
+                        name = 'MIT'
+                        url = 'https://mit-license.org/'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'OWNER'
+                        name = 'OWNER'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git@github.com:OWNER/shaurma-lib.git'
+                    developerConnection = 'scm:git:git@github.com:OWNER/shaurma-lib.git'
+                    url = 'https://github.com/OWNER/shaurma-lib'
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'github'
+            url = 'https://maven.pkg.github.com/OWNER/shaurma-lib'
+            credentials {
+                username = System.getenv('GITHUB_ACTOR') ?: project.findProperty('gpr.user') ?: ''
+                password = System.getenv('GITHUB_TOKEN') ?: project.findProperty('gpr.key') ?: ''
+            }
+        }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
