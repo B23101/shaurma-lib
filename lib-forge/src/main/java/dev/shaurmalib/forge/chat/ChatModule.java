@@ -55,7 +55,19 @@ public final class ChatModule {
      * (наприклад — уже наявний {@code AlertNotificationOverlay} у
      * snipers, щоб UX і фід лишились рівно тими самими, що й раніше).
      */
-    @OnlyIn(Dist.CLIENT)
+    // БЕЗ @OnlyIn! Хоча реалізації цього інтерфейсу — клієнтські, САМ тип
+    // стоїть у сигнатурі спільного методу
+    // ShaurmaLib.Builder.withChatDisplaySink(ChatDisplaySink), який викликає
+    // КОЖЕН консюмер (у т.ч. на виділеному сервері — звичайно всередині
+    // DistExecutor). Якщо позначити інтерфейс @OnlyIn(CLIENT), Forge's
+    // RuntimeDistCleaner виріже його з серверного рантайму, і створення
+    // мод-класу консюмера падає ще до старту:
+    //   "Attempted to load class dev/shaurmalib/forge/chat/ChatModule$ChatDisplaySink
+    //    for invalid dist DEDICATED_SERVER"
+    // (Forge рефлектується по конструктору @Mod-класу і резолвить типи з
+    // constant pool). Клієнтську поведінку це не послаблює — її досі
+    // вмикає лише @OnlyIn(Dist.CLIENT) attachDisplaySink(...) під
+    // isClientDist()-перевіркою у Builder.build().
     public interface ChatDisplaySink {
         void display(Component message, int accentArgb);
     }

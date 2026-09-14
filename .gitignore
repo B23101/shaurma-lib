@@ -1,0 +1,24 @@
+# Gradle
+.gradle/
+build/
+*/build/
+gradle-app.setting
+.gradletasknamecache
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.eclipse/
+bin/
+.settings/
+
+# Середовище виконання
+run/
+runs/
+
+# Локальні архіви/звіти
+*.zip

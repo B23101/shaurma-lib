@@ -29,13 +29,29 @@ public final class StationaryCameraController implements CameraOwner {
     private FreeCameraEntity freeCamera;
     private CameraOwnershipRegistry.OwnershipToken token;
 
-    /** Вмикає фри-камеру на заданій позиції. Якщо вже активна — спершу вимикає стару. */
+    /**
+     * Вмикає фри-камеру на заданій позиції. Якщо вже активна — спершу
+     * деспаунить стару entity й тихо знімає старий запис зі стека
+     * ({@link CameraOwnershipRegistry#discardSilently}, БЕЗ виклику
+     * resumeOwnership наступного власника чи падіння на гравця) — щоб
+     * не було видимого проміжного кадру між старою і новою сесією цього
+     * контролера (джерело нюансу: {@code SDRoundCameraManager.startIdle()}
+     * викликає {@code stopInternal(false)} саме з цією метою при рестарті
+     * intro-камери нового раунду поки попередня ще не DONE). Використання
+     * звичайного {@link CameraOwnershipRegistry#release} тут замість
+     * {@code discardSilently} спричиняло б саме такий небажаний стрибок.
+     */
     public void enable(float x, float y, float z, float yaw, float pitch) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null || mc.player == null) return;
 
         if (token != null) {
-            disableInternal(false);
+            if (freeCamera != null) {
+                freeCamera.despawn();
+                freeCamera = null;
+            }
+            CameraOwnershipRegistry.discardSilently(token);
+            token = null;
         }
 
         ClientLevel level = (ClientLevel) mc.level;
@@ -57,14 +73,32 @@ public final class StationaryCameraController implements CameraOwner {
         disableInternal(true);
     }
 
+    /**
+     * ВАЖЛИВО (антистрибок фікс, збережений з оригінального
+     * {@code KitSelectCameraManager.disableInternal}): {@link CameraOwnershipRegistry#release}
+     * ВИКЛИКАЄТЬСЯ ПЕРШИМ — воно само перемикає {@code mc.setCameraEntity(...)}
+     * на наступного власника/гравця (через {@code resumeTopOrPlayer()}/
+     * {@code resumeOwnership()}) — і лише ПІСЛЯ цього деспаунимо
+     * {@link #freeCamera}. Якщо деспаунити першим, між {@code discard()} і
+     * подальшим {@code setCameraEntity()} є мікрофрейм, де Minecraft сам
+     * автоматично перемикає камеру на гравця (бачачи видалену camera
+     * entity) — і коли {@code release()} відпрацьовує вже ПІСЛЯ цього, він
+     * або дублює той самий {@code setCameraEntity(player)} (непомітно), або,
+     * якщо стек не порожній, ще й одразу перебиває щойно застосований
+     * ванільний авто-скид новим {@code setCameraEntity(nextOwner)} — тобто
+     * гравець встигає побачити один кадр на власному тілі перед тим, як
+     * камера "стрибне" до наступного власника. Порядок нижче усуває обидва
+     * випадки: камера вже стоїть на правильній цілі до того, як стара
+     * FreeCameraEntity взагалі видаляється зі світу.
+     */
     private void disableInternal(boolean releaseOwnership) {
-        if (freeCamera != null) {
-            freeCamera.despawn();
-            freeCamera = null;
-        }
         if (releaseOwnership && token != null) {
             CameraOwnershipRegistry.release(token);
             token = null;
+        }
+        if (freeCamera != null) {
+            freeCamera.despawn();
+            freeCamera = null;
         }
     }
 

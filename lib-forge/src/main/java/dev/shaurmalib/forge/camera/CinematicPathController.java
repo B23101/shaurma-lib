@@ -34,12 +34,28 @@ public final class CinematicPathController implements CameraOwner {
     private long startTimeMs;
     private boolean moving;
 
-    /** Стартує камеру на {@code from} і починає рух до {@code to} за {@code durationMs}. */
+    /**
+     * Стартує камеру на {@code from} і починає рух до {@code to} за
+     * {@code durationMs}. Якщо вже активна (рестарт кінематики поки
+     * попередня ще не {@code stop()}) — тихо знімає стару camera entity й
+     * старий запис у {@link CameraOwnershipRegistry} через
+     * {@link CameraOwnershipRegistry#discardSilently} (БЕЗ виклику
+     * resumeOwnership/падіння на гравця), щоб не було видимого проміжного
+     * кадру між старою і новою сесією — той самий нюанс, що й у
+     * {@code StationaryCameraController.enable()}.
+     */
     public void start(Vec3 from, float fromYaw, float fromPitch, Vec3 to, float toYaw, float toPitch, int durationMs) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.level == null) return;
 
-        if (token != null) stopInternal(false);
+        if (token != null) {
+            if (freeCamera != null) {
+                freeCamera.despawn();
+                freeCamera = null;
+            }
+            CameraOwnershipRegistry.discardSilently(token);
+            token = null;
+        }
 
         CameraPose fromPose = CameraVecAdapter.pose(from, fromYaw, fromPitch);
         CameraPose toPose = CameraVecAdapter.pose(to, toYaw, toPitch);
@@ -70,19 +86,30 @@ public final class CinematicPathController implements CameraOwner {
     public boolean isMoving() { return moving; }
     public boolean isActive() { return token != null; }
 
-    /** Вимикає камеру і повертає керування гравцю (консюмер сам ховає перехід, напр. fade-to-black). */
+    /**
+     * Вимикає камеру і повертає керування гравцю (консюмер сам ховає
+     * перехід, напр. fade-to-black).
+     * <p>
+     * ВАЖЛИВО (той самий антистрибок фікс, що й у
+     * {@code StationaryCameraController.disableInternal} — джерело:
+     * оригінальний {@code KitSelectCameraManager.disableInternal}):
+     * {@link CameraOwnershipRegistry#release} викликається ПЕРШИМ — воно
+     * саме перемикає {@code mc.setCameraEntity(...)} на наступного
+     * власника/гравця — і лише ПІСЛЯ цього деспаунимо {@link #freeCamera}.
+     * Зворотний порядок залишає мікрофрейм, де Minecraft сам автоматично
+     * скидає камеру на гравця одразу після {@code discard()}, а вже потім
+     * {@code release()} перебиває цей авто-скид власним викликом — гравець
+     * встигає побачити зайвий кадр на власному тілі перед стрибком до
+     * фактичного наступного власника.
+     */
     public void stop() {
-        stopInternal(true);
-    }
-
-    private void stopInternal(boolean releaseOwnership) {
+        if (token != null) {
+            CameraOwnershipRegistry.release(token);
+            token = null;
+        }
         if (freeCamera != null) {
             freeCamera.despawn();
             freeCamera = null;
-        }
-        if (releaseOwnership && token != null) {
-            CameraOwnershipRegistry.release(token);
-            token = null;
         }
         moving = false;
     }

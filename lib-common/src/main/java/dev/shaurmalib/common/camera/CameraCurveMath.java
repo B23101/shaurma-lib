@@ -44,6 +44,29 @@ public final class CameraCurveMath {
                 : 1f - (float) Math.pow(-2f * t + 2f, 3) / 2f;
     }
 
+    /**
+     * Кубічний ease-out — швидкий старт, плавне гальмування до кінця (без
+     * прискорення на вході, на відміну від {@link #easeInOutCubic}).
+     * Джерело: ідентичні приватні копії {@code DropAnimationHandler.easeOutCubic}
+     * і {@code DeathCameraHandler.easeOutCubic} (обидві використовують цю
+     * криву для дистанції камери від рухомої референс-точки — TOP/ZOOM фази
+     * дропу, підйом RISE над трупом) — узагальнено сюди, щоб
+     * {@code FollowEntityMotion} (lib-forge) не тримав третю копію тієї ж формули.
+     */
+    public static float easeOutCubic(float t) {
+        float f = 1f - t;
+        return 1f - f * f * f;
+    }
+
+    /**
+     * Квадратичний ease-in — повільний старт, швидке посилення до кінця.
+     * Джерело: {@code DeathCameraHandler.easeInQuad} (контузійний блюр
+     * протягом усієї анімації смерті, vignette-прогрес).
+     */
+    public static float easeInQuad(float t) {
+        return t * t;
+    }
+
     /** Інтерполяція кута коротким шляхом по колу (уникає "перекруту" на 350°). */
     public static float lerpAngleShortest(float a, float b, float t) {
         float diff = ((b - a + 540f) % 360f) - 180f;

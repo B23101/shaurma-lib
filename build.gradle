@@ -9,7 +9,10 @@
 
 allprojects {
     group = 'dev.shaurmalib'
-    version = '0.1.0-SNAPSHOT'
+    // Версія — з gradle.properties (єдине місце редагування).
+    // -SNAPSHOT робить артефакт "changing module": консюмер ніколи не
+    // вказує нову версію, Gradle сам тягне найсвіжіший SNAPSHOT.
+    version = findProperty('libVersion') ?: '0.1.0-SNAPSHOT'
 }
 
 subprojects {

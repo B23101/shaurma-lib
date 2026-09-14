@@ -970,6 +970,12 @@ public final class ShaurmaLib {
             return this;
         }
 
+        /** Чи поточний рантайм — клієнт (визначає, чи можна торкатись @OnlyIn(CLIENT) класів). */
+        private static boolean isClientDist() {
+            return net.minecraftforge.fml.loading.FMLEnvironment.dist
+                    == net.minecraftforge.api.distmarker.Dist.CLIENT;
+        }
+
         private void requireOverlays(String callerMethod) {
             if (!overlaysEnabled) {
                 throw new IllegalStateException(
@@ -1003,22 +1009,38 @@ public final class ShaurmaLib {
             if (animatedItemsEnabled && phantomSlotBridge != null) {
                 ItemAnimationEngine.registerPhantomSlotBridge(phantomSlotBridge);
             }
-            if (actionBarEnabled) {
-                ActionBarMessageSystem.attach();
-            }
-            if (animatedCountdownEnabled) {
-                AnimatedCountdownSystem.attach();
-            }
-            for (String tintId : worldTintChannels) {
-                WorldTintOverlay.attach(tintId);
+
+            // ── Клієнтські підмодулі — ЛИШЕ за наявності клієнта ─────────
+            // Усі класи нижче — @OnlyIn(Dist.CLIENT): на виділеному сервері
+            // Forge їх ВИРІЗАЄ з рантайм-класів, тому будь-який прямий виклик
+            // зі спільного шляху валить запуск сервера
+            // NoClassDefFoundError-ом. Раніше build() викликав їх
+            // безумовно — тобто будь-який мод, що підключав withOverlays()
+            // (або withActionBarMessages/withAnimatedCountdown/withWorldTint/
+            // withRadio/withChatDisplaySink), падав на дедіку. Тепер
+            // клієнтські підмодулі підключаються лише на клієнті;
+            // серверний бік (мережеві канали, реєстри даних, статичні API)
+            // і так не залежить від жодного з них.
+            if (isClientDist()) {
+                if (actionBarEnabled) {
+                    ActionBarMessageSystem.attach();
+                }
+                if (animatedCountdownEnabled) {
+                    AnimatedCountdownSystem.attach();
+                }
+                for (String tintId : worldTintChannels) {
+                    WorldTintOverlay.attach(tintId);
+                }
+                if (radioEnabled) {
+                    RadioAudioDucking.configure(radioVolumeProvider, radioStartSound, radioNoiseSound, radioEndSound);
+                    RadioDialogOverlay.attach(radioOverlayVisible);
+                }
+                if (chatDisplaySink != null) {
+                    ChatModule.attachDisplaySink(chatDisplaySink);
+                }
             }
             if (chatEnabled) {
-                ChatModule.attachDisplaySink(chatDisplaySink);
                 ChatModule.attach(chatTeamContext, chatFeedId);
-            }
-            if (radioEnabled) {
-                RadioAudioDucking.configure(radioVolumeProvider, radioStartSound, radioNoiseSound, radioEndSound);
-                RadioDialogOverlay.attach(radioOverlayVisible);
             }
             if (graffitiEnabled) {
                 dev.shaurmalib.forge.graffiti.GraffitiSyncManager.bind(

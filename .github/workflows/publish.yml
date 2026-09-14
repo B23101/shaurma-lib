@@ -1,0 +1,40 @@
+name: Publish to GitHub Packages
+
+# Автопублікація бібліотеки: кожен push у main → новий SNAPSHOT у GitHub
+# Packages. Саме завдяки цьому мод-консюмер (і мод друга) НЕ змінює версію
+# у своєму build.gradle — він завжди залежить від 0.1.0-SNAPSHOT і отримує
+# найсвіжішу збірку при кожному перезбиранні.
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build library
+        run: ./gradlew build --no-daemon
+
+      - name: Publish to GitHub Packages
+        run: ./gradlew publish --no-daemon
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -127,8 +127,80 @@ tasks.named('build').configure {
     dependsOn tasks.named('reobfShadowJar')
 }
 
-
-
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  Публікація у GitHub Packages
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Публікується reobfShadowJar, а не slim-jar чи необфускований shadowJar:
+// у ньому вже лежать класи lib-common, релокований snakeyaml,
+// shaurma_lib.mixins.json, MixinConfigs у маніфесті та Forge-реобфускація.
+// Саме цей артефакт консюмер кладе на compile classpath і в /mods.
+//
+// Координати:  dev.shaurmalib:shaurma-lib-forge:<libVersion>
+// Репозиторій: https://maven.pkg.github.com/<githubOwner>/<githubRepo>
+//
+// Локально:
+//     ./gradlew publish
+// або точково:
+//     ./gradlew publishMavenJavaPublicationToGitHubPackagesRepository
+//
+// Credentials беруться з env (GITHUB_ACTOR/GITHUB_TOKEN — у GitHub Actions
+// вони є автоматично) або з ~/.gradle/gradle.properties (gpr.user/gpr.key).
+apply plugin: 'maven-publish'
+
+def ghOwner = findProperty('githubOwner') ?: 'B23101'
+def ghRepo  = findProperty('githubRepo')  ?: 'shaurma-lib'
+
+def ghUsername = findProperty('gpr.user') ?: System.getenv('GITHUB_ACTOR')
+def ghPassword = findProperty('gpr.key')  ?: System.getenv('GITHUB_TOKEN')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId    = 'dev.shaurmalib'
+            artifactId = 'shaurma-lib-forge'
+            // version успадковується з allprojects (gradle.properties: libVersion)
+
+            // ГОЛОВНИЙ артефакт — повний reobfShadowJar
+            // (lib-common + relocated snakeyaml + Forge reobfuscation).
+            def reobfArtifact = layout.buildDirectory.file('reobfShadowJar/output.jar')
+            artifact(reobfArtifact) {
+                builtBy tasks.named('reobfShadowJar')
+            }
+            // Sources — щоб консюмер бачив докстрінги модулів прямо в IDE.
+            artifact tasks.named('sourcesJar')
+
+            pom {
+                name        = 'ShaurmaLib For Forge'
+                description = 'Спільна бібліотека модулів для Forge 1.20.1 модів (Builder-ініціалізація, конфіги, телепорт, анімовані предмети, оверлеї, радіо-диктор, камера тощо).'
+                url         = "https://github.com/${ghOwner}/${ghRepo}"
+                licenses {
+                    license {
+                        name = 'All Rights Reserved'
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url  = uri("https://maven.pkg.github.com/${ghOwner}/${ghRepo}")
+            credentials {
+                username = ghUsername
+                password = ghPassword
+            }
+        }
+    }
+}
+
+// Публікація можлива лише ГОТОВИМ REOBF-артефактом — прив'язуємо її до
+// reobfShadowJar, щоб `publish` ніколи не вистрілив зі старим jar.
+tasks.withType(PublishToMavenRepository).configureEach {
+    dependsOn tasks.named('reobfShadowJar')
 }

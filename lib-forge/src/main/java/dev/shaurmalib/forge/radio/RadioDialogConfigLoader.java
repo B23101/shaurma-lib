@@ -83,7 +83,18 @@ public final class RadioDialogConfigLoader {
             Map<String, Object> root = (Map<String, Object>) new Yaml()
                     .load(new String(in.readAllBytes(), StandardCharsets.UTF_8));
             RadioDialogRegistry.load(root);
-            RadioAudioDucking.setDuckRatio(RadioDialogRegistry.getDuckRatio());
+            // Duck-ratio — суто клієнтська настройка (керує приглушенням
+            // звукових категорій через SoundManager), а цей метод викликається
+            // також на ВИДІЛЕНОМУ сервері. RadioAudioDucking позначений
+            // @OnlyIn(CLIENT), тому Forge's RuntimeDistCleaner перетворює саме
+            // завантаження класу на RuntimeException ("Attempted to load class
+            // ... for invalid dist DEDICATED_SERVER") — і валило весь розбір
+            // radio_dialogs.yml. Гілка на сервері не виконується, тож клас там
+            // навіть не завантажується.
+            if (net.minecraftforge.fml.loading.FMLEnvironment.dist
+                    == net.minecraftforge.api.distmarker.Dist.CLIENT) {
+                RadioAudioDucking.setDuckRatio(RadioDialogRegistry.getDuckRatio());
+            }
             LOGGER.info("[RadioDialog] Завантажено {} реплік з {}",
                     RadioDialogRegistry.getAll().size(), configFile.getPath());
         } catch (Exception e) {

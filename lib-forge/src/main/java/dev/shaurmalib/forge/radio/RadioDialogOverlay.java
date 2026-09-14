@@ -75,6 +75,33 @@ public class RadioDialogOverlay {
     private long showStartMs = 0L;
     private long hideStartMs = 0L;
 
+    /**
+     * Слухач стану "диктор говорить" — оригінал snipers тримав для цього
+     * окремий статичний клас {@code RadioDialogState}, який читав
+     * GeckoLib-контролер 3D-моделі рації ({@code CommanderRadioItem}), щоб
+     * перемикати анімації {@code idle}/{@code talking}. Бібліотека не
+     * хардкодить жодного предмета-моделі консюмера (у іншого моду може
+     * взагалі не бути такої моделі), тому просто повідомляє того, хто
+     * підписався: {@code true} — репліка друкується (модель "говорить"),
+     * {@code false} — ні.
+     * <p>
+     * Підписатися треба з КЛІЄНТСЬКОГО коду консюмера (клас @OnlyIn(CLIENT)),
+     * наприклад:
+     * <pre>{@code
+     * RadioDialogOverlay.setTalkingListener(MyRadioState::setTalking);
+     * }</pre>
+     */
+    public static void setTalkingListener(java.util.function.Consumer<Boolean> listener) {
+        talkingListener = listener;
+    }
+
+    private static java.util.function.Consumer<Boolean> talkingListener;
+
+    private void notifyTalking(boolean talking) {
+        java.util.function.Consumer<Boolean> l = talkingListener;
+        if (l != null) l.accept(talking);
+    }
+
     private RadioDialogOverlay() {}
 
     /**
@@ -137,7 +164,10 @@ public class RadioDialogOverlay {
     }
 
     public void tick() {
-        if (!active) return;
+        if (!active) {
+            notifyTalking(false);
+            return;
+        }
         RadioAudioDucking.tick();
         if (fadingIn) {
             fadeProgress += 1f / ANIM_TICKS;
@@ -156,6 +186,7 @@ public class RadioDialogOverlay {
                 fadingOut = false;
                 active = false;
                 RadioAudioDucking.stop();
+                notifyTalking(false);
                 return;
             }
         }
@@ -172,6 +203,10 @@ public class RadioDialogOverlay {
         for (int i = 0; i < charIndex && i < charAnim.length; i++) {
             if (charAnim[i] < 1f) charAnim[i] = Math.min(1f, charAnim[i] + 0.22f);
         }
+
+        // Модель-консюмер «говорить», поки репліка ще друкується (той самий
+        // критерій `typing && active`, що й у RadioDialogState оригіналу).
+        notifyTalking(typing && active);
 
         // Скрол рахується тут (не в render!), синхронно з lastKnownAvailableW,
         // яке оновлюється в render() кожен кадр — уникає розбіжності
