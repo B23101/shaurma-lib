@@ -13,6 +13,7 @@ import dev.shaurmalib.forge.network.packets.PlaySoundPacket;
 import dev.shaurmalib.forge.network.packets.RadioDialogPacket;
 import dev.shaurmalib.forge.network.packets.RadioDialogStopPacket;
 import dev.shaurmalib.forge.network.packets.StopSoundPacket;
+import dev.shaurmalib.forge.network.packets.StaminaSyncPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -73,6 +74,8 @@ public final class ShaurmaLibNetwork {
         CHANNEL.registerMessage(nextId++, InventorySlotAllocationPacket.class,
                 InventorySlotAllocationPacket::encode, InventorySlotAllocationPacket::decode,
                 InventorySlotAllocationPacket::handle);
+        CHANNEL.registerMessage(nextId++, StaminaSyncPacket.class,
+                StaminaSyncPacket::encode, StaminaSyncPacket::decode, StaminaSyncPacket::handle);
         // Наступні модулі (worldtint, mode settings, ...)
         // додають свій registerMessage(nextId++, ...) тут, у порядку
         // впровадження — ID мають лишатись стабільними між релізами lib,

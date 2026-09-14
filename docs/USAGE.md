@@ -907,10 +907,21 @@ ShaurmaLib.attachVanillaHudCancel(() -> chatActive);
 
 ### 3.27. `InventorySlotAllocation` — персональні слоти гравця
 
+Спочатку підключіть модуль у builder. Це лише додає можливість API і не
+обмежує жодного гравця автоматично:
+
+```java
+ShaurmaLib.Handle lib = ShaurmaLib.init("mymod", modEventBus)
+        .withInventorySlotAllocation()
+        .build();
+```
+
 Модуль обмежує інвентар **окремого** гравця. Сервер відхиляє кліки по
 недозволених слотах, забороняє небезпечні mass-transfer операції
-(`shift-click`, quick-craft, double-click pickup), а клієнт не відкриває
-ванільний екран інвентаря і показує лише виділені hotbar-слоти.
+(`shift-click`, quick-craft, double-click pickup), а клієнтський mixin
+блокує викидання предметів до відправлення пакета, тому предмет не зникає
+візуально. HUD показує лише виділені hotbar-слоти та не дозволяє вибрати
+заблокований слот.
 
 ```java
 // 0 — жодного hotbar-слоту; залишається лише рука без видимого hotbar.
@@ -929,14 +940,254 @@ InventorySlotAllocation.clear(player);
 Індекси vanilla inventory: `0..8` — hotbar, `9..35` — основний інвентар,
 `36..39` — броня, `40` — offhand. Вміст недозволених слотів не видаляється.
 За замовчуванням стандартний екран інвентаря заблокований; якщо він потрібен
-для конкретного режиму, після розподілення викличте:
+для конкретного режиму, після розподілення викличте. Для `0..9` hotbar-слотів
+це означає "доступна лише рука/hotbar", а весь vanilla inventory screen
+залишається заблокованим, доки його явно не розблокувати:
 
 ```java
 InventorySlotAllocation.setInventoryScreenBlocked(player, false);
 ```
 
+Викидання також заблоковане за замовчуванням. Його можна дозволити окремо:
+
+```java
+InventorySlotAllocation.setItemDropBlocked(player, false);
+```
+
+Якщо замість повного блокування потрібен власний екран, на клієнті один раз
+зареєструйте фабрику:
+
+```java
+ShaurmaLib.setInventoryScreenFactory(MyInventoryScreen::new);
+```
+
+Передача `null` повертає режим повного блокування vanilla-екрана.
+
+Повністю власний вигляд hotbar можна підключити на клієнті:
+
+```java
+InventorySlotAllocationClientHooks.setCustomHotbarRenderer(
+        (graphics, minecraft, allowedSlots, partialTick, width, height) -> {
+            // allowedSlots містить фізичні слоти vanilla: 0..8.
+            // Тут мод малює власні текстури, предмети, анімації та selection.
+        });
+```
+
+Якщо renderer не зареєстрований, використовується стандартний renderer
+бібліотеки. Переданий список слотів незмінний; серверне обмеження все одно
+перевіряється незалежно від клієнтського рендера.
+
 Для контейнерів типу скрині `shift-click` навмисно заблокований повністю:
 звичайне переміщення предметів мишкою в дозволені слоти залишається доступним.
+
+### 3.28. `Stamina` — витрата та відновлення енергії
+
+`Stamina` — серверний opt-in модуль. Він не активує витрату stamina для
+гравців лише через наявність бібліотеки. Подієві hooks підключені в jar-і,
+але залишаються бездіяльними, доки мод не викличе `withStamina(...)`.
+
+#### Підключення
+
+```java
+import dev.shaurmalib.forge.ShaurmaLib;
+import dev.shaurmalib.forge.stamina.StaminaRules;
+import dev.shaurmalib.forge.stamina.StaminaService;
+
+ShaurmaLib.Handle lib = ShaurmaLib.init("mymod", modEventBus)
+        .withStamina()
+        .build();
+```
+
+`withStamina()` вмикає стандартні правила. Якщо потрібні інші дефолти для
+всіх гравців, передайте їх одразу:
+
+```java
+ShaurmaLib.Handle lib = ShaurmaLib.init("mymod", modEventBus)
+        .withStamina(StaminaRules.builder()
+                .maxStamina(100)
+                .drainPerSecond(20)
+                .recoveryPerSecond(25)
+                .emptyRecoveryDelaySeconds(3)
+                .recoveryDelaySeconds(2)
+                .build())
+        .build();
+```
+
+#### Правила `StaminaRules`
+
+`StaminaRules` — immutable record із builder-ом. Усі числові значення
+перевіряються: `maxStamina` має бути більше `0`, інші параметри не можуть
+бути від’ємними або `NaN`/Infinity.
+
+| Параметр | Одиниця | Поведінка |
+|---|---:|---|
+| `active` | boolean | Чи працює stamina для гравця. `false` вимикає drain і regen, але не змінює ванільний sprint/hunger. |
+| `maxStamina` | stamina | Верхня межа значення. |
+| `drainPerSecond` | stamina/сек | Витрата під час sprint. `0` повністю вимикає витрату. |
+| `recoveryPerSecond` | stamina/сек | Швидкість відновлення після затримки. |
+| `emptyRecoveryDelaySeconds` | сек | Затримка після досягнення `0`. |
+| `recoveryDelaySeconds` | сек | Затримка після використання, якщо залишилась stamina. |
+| `recoveryEnabled` | boolean | Дозволяє або повністю забороняє regen. |
+| `forceFullHungerWhileActive` | boolean | Кожен тик підтримує hunger `20` і saturation `5`, коли правила active. Це замінює hunger-обмеження sprint. |
+| `blockJumpWhenDepleted` | boolean | Серверно блокує стрибок, коли правила active і stamina дорівнює `0`. За замовчуванням `false`. |
+
+Приклад повних правил:
+
+```java
+StaminaRules gameRules = StaminaRules.builder()
+        .active(true)
+        .maxStamina(100)
+        .drainPerSecond(20)
+        .recoveryPerSecond(25)
+        .emptyRecoveryDelaySeconds(3)
+        .recoveryDelaySeconds(2)
+        .recoveryEnabled(true)
+        .forceFullHungerWhileActive(true)
+        .blockJumpWhenDepleted(true)
+        .build();
+```
+
+#### Правила для конкретного гравця
+
+`setRules` призначає правила конкретному `ServerPlayer` і синхронізує
+оновлений стан. Це потрібно викликати при вході гравця в lobby/game:
+
+```java
+StaminaService.setRules(player, gameRules);
+
+StaminaRules lobbyRules = StaminaRules.builder()
+        .active(false)
+        .build();
+StaminaService.setRules(player, lobbyRules);
+```
+
+Правила **не зберігаються в NBT**: це навмисно, бо правила належать режиму,
+а не гравцю. Після relog/restart мод має повторно призначити правила режиму.
+Поточне числове значення stamina зберігається в persistent player data.
+
+#### Значення stamina
+
+```java
+float current = StaminaService.getStamina(player);
+float maximum = StaminaService.getMaxStamina(player);
+boolean active = StaminaService.isActive(player);
+
+StaminaService.setStamina(player, 50.0f);
+StaminaService.setStaminaPercent(player, 0.5f);
+StaminaService.setStamina(player, 0.0f);
+```
+
+`setStamina` автоматично обмежує значення діапазоном `0..maxStamina`.
+Від’ємні значення не падають із помилкою — вони стають `0`; значення вище
+максимуму стає `maxStamina`. `NaN`/Infinity відхиляються exception-ом.
+
+За замовчуванням зменшення stamina вручну починає нову recovery-затримку.
+Для адміністративного/синхронізаційного встановлення без скидання таймера:
+
+```java
+StaminaService.setStamina(player, value, false);
+```
+
+`syncNow(player)` примусово повторно відправляє стан клієнту. `clear(player)`
+видаляє персональні правила, runtime-значення та persistent stamina і
+вимикає HUD для цього клієнта.
+
+#### Серверна механіка по тиках
+
+На `PlayerTickEvent.END` сервер:
+
+1. пропускає creative/spectator без drain/regen і вимикає їхній HUD;
+2. якщо `active=false`, не торкається stamina або vanilla hunger;
+3. якщо гравець спринтує не на vehicle і stamina `>0`, віднімає
+   `drainPerSecond / 20`;
+4. при досягненні `0` примусово вимикає sprint;
+5. якщо sprint-клавіша залишилась затиснута, сервер все одно не вважає
+   гравця спринтером при `0`, тому recovery запускається;
+6. після відповідної затримки додає `recoveryPerSecond / 20`;
+7. не дозволяє значенню вийти за межі `0..maxStamina`;
+8. синхронізує тільки змінений стан, а при login робить forced sync.
+
+Коли `drainPerSecond=0`, sprint не створює drain і не блокує regen.
+Коли `recoveryEnabled=false`, recovery не відбувається навіть після
+повного виснаження, але drain продовжується.
+
+Якщо `blockJumpWhenDepleted(true)`, клієнтський і серверний mixin скасовують
+`jumpFromGround` для гравця при `0` stamina. Клієнт не починає стрибок
+візуально, а сервер додатково перевіряє правило. Це не змінює витрату stamina:
+стрибки не списують stamina автоматично, а лише можуть бути заборонені після
+виснаження. При `false` стрибки працюють як у vanilla.
+
+У поточному API drain підключений тільки до sprint. Стрибки, плавання,
+атаки, mining і використання предметів не витрачають stamina автоматично:
+це навмисно не вигадується бібліотекою без правил конкретної гри. Для таких
+дій мод може сам зменшити значення через `setStamina(...)`, після чого
+бібліотека застосує звичайну recovery-затримку.
+
+#### Hunger і sprint
+
+`forceFullHungerWhileActive(true)` кожен серверний тик встановлює hunger
+`20` і saturation `5`. Це потрібно для режимів, де stamina повністю замінює
+vanilla sprint hunger gate. Після переходу на `active(false)` бібліотека
+не відновлює попередній hunger автоматично — мод режиму має сам задати
+потрібний рівень через `player.getFoodData()`.
+
+При `forceFullHungerWhileActive(false)` hunger не змінюється бібліотекою:
+Minecraft сам забороняє sprint при hunger нижче ванільного порога.
+
+#### Клієнтська синхронізація і HUD
+
+Сервер відправляє `StaminaSyncPacket` із `active`, `stamina` та
+`maxStamina`. Клієнтський стан доступний через:
+
+```java
+StaminaSyncPacket.ClientState.isActive();
+StaminaSyncPacket.ClientState.getStamina();
+StaminaSyncPacket.ClientState.getMaxStamina();
+```
+
+Пакет не приймає команди від клієнта: клієнт не може змінити stamina.
+При logout client state очищається.
+
+За замовчуванням бібліотека показує просту stamina-панель над hotbar. Її
+можна повністю замінити:
+
+```java
+StaminaClientHooks.setRenderer(
+        (graphics, minecraft, stamina, maxStamina, partialTick, width, height) -> {
+            // Власний bar, текстури та анімації.
+        });
+```
+
+Renderer викликається після vanilla hotbar лише коли stamina active:
+
+```java
+StaminaClientHooks.setRenderer(
+        (graphics, minecraft, stamina, maxStamina, partialTick, width, height) -> {
+            if (maxStamina <= 0) return;
+            float progress = stamina / maxStamina;
+            // Власні texture, animation, colors і позиція.
+        });
+```
+
+Передані `stamina` та `maxStamina` приходять із сервера. Renderer не є
+механікою stamina і не може дозволити sprint або змінити значення.
+Передача `null` повертає стандартний renderer бібліотеки.
+
+#### Lifecycle і очищення
+
+`StaminaHooks` обробляє:
+
+| Подія | Дія |
+|---|---|
+| `PlayerTickEvent.END` | drain/regen на сервері |
+| `PlayerLoggedInEvent` | forced sync клієнта |
+| `PlayerLoggedOutEvent` | очищення runtime maps без видалення persistent stamina |
+| client `LoggingOut` | очищення клієнтського HUD state |
+
+`clear(player)` використовуйте при остаточному виході з режиму, якщо stamina
+не повинна переноситись у наступну сесію. `setRules(active(false))`
+використовуйте для lobby, якщо значення потрібно зберегти до повернення в
+гру.
 
 ---
 

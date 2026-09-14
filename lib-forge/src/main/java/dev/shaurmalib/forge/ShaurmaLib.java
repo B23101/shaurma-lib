@@ -11,6 +11,9 @@ import dev.shaurmalib.forge.chat.ChatModule;
 import dev.shaurmalib.forge.client.chat.ChatScreenInterceptHandler;
 import dev.shaurmalib.forge.config.ConfigModule;
 import dev.shaurmalib.forge.item.ItemAnimationEngine;
+import dev.shaurmalib.forge.inventory.InventorySlotAllocation;
+import dev.shaurmalib.forge.stamina.StaminaRules;
+import dev.shaurmalib.forge.stamina.StaminaService;
 import dev.shaurmalib.forge.license.LicenseModule;
 import dev.shaurmalib.forge.lobby.LobbyModule;
 import dev.shaurmalib.forge.lock.InteractionLockModule;
@@ -187,6 +190,9 @@ public final class ShaurmaLib {
         private final java.util.List<String> worldTintChannels = new java.util.ArrayList<>();
         private PhantomSlotBridge<ServerPlayer> phantomSlotBridge;
         private boolean radioEnabled = false;
+        private boolean inventorySlotAllocationEnabled = false;
+        private boolean staminaEnabled = false;
+        private StaminaRules staminaRules;
         private RadioVoiceVolumeProvider radioVolumeProvider;
         private SoundEvent radioStartSound;
         private SoundEvent radioNoiseSound;
@@ -730,6 +736,30 @@ public final class ShaurmaLib {
         }
 
         /**
+         * Вмикає API розподілу hotbar-слотів між гравцями. Сам виклик не
+         * призначає жодних обмежень: консюмер окремо викликає
+         * {@link InventorySlotAllocation#setHotbarSlotCount} або
+         * {@link InventorySlotAllocation#setAllowedSlots}.
+         */
+        public Builder withInventorySlotAllocation() {
+            this.inventorySlotAllocationEnabled = true;
+            return this;
+        }
+
+        public Builder withStamina() {
+            return withStamina(StaminaRules.defaults());
+        }
+
+        public Builder withStamina(StaminaRules rules) {
+            if (rules == null) {
+                throw new IllegalArgumentException("Правила stamina не можуть бути null.");
+            }
+            this.staminaEnabled = true;
+            this.staminaRules = rules;
+            return this;
+        }
+
+        /**
          * Опційний anti-dupe міст до продуктово-специфічних "фантомних"
          * слотів споживача (як параглайдер/зіплайн по F/G у snipers,
          * див. {@link PhantomSlotBridge}). Викликати ЛИШЕ якщо
@@ -1006,6 +1036,12 @@ public final class ShaurmaLib {
         }
 
         public Handle build() {
+            if (inventorySlotAllocationEnabled) {
+                InventorySlotAllocation.enable();
+            }
+            if (staminaEnabled) {
+                StaminaService.enable(staminaRules);
+            }
             if (animatedItemsEnabled && phantomSlotBridge != null) {
                 ItemAnimationEngine.registerPhantomSlotBridge(phantomSlotBridge);
             }
@@ -1052,7 +1088,7 @@ public final class ShaurmaLib {
                     animatedBlocksEnabled, skinnableEntitiesEnabled, graffitiEnabled, animationRecordingEnabled, spectatorEnabled, screenEffectsEnabled,
                     configModule, modeContractModule,
                     lifecycleModule, licenseModule, lobbyModule, playerLifecycleModule, interactionLockModule,
-                    modeSettingsModule);
+                    modeSettingsModule, inventorySlotAllocationEnabled, staminaEnabled);
         }
     }
 
@@ -1152,6 +1188,22 @@ public final class ShaurmaLib {
     }
 
     /**
+     * Встановлює клієнтський екран, який відкривається замість vanilla
+     * inventory screen, коли розподіл слотів заблокував інвентар.
+     * Передавати {@code null}, щоб повністю блокувати відкриття.
+     */
+    public static void setInventoryScreenFactory(java.util.function.Supplier<?> screenFactory) {
+        if (net.minecraftforge.fml.loading.FMLEnvironment.dist
+                != net.minecraftforge.api.distmarker.Dist.CLIENT) {
+            throw new IllegalStateException("Inventory screen factory доступний лише на клієнті.");
+        }
+        @SuppressWarnings("unchecked")
+        java.util.function.Supplier<? extends net.minecraft.client.gui.screens.Screen> factory =
+                (java.util.function.Supplier<? extends net.minecraft.client.gui.screens.Screen>) screenFactory;
+        dev.shaurmalib.forge.inventory.InventorySlotAllocationClientHooks.setCustomInventoryScreen(factory);
+    }
+
+    /**
      * Оброблений handle з доступом до активованих модулів. Виклик гетера
      * ще не активованого модуля кидає {@link IllegalStateException} із
      * зрозумілим повідомленням, яку саме {@code withXxx(...)} треба було
@@ -1182,6 +1234,8 @@ public final class ShaurmaLib {
         private final boolean animationRecordingEnabled;
         private final boolean spectatorEnabled;
         private final boolean screenEffectsEnabled;
+        private final boolean inventorySlotAllocationEnabled;
+        private final boolean staminaEnabled;
         private final ConfigModule configModule;
         private final ModeContractModule modeContractModule;
         private final LifecycleModule lifecycleModule;
@@ -1205,7 +1259,9 @@ public final class ShaurmaLib {
                         ModeContractModule modeContractModule, LifecycleModule lifecycleModule,
                         LicenseModule licenseModule, LobbyModule lobbyModule,
                         PlayerLifecycleModule playerLifecycleModule, InteractionLockModule interactionLockModule,
-                        ModeSettingsModule modeSettingsModule) {
+                        ModeSettingsModule modeSettingsModule,
+                        boolean inventorySlotAllocationEnabled,
+                        boolean staminaEnabled) {
             this.consumerModId = consumerModId;
             this.eventBus = eventBus;
             this.teleportEnabled = teleportEnabled;
@@ -1228,6 +1284,8 @@ public final class ShaurmaLib {
             this.animationRecordingEnabled = animationRecordingEnabled;
             this.spectatorEnabled = spectatorEnabled;
             this.screenEffectsEnabled = screenEffectsEnabled;
+            this.inventorySlotAllocationEnabled = inventorySlotAllocationEnabled;
+            this.staminaEnabled = staminaEnabled;
             this.configModule = configModule;
             this.modeContractModule = modeContractModule;
             this.lifecycleModule = lifecycleModule;
@@ -1240,6 +1298,14 @@ public final class ShaurmaLib {
 
         public String consumerModId() {
             return consumerModId;
+        }
+
+        public boolean inventorySlotAllocationEnabled() {
+            return inventorySlotAllocationEnabled;
+        }
+
+        public boolean staminaEnabled() {
+            return staminaEnabled;
         }
 
         public IEventBus eventBus() {

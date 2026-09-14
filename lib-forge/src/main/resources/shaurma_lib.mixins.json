@@ -8,6 +8,8 @@
   "mixins": [],
   "client": [
     "MixinItemInHandRenderer",
+    "MixinLocalPlayerInventoryDrop",
+    "MixinLivingEntityStaminaJump",
     "MixinChatComponent",
     "MixinSoundEngineDuckOnStart",
     "SoundEngineAccessor",
@@ -17,6 +19,7 @@
   "server": [
     "MixinAbstractContainerMenu",
     "MixinServerGamePacketListenerImpl",
+    "MixinLivingEntityStaminaJump",
     "SlotContainerAccess"
   ]
 }

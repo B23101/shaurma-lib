@@ -31,10 +31,20 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class InventorySlotAllocation {
 
     private static final Map<UUID, Allocation> ALLOCATIONS = new ConcurrentHashMap<>();
+    private static volatile boolean enabled;
 
     private InventorySlotAllocation() {}
 
+    public static void enable() {
+        enabled = true;
+    }
+
+    public static boolean isEnabled() {
+        return enabled;
+    }
+
     public static void setHotbarSlotCount(ServerPlayer player, int count) {
+        requireEnabled();
         if (count < 0 || count > 9) {
             throw new IllegalArgumentException("Кількість hotbar-слотів має бути від 0 до 9.");
         }
@@ -53,6 +63,7 @@ public final class InventorySlotAllocation {
     public static void setAllowedSlots(ServerPlayer player,
                                        Collection<Integer> slots,
                                        boolean blockInventoryScreen) {
+        requireEnabled();
         if (player == null || slots == null) {
             throw new IllegalArgumentException("Гравець і slots не можуть бути null.");
         }
@@ -65,18 +76,30 @@ public final class InventorySlotAllocation {
             copy.add(slot);
         }
 
-        Allocation allocation = new Allocation(copy, blockInventoryScreen);
+        Allocation allocation = new Allocation(copy, blockInventoryScreen, true);
         ALLOCATIONS.put(player.getUUID(), allocation);
         normalizeSelectedSlot(player, allocation);
         syncToClient(player, allocation);
     }
 
     public static void setInventoryScreenBlocked(ServerPlayer player, boolean blocked) {
+        requireEnabled();
         Allocation current = ALLOCATIONS.get(player.getUUID());
         if (current == null) {
             return;
         }
-        Allocation updated = new Allocation(current.allowedSlots, blocked);
+        Allocation updated = new Allocation(current.allowedSlots, blocked, current.blockItemDrop);
+        ALLOCATIONS.put(player.getUUID(), updated);
+        syncToClient(player, updated);
+    }
+
+    public static void setItemDropBlocked(ServerPlayer player, boolean blocked) {
+        requireEnabled();
+        Allocation current = ALLOCATIONS.get(player.getUUID());
+        if (current == null) {
+            return;
+        }
+        Allocation updated = new Allocation(current.allowedSlots, current.blockInventoryScreen, blocked);
         ALLOCATIONS.put(player.getUUID(), updated);
         syncToClient(player, updated);
     }
@@ -99,6 +122,11 @@ public final class InventorySlotAllocation {
     public static boolean isInventoryScreenBlocked(ServerPlayer player) {
         Allocation allocation = player == null ? null : ALLOCATIONS.get(player.getUUID());
         return allocation != null && allocation.blockInventoryScreen;
+    }
+
+    public static boolean isItemDropBlocked(ServerPlayer player) {
+        Allocation allocation = player == null ? null : ALLOCATIONS.get(player.getUUID());
+        return allocation != null && allocation.blockItemDrop;
     }
 
     public static boolean shouldCancelClick(AbstractContainerMenu menu,
@@ -173,9 +201,18 @@ public final class InventorySlotAllocation {
         player.inventoryMenu.sendAllDataToRemote();
     }
 
-    public record Allocation(Set<Integer> allowedSlots, boolean blockInventoryScreen) {
+    public record Allocation(Set<Integer> allowedSlots,
+                             boolean blockInventoryScreen,
+                             boolean blockItemDrop) {
         public Allocation {
             allowedSlots = Collections.unmodifiableSet(new LinkedHashSet<>(allowedSlots));
+        }
+    }
+
+    private static void requireEnabled() {
+        if (!enabled) {
+            throw new IllegalStateException(
+                    "Розподіл слотів не підключено — викличте withInventorySlotAllocation() на Builder.");
         }
     }
 
