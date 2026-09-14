@@ -4,6 +4,9 @@
 Публікується у **GitHub Packages**, тому підключається однією залежністю —
 і **ніколи не вимагає правити версію**.
 
+Актуальний повний довідник інтеграції та API оновлено **2026-09-14**:
+[docs/USAGE.md](docs/USAGE.md).
+
 ```
 dev.shaurmalib:shaurma-lib-forge:0.1.0-SNAPSHOT
 ```
@@ -156,6 +159,7 @@ public class MyMod {
 | Перемикання миксинів | `withMixins(toggles...)` |
 | Режими гри | `withModeContract(modeStateFileName)` |
 | Lifecycle матчу | `withLifecycle(minPlayersToStart)` |
+| Меню налаштувань режиму | `withModeSettings(style, bridge, showPlayersTab)` |
 | Join/return-політика | `withPlayerLifecycle(...)` |
 | Ліцензія | `withLicense(provider, dir)` |
 | Лобі | `withLobby(teamId, spawnProvider)` |

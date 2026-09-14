@@ -10,6 +10,11 @@ dev.shaurmalib:shaurma-lib-forge:0.1.0-SNAPSHOT
 Референсний приклад використання — мод `snipers_shaurma` (усі модулі нижче
 там реально підключені й працюють).
 
+> **Версія довідника:** 2026-09-14. Цей файл описує публічний спосіб
+> підключення бібліотеки, порядок ініціалізації, залежності між модулями,
+> серверні та клієнтські API, lifecycle і правила безпечного використання.
+> Усі системи opt-in: наявність jar сама по собі не вмикає ігрову механіку.
+
 ---
 
 ## 0. Головний принцип
@@ -206,6 +211,58 @@ public class MyMod {
 }
 ```
 
+### 2.1. Повний шаблон для режиму з inventory allocation і stamina
+
+Це робочий каркас для мода, який має конфіги, матч, кастомний inventory
+screen, обмежений hotbar і stamina. Вилучайте непотрібні `.withXxx(...)`,
+але не викликайте гетери модулів, які не були підключені.
+
+```java
+@Mod("mymod")
+public final class MyMod {
+    public MyMod() {
+        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        ShaurmaLib.Handle lib = ShaurmaLib.init("mymod", bus)
+                .withConfig(worldRoot, "mymod", MyMod.class::getResourceAsStream)
+                .withTeleport()
+                .withPlayerFreeze()
+                .withModeContract("mode.yml")
+                .withLifecycle(2)
+                .withInventorySlotAllocation()
+                .withStamina(StaminaRules.builder()
+                        .maxStamina(100)
+                        .drainPerSecond(20)
+                        .recoveryPerSecond(25)
+                        .emptyRecoveryDelaySeconds(3)
+                        .recoveryDelaySeconds(2)
+                        .forceFullHungerWhileActive(true)
+                        .blockJumpWhenDepleted(true)
+                        .build())
+                .withOverlays()
+                .withActionBarMessages()
+                .withSound()
+                .build();
+    }
+}
+```
+
+Після `build()` правила режиму застосовуються продуктовою логікою, а не
+конструктором бібліотеки:
+
+```java
+// Початок гри: 4 доступні hotbar-слоти і stamina активна.
+InventorySlotAllocation.setHotbarSlotCount(player, 4);
+StaminaService.setRules(player, gameRules);
+
+// Лобі: inventory можна заблокувати, stamina не витрачається.
+InventorySlotAllocation.setInventoryScreenBlocked(player, true);
+StaminaService.setRules(player, StaminaRules.builder().active(false).build());
+```
+
+Для клієнтських API (`setInventoryScreenFactory`, власний hotbar/HUD renderer
+та `attachOverlayEngine`) код має виконуватися лише на клієнтській стороні.
+
 `Handle` — дескриптор зі вже підключеними модулями. Гетери на ньому
 потрібні лише для того, щоб дістати модуль як об'єкт (наприклад
 `lib.configModule().configTree()`); більшість API статичні й викликаються
@@ -220,6 +277,45 @@ public class MyMod {
 | `withSpectator()` | `withTeleport()` |
 | `withActionBarMessages()`, `withAnimatedCountdown()`, `withWorldTint(...)`, `withRadio(...)` | `withOverlays()` |
 | `withChat(...)` | `withOverlays()` — **крім** випадку, коли викликано `withChatDisplaySink(...)` |
+| `withModeSettings(...)` | `withModeContract(...)` і `withLifecycle(...)` |
+| `withPhantomSlotBridge(...)` | `withAnimatedItems()` |
+
+### 2.2. Повний список `Builder`-методів
+
+| Метод | Призначення |
+|---|---|
+| `withConfig(...)` | YAML-конфіги та reload bus |
+| `withTeleport()` | безпечна телепортація |
+| `withPlayerFreeze()` | серверне замороження гравця |
+| `withPlayerAnim()` | Player Animation Library-пози |
+| `withInteractionLock()` | блокування дій |
+| `withDamageGuard()` | фільтрація урону |
+| `withAnimatedItems()` | анімовані предмети, рука й item camera |
+| `withPhantomSlotBridge(...)` | anti-dupe для фантомних слотів |
+| `withAnimatedBlocks()` | GeckoLib-блоки |
+| `withSkinnableEntities()` | сутності з runtime skin |
+| `withInvisibleZones()` | невидимі зони |
+| `withSpectator()` | spectator session |
+| `withAnimationRecording()` | запис animation keyframes |
+| `withScreenEffects()` | post-chain ефекти |
+| `withFreeCamera()` | camera ownership і freecam |
+| `withGraffiti(namespace)` | серверне ядро графіті |
+| `withMixins(...)` | вмикання/вимикання library mixins |
+| `withModeContract(...)` | реєстр і persistence режиму |
+| `withLifecycle(...)` | lifecycle матчу |
+| `withModeSettings(...)` | стандартний екран налаштувань режиму |
+| `withPlayerLifecycle(...)` | join/return/disconnect policy |
+| `withLicense(...)` | license gate |
+| `withLobby(...)` | lobby spawn і name-tag policy |
+| `withOverlays()` | базовий GUI overlay engine |
+| `withActionBarMessages()` | action-bar notification system |
+| `withAnimatedCountdown()` | animated countdown |
+| `withWorldTint(...)` | world tint channels |
+| `withChat(...)` / `withChatDisplaySink(...)` | chat history і display |
+| `withRadio(...)` | radio dialog, overlay і ducking |
+| `withSound()` | sound center |
+| `withInventorySlotAllocation()` | персональні inventory rules |
+| `withStamina(...)` | server-authoritative stamina |
 
 Порушення порядку = `IllegalStateException` на старті з назвою потрібного
 методу.
@@ -680,6 +776,46 @@ lib.lifecycleModule().idleBehavior();
 
 Блокування редагування налаштувань під час гри використовується всередині
 `withModeSettings(...)` — окремо його кликати не треба.
+
+### 3.18a. `withModeSettings(style, bridge, showPlayersTab)` — меню режиму
+
+Метод створює готовий клієнтський `ModeSettingsScreen` для режимів,
+зареєстрованих через `withModeContract(...)`. Він обов'язково вимагає
+`withLifecycle(...)`, щоб меню знало, коли редагування треба заблокувати.
+
+```java
+StyleTheme style = StyleTheme.builder()
+        .backgroundColor(0x090A0F)
+        .borderColor(0x667788)
+        .borderWidth(1)
+        .build();
+
+SettingsSyncBridge bridge = new SettingsSyncBridge() {
+    @Override
+    public List<PlayerModeRow> playersList() { return currentPlayers; }
+    @Override
+    public void requestPlayerList() { /* власний packet */ }
+    @Override
+    public void togglePlayerSpectator(String name, boolean spectator) { /* packet */ }
+    @Override
+    public void saveSettings(Map<String, Integer> values) { /* packet */ }
+    @Override
+    public void requestModeChange(String modeId) { /* packet */ }
+};
+
+ShaurmaLib.Handle lib = ShaurmaLib.init("mymod", modEventBus)
+        .withConfig(worldRoot, "mymod", MyMod.class::getResourceAsStream)
+        .withModeContract("mode.yml")
+        .withLifecycle(2)
+        .withModeSettings(style, bridge, true)
+        .build();
+```
+
+Після `build()` мод може відкрити екран через
+`lib.modeSettingsModule().newScreen(Component.literal("Settings"))`.
+`showPlayersTab=false` приховує вкладку призначення режимів гравцям.
+Мережеве застосування значень навмисно залишається в `SettingsSyncBridge`:
+бібліотека не вигадує packet-формат конкретної гри.
 
 ---
 
