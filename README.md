@@ -166,6 +166,7 @@ public class MyMod {
 | Тінт світу | `withWorldTint(tintId)` |
 | Чат | `withChat(ctx, feedId)` / `withChatDisplaySink(sink)` |
 | Радіо-диктор | `withRadio(volume, start, noise, end, visible)` |
+| Розподіл слотів гравця | `InventorySlotAllocation.setHotbarSlotCount(player, count)` |
 
 Статичні сервіси (підключаються прапорцем лише як підтвердження наміру):
 `TeleportService`, `PlayerFreezeService`, `PlayerPoseController`,

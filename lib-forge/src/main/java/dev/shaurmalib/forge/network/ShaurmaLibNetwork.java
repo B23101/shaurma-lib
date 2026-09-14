@@ -7,6 +7,7 @@ import dev.shaurmalib.forge.network.packets.GraffitiImageStartPacket;
 import dev.shaurmalib.forge.network.packets.GraffitiRemovePacket;
 import dev.shaurmalib.forge.network.packets.GraffitiRequestImagePacket;
 import dev.shaurmalib.forge.network.packets.GraffitiSyncPacket;
+import dev.shaurmalib.forge.network.packets.InventorySlotAllocationPacket;
 import dev.shaurmalib.forge.network.packets.ItemAnimPacket;
 import dev.shaurmalib.forge.network.packets.PlaySoundPacket;
 import dev.shaurmalib.forge.network.packets.RadioDialogPacket;
@@ -69,6 +70,9 @@ public final class ShaurmaLibNetwork {
                 PlaySoundPacket::encode, PlaySoundPacket::decode, PlaySoundPacket::handle);
         CHANNEL.registerMessage(nextId++, StopSoundPacket.class,
                 StopSoundPacket::encode, StopSoundPacket::decode, StopSoundPacket::handle);
+        CHANNEL.registerMessage(nextId++, InventorySlotAllocationPacket.class,
+                InventorySlotAllocationPacket::encode, InventorySlotAllocationPacket::decode,
+                InventorySlotAllocationPacket::handle);
         // Наступні модулі (worldtint, mode settings, ...)
         // додають свій registerMessage(nextId++, ...) тут, у порядку
         // впровадження — ID мають лишатись стабільними між релізами lib,

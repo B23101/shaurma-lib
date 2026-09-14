@@ -905,6 +905,39 @@ ShaurmaLib.attachChatScreenIntercept(event, ...);
 ShaurmaLib.attachVanillaHudCancel(() -> chatActive);
 ```
 
+### 3.27. `InventorySlotAllocation` — персональні слоти гравця
+
+Модуль обмежує інвентар **окремого** гравця. Сервер відхиляє кліки по
+недозволених слотах, забороняє небезпечні mass-transfer операції
+(`shift-click`, quick-craft, double-click pickup), а клієнт не відкриває
+ванільний екран інвентаря і показує лише виділені hotbar-слоти.
+
+```java
+// 0 — жодного hotbar-слоту; залишається лише рука без видимого hotbar.
+InventorySlotAllocation.setHotbarSlotCount(player, 0);
+
+// Доступні слоти 0..3, решта інвентаря недоступна.
+InventorySlotAllocation.setHotbarSlotCount(player, 4);
+
+// Довільна розкладка: hotbar 0, 2 і offhand 40.
+InventorySlotAllocation.setAllowedSlots(player, Set.of(0, 2, 40));
+
+// Зняти обмеження.
+InventorySlotAllocation.clear(player);
+```
+
+Індекси vanilla inventory: `0..8` — hotbar, `9..35` — основний інвентар,
+`36..39` — броня, `40` — offhand. Вміст недозволених слотів не видаляється.
+За замовчуванням стандартний екран інвентаря заблокований; якщо він потрібен
+для конкретного режиму, після розподілення викличте:
+
+```java
+InventorySlotAllocation.setInventoryScreenBlocked(player, false);
+```
+
+Для контейнерів типу скрині `shift-click` навмисно заблокований повністю:
+звичайне переміщення предметів мишкою в дозволені слоти залишається доступним.
+
 ---
 
 ## 4. Модулі поза `Builder` (module hooks)

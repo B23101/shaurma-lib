@@ -14,5 +14,9 @@
     "SoundManagerAccessor",
     "PostChainAccessor"
   ],
-  "server": []
+  "server": [
+    "MixinAbstractContainerMenu",
+    "MixinServerGamePacketListenerImpl",
+    "SlotContainerAccess"
+  ]
 }
