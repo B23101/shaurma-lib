@@ -1,0 +1,10 @@
+{
+  "intro_music": {
+    "sounds": [
+      {
+        "name": "shaurma_lib:intro_music",
+        "stream": true
+      }
+    ]
+  }
+}

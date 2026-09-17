@@ -1,7 +1,17 @@
 package dev.shaurmalib.forge;
 
 import dev.shaurmalib.forge.network.ShaurmaLibNetwork;
+import dev.shaurmalib.forge.overlay.IntroOverlay;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 
 /**
  * Точка входу Forge-мода бібліотеки (modId {@code shaurma_lib}, задекларований
@@ -26,8 +36,22 @@ import net.minecraftforge.fml.common.Mod;
 @Mod("shaurma_lib")
 public final class ShaurmaLibMod {
 
+    public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
+            DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, "shaurma_lib");
+    public static final RegistryObject<SoundEvent> INTRO_MUSIC = SOUND_EVENTS.register(
+            "intro_music",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("shaurma_lib", "intro_music")));
+
     public ShaurmaLibMod() {
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        SOUND_EVENTS.register(modEventBus);
         // Стабільний мережевий канал lib (packet IDs фіксовані між релізами).
         ShaurmaLibNetwork.register();
+
+        // Базове intro вмикається автоматично для всіх споживачів бібліотеки.
+        // Головний мод може повторно викликати IntroOverlay.attach(...) зі
+        // своїм enabled-supplier, звуком і текстом або передати () -> false.
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> IntroOverlay.attach(
+                () -> true, () -> null, () -> 1.0, "ШАУРМА", ""));
     }
 }

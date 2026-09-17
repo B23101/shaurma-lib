@@ -1191,6 +1191,21 @@ public final class ShaurmaLib {
     }
 
     /**
+     * Підключає скасування ванільного HUD з незалежними перемикачами
+     * хотбару, HP, їжі, досвіду та броні. {@code true} означає "приховати"
+     * відповідний ванільний елемент.
+     */
+    public static void attachVanillaHudCancel(BooleanSupplier chatActive,
+                                              BooleanSupplier hotbarHidden,
+                                              BooleanSupplier healthHidden,
+                                              BooleanSupplier foodHidden,
+                                              BooleanSupplier experienceHidden,
+                                              BooleanSupplier armorHidden) {
+        VanillaHudCancelModule.attach(chatActive, hotbarHidden, healthHidden, foodHidden,
+                experienceHidden, armorHidden);
+    }
+
+    /**
      * Підключає {@link dev.shaurmalib.forge.tab.TabVisibilityModule} —
      * скасовує ванільний {@code player_list} (звичайний Tab-список
      * гравців) і починає рахувати прогрес появи кастомної таблиці

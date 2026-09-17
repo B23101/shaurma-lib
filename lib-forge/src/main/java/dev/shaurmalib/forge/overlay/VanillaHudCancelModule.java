@@ -72,6 +72,11 @@ public final class VanillaHudCancelModule {
     private VanillaHudCancelModule() {}
 
     private static volatile BooleanSupplier chatActive = () -> false;
+    private static volatile BooleanSupplier hotbarHidden = () -> true;
+    private static volatile BooleanSupplier healthHidden = () -> true;
+    private static volatile BooleanSupplier foodHidden = () -> true;
+    private static volatile BooleanSupplier experienceHidden = () -> true;
+    private static volatile BooleanSupplier armorHidden = () -> true;
     private static volatile boolean attached = false;
 
     /**
@@ -87,7 +92,27 @@ public final class VanillaHudCancelModule {
      */
     @OnlyIn(Dist.CLIENT)
     public static synchronized void attach(BooleanSupplier chatActive) {
+        attach(chatActive, () -> true, () -> true, () -> true, () -> true, () -> true);
+    }
+
+    /**
+     * Підключає скасування HUD з незалежним перемикачем для кожного
+     * ванільного елемента. Це дозволяє режимам залишити, наприклад, їжу
+     * або досвід видимими, не повертаючи всі інші елементи.
+     */
+    @OnlyIn(Dist.CLIENT)
+    public static synchronized void attach(BooleanSupplier chatActive,
+                                           BooleanSupplier hotbarHidden,
+                                           BooleanSupplier healthHidden,
+                                           BooleanSupplier foodHidden,
+                                           BooleanSupplier experienceHidden,
+                                           BooleanSupplier armorHidden) {
         VanillaHudCancelModule.chatActive = chatActive != null ? chatActive : () -> false;
+        VanillaHudCancelModule.hotbarHidden = hotbarHidden != null ? hotbarHidden : () -> true;
+        VanillaHudCancelModule.healthHidden = healthHidden != null ? healthHidden : () -> true;
+        VanillaHudCancelModule.foodHidden = foodHidden != null ? foodHidden : () -> true;
+        VanillaHudCancelModule.experienceHidden = experienceHidden != null ? experienceHidden : () -> true;
+        VanillaHudCancelModule.armorHidden = armorHidden != null ? armorHidden : () -> true;
         if (attached) return;
         MinecraftForge.EVENT_BUS.register(VanillaHudCancelModule.class);
         attached = true;
@@ -122,19 +147,19 @@ public final class VanillaHudCancelModule {
         // Кожна перевірка незалежна — навмисно без early-return/else,
         // щоб скасування однієї не могло випадково "проковтнути" інші
         // при майбутніх правках цього методу.
-        if (event.getOverlay().id().equals(VanillaGuiOverlay.HOTBAR.id())) {
+        if (event.getOverlay().id().equals(VanillaGuiOverlay.HOTBAR.id()) && hotbarHidden.getAsBoolean()) {
             event.setCanceled(true);
         }
-        if (event.getOverlay().id().equals(VanillaGuiOverlay.PLAYER_HEALTH.id())) {
+        if (event.getOverlay().id().equals(VanillaGuiOverlay.PLAYER_HEALTH.id()) && healthHidden.getAsBoolean()) {
             event.setCanceled(true);
         }
-        if (event.getOverlay().id().equals(VanillaGuiOverlay.FOOD_LEVEL.id())) {
+        if (event.getOverlay().id().equals(VanillaGuiOverlay.FOOD_LEVEL.id()) && foodHidden.getAsBoolean()) {
             event.setCanceled(true);
         }
-        if (event.getOverlay().id().equals(VanillaGuiOverlay.EXPERIENCE_BAR.id())) {
+        if (event.getOverlay().id().equals(VanillaGuiOverlay.EXPERIENCE_BAR.id()) && experienceHidden.getAsBoolean()) {
             event.setCanceled(true);
         }
-        if (event.getOverlay().id().equals(VanillaGuiOverlay.ARMOR_LEVEL.id())) {
+        if (event.getOverlay().id().equals(VanillaGuiOverlay.ARMOR_LEVEL.id()) && armorHidden.getAsBoolean()) {
             event.setCanceled(true);
         }
     }
