@@ -50,6 +50,7 @@ public final class IntroOverlay {
     private static boolean attached;
     private static boolean pending;
     private static int pendingTicks;
+    private static boolean wasInWorld;
     private static boolean active;
     private static boolean soundPlayed;
     private static boolean soundsPaused;
@@ -105,6 +106,7 @@ public final class IntroOverlay {
     @SubscribeEvent
     public static void onLogout(ClientPlayerNetworkEvent.LoggingOut event) {
         pending = false;
+        wasInWorld = false;
         deactivate();
     }
 
@@ -112,16 +114,23 @@ public final class IntroOverlay {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft mc = Minecraft.getInstance();
+        boolean inWorld = mc.level != null && mc.player != null;
+        if (inWorld && !wasInWorld) {
+            // Keep the intro reliable even if the network login event was
+            // fired before this shared listener was registered.
+            pending = true;
+            pendingTicks = 0;
+        }
+        wasInWorld = inWorld;
         if (!enabled.getAsBoolean()) {
-            pending = false;
             if (active) deactivate();
             return;
         }
-        if (pending && mc.level != null && mc.player != null && ++pendingTicks >= 2) {
+        if (pending && inWorld && ++pendingTicks >= 2) {
             pending = false;
             activate();
         }
-        if (active && mc.level == null) deactivate();
+        if (active && !inWorld) deactivate();
     }
 
     private static void render(net.minecraftforge.client.gui.overlay.ForgeGui gui,
