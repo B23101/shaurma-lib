@@ -1145,14 +1145,17 @@ public final class ShaurmaLib {
      * static void onScreenOpening(ScreenEvent.Opening event) {
      *     ShaurmaLib.attachChatScreenIntercept(event,
      *         () -> ClientGameState.teamMode,
-     *         visible -> CustomTabOverlay.forceVisible = visible);
+     *         dev.shaurmalib.forge.tab.TabVisibilityModule::setForceVisible);
      * }
      * }</pre>
      *
      * @param teamModeAvailable      чи показувати кнопки Global/Team у T-екрані.
      * @param tabOverlayForceVisible консюмерський tab-list тримається
-     *                               видимим, поки {@code true}; передайте
-     *                               {@code b -> {}}, якщо такого оверлею немає.
+     *                               видимим, поки {@code true}; типово
+     *                               {@link dev.shaurmalib.forge.tab.TabVisibilityModule#setForceVisible},
+     *                               якщо підключено {@link #attachTabVisibility};
+     *                               передайте {@code b -> {}}, якщо такого
+     *                               оверлею немає.
      */
     public static void attachChatScreenIntercept(ScreenEvent.Opening event,
                                                    BooleanSupplier teamModeAvailable,
@@ -1185,6 +1188,35 @@ public final class ShaurmaLib {
      */
     public static void attachVanillaHudCancel(BooleanSupplier chatActive) {
         VanillaHudCancelModule.attach(chatActive);
+    }
+
+    /**
+     * Підключає {@link dev.shaurmalib.forge.tab.TabVisibilityModule} —
+     * скасовує ванільний {@code player_list} (звичайний Tab-список
+     * гравців) і починає рахувати прогрес появи кастомної таблиці
+     * консюмера (клавіша Tab або примусова видимість з T-меню), щоб цю
+     * пару (приховати ванільний / показати кастомний по тій самій
+     * кнопці) не доводилось повторювати вручну в кожному консюмерському
+     * моді. Викликати один раз, типово одразу після {@link Builder#build()}:
+     * <pre>{@code
+     * ShaurmaLib.attachTabVisibility((gui, g, pt, sw, sh, progress) -> {
+     *     // консюмерський layout — обирає режим і малює через TabListStyle,
+     *     // з progress замість власного animProgress
+     * });
+     * }</pre>
+     * Безпечно викликати повторно — фактична підписка на event bus
+     * відбувається лише один раз; повторний виклик лише підміняє
+     * {@code tabRenderer} (еквівалент {@link dev.shaurmalib.forge.tab.TabVisibilityModule#setRenderer}).
+     * <p>
+     * Рендер уже підключений — модуль сам реєструє себе в
+     * {@link OverlayEngine} усередині {@code attach}, окремий виклик
+     * {@code OverlayEngine.register(...)} НЕ потрібен.
+     *
+     * @param tabRenderer консюмерський layout кастомної таблиці — див.
+     *                    {@link dev.shaurmalib.forge.tab.TabVisibilityModule.TabRenderer}.
+     */
+    public static void attachTabVisibility(dev.shaurmalib.forge.tab.TabVisibilityModule.TabRenderer tabRenderer) {
+        dev.shaurmalib.forge.tab.TabVisibilityModule.attach(tabRenderer);
     }
 
     /**
