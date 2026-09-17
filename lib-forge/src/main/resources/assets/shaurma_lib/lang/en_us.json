@@ -1,4 +1,6 @@
 {
+  "gui.shaurma_lib.intro.title": "SHAURMA TEAM",
+  "gui.shaurma_lib.intro.subtitle": "PRESENTS",
   "gui.shaurma_lib.chat.title": "Chat",
   "gui.shaurma_lib.chat.input_hint": "Message...",
   "gui.shaurma_lib.chat.mode_global": "Sending to: Global",

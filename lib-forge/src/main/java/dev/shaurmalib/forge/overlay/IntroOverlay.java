@@ -5,6 +5,7 @@ import dev.shaurmalib.forge.ShaurmaLibMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
@@ -45,8 +46,8 @@ public final class IntroOverlay {
     private static volatile BooleanSupplier enabled = () -> true;
     private static volatile Supplier<SoundEvent> soundSupplier = () -> null;
     private static volatile DoubleSupplier volumeSupplier = () -> 1.0;
-    private static volatile String title = "ШАУРМА";
-    private static volatile String subtitle = "";
+    private static volatile String titleKey = "gui.shaurma_lib.intro.title";
+    private static volatile String subtitleKey = "gui.shaurma_lib.intro.subtitle";
     private static boolean attached;
     private static boolean pending;
     private static int pendingTicks;
@@ -59,16 +60,34 @@ public final class IntroOverlay {
 
     private IntroOverlay() {}
 
+    /**
+     * @param titleKey    ключ перекладу заголовка (lang-файл), напр.
+     *                    {@code "gui.mymod.intro.title"}. {@code null} —
+     *                    використати дефолтний ключ бібліотеки
+     *                    ({@code gui.shaurma_lib.intro.title}, значення
+     *                    "КОМАНДА ШАУРМА").
+     * @param subtitleKey ключ перекладу субтитра, аналогічно. {@code null} —
+     *                    дефолтний {@code gui.shaurma_lib.intro.subtitle}
+     *                    ("ПРЕДСТАВЛЯЄ").
+     */
     public static synchronized void attach(BooleanSupplier enabled,
                                             Supplier<SoundEvent> sound,
                                             DoubleSupplier volume,
-                                            String title,
-                                            String subtitle) {
+                                            String titleKey,
+                                            String subtitleKey) {
         IntroOverlay.enabled = enabled != null ? enabled : () -> true;
-        soundSupplier = sound != null ? sound : () -> ShaurmaLibMod.INTRO_MUSIC.get();
+        // NB: sound сам ніколи не == null (споживач завжди передає лямбду,
+        // напр. () -> null), тож фолбек має перевіряти РЕЗУЛЬТАТ виклику,
+        // а не сам Supplier — інакше INTRO_MUSIC ніколи не підхоплюється і
+        // звук завжди мовчить.
+        Supplier<SoundEvent> resolvedSound = sound != null ? sound : () -> null;
+        soundSupplier = () -> {
+            SoundEvent value = resolvedSound.get();
+            return value != null ? value : ShaurmaLibMod.INTRO_MUSIC.get();
+        };
         volumeSupplier = volume != null ? volume : () -> 1.0;
-        IntroOverlay.title = title != null ? title : "ШАУРМА";
-        IntroOverlay.subtitle = subtitle != null ? subtitle : "";
+        IntroOverlay.titleKey = titleKey != null ? titleKey : "gui.shaurma_lib.intro.title";
+        IntroOverlay.subtitleKey = subtitleKey != null ? subtitleKey : "gui.shaurma_lib.intro.subtitle";
         if (attached) return;
         MinecraftForge.EVENT_BUS.register(IntroOverlay.class);
         OverlayEngine.register("shaurma_intro", IntroOverlay::render, () -> active);
@@ -200,14 +219,15 @@ public final class IntroOverlay {
         }
 
         float reveal = t < PH2 ? 0f : Math.min(1f, (t - PH2) / (float) REVEAL_MS);
+        String resolvedSubtitle = Component.translatable(subtitleKey).getString();
         if (t >= PH2 && t < PH3) {
             drawTitle(g, mc, cx, cy, reveal, t, alpha);
         } else if (t >= PH3 && t < PH4) {
             drawTitle(g, mc, cx, cy, 1f, t, alpha);
-            if (!subtitle.isEmpty()) {
+            if (!resolvedSubtitle.isEmpty()) {
                 float subtitleProgress = Math.min(1f, (t - PH3) / 700f);
-                int shown = (int) (subtitle.length() * subtitleProgress);
-                String shownText = subtitle.substring(0, shown);
+                int shown = (int) (resolvedSubtitle.length() * subtitleProgress);
+                String shownText = resolvedSubtitle.substring(0, shown);
                 int x = cx - (int) (mc.font.width(shownText) * 1.4f) / 2;
                 PoseStack subtitlePose = g.pose();
                 subtitlePose.pushPose();
@@ -242,6 +262,7 @@ public final class IntroOverlay {
 
     private static void drawTitle(GuiGraphics g, Minecraft mc, int cx, int cy,
                                   float progress, long time, float alpha) {
+        String title = Component.translatable(titleKey).getString();
         StringBuilder text = new StringBuilder();
         long flicker = time / 50L;
         for (int i = 0; i < title.length(); i++) {

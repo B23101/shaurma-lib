@@ -1,4 +1,6 @@
 {
+  "gui.shaurma_lib.intro.title": "КОМАНДА ШАУРМА",
+  "gui.shaurma_lib.intro.subtitle": "ПРЕДСТАВЛЯЄ",
   "gui.shaurma_lib.chat.title": "Чат",
   "gui.shaurma_lib.chat.input_hint": "Повідомлення...",
   "gui.shaurma_lib.chat.mode_global": "Надсилання: Загальний",

@@ -397,10 +397,14 @@ public final class ChatModule {
                 ? ChatChannel.GLOBAL_ID : channelId;
         int accent = ChatFormatEngine.resolveAccent(colorHex != null ? colorHex
                 : ChatChannelRegistry.byIdOrSynthetic(channel).colorHex());
-        displayMessage(formatted, accent);
+        boolean team = !ChatChannel.GLOBAL_ID.equals(channel);
+        dev.shaurmalib.common.chat.ChatEntry chatEntry = new dev.shaurmalib.common.chat.ChatEntry(
+                team ? dev.shaurmalib.common.chat.ChatEntryType.CHAT_TEAM
+                     : dev.shaurmalib.common.chat.ChatEntryType.CHAT_GLOBAL,
+                formatted, senderUuid, channel, senderName, rawText, colorHex);
+        displayChatEntry(chatEntry, accent);
         playMessageSound();
-        HISTORY.addChat(formatted, senderUuid, channel, senderName, rawText, colorHex,
-                !ChatChannel.GLOBAL_ID.equals(channel));
+        HISTORY.addChat(formatted, senderUuid, channel, senderName, rawText, colorHex, team);
     }
 
     /** Клієнтське дзеркало доступних каналів (з {@code ChatChannelsSyncPacket}). */
@@ -438,6 +442,28 @@ public final class ChatModule {
         if (id != null && !id.isBlank()) {
             AlertNotificationSystem.push(id,
                     dev.shaurmalib.common.overlay.AlertSpec.of(message.getString(), accentArgb));
+        }
+    }
+
+    /**
+     * Показує чат-повідомлення гравця через ту саму верству, що й журнал
+     * ({@link dev.shaurmalib.forge.chat.ChatEntryRendererRegistry}), а не
+     * голий текст — сплеш і панель журналу тепер виглядають однаково
+     * (голова, нік кольором групи). {@link ChatDisplaySink}, якщо
+     * зареєстрований, і тут має пріоритет (консюмер сам вирішив, що малює
+     * повідомлення повністю власним кодом).
+     */
+    @OnlyIn(Dist.CLIENT)
+    private static void displayChatEntry(dev.shaurmalib.common.chat.ChatEntry entry, int accentArgb) {
+        ChatDisplaySink sink = displaySink;
+        if (sink != null) {
+            sink.display(entry.message() != null ? entry.message() : Component.empty(), accentArgb);
+            return;
+        }
+        String id = feedId;
+        if (id != null && !id.isBlank()) {
+            AlertNotificationSystem.pushChatEntry(id, entry, accentArgb,
+                    dev.shaurmalib.common.overlay.OverlayTimings.chatDefault());
         }
     }
 

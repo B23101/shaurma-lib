@@ -63,6 +63,6 @@ public final class ShaurmaLibMod {
         // Головний мод може повторно викликати IntroOverlay.attach(...) зі
         // своїм enabled-supplier, звуком і текстом або передати () -> false.
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> IntroOverlay.attach(
-                () -> true, () -> null, () -> 1.0, "ШАУРМА", ""));
+                () -> true, null, () -> 1.0, null, null));
     }
 }
