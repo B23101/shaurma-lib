@@ -5,5 +5,7 @@
   "gui.shaurma_lib.chat.mode_team": "Sending to: Team",
   "gui.shaurma_lib.chat.btn_global": "Global",
   "gui.shaurma_lib.chat.btn_team": "Team",
-  "gui.shaurma_lib.chat.empty_history": "No messages yet."
+  "gui.shaurma_lib.chat.empty_history": "No messages yet.",
+  "gui.shaurma_lib.chat.channel.global": "Global",
+  "gui.shaurma_lib.chat.channel.team": "Team"
 }

@@ -187,6 +187,11 @@ public final class ShaurmaLib {
         private TeamChatContext chatTeamContext;
         private String chatFeedId;
         private dev.shaurmalib.forge.chat.ChatModule.ChatDisplaySink chatDisplaySink;
+        private dev.shaurmalib.common.chat.ChatChannelProvider chatChannelProvider;
+        private java.util.function.Supplier<Integer> chatFeedTopOffset = () -> 0;
+        private boolean chatSoundEnabled;
+        private InventorySlotAllocation.CreativePolicy inventoryCreativePolicy =
+                InventorySlotAllocation.CreativePolicy.APPLY;
         private final java.util.List<String> worldTintChannels = new java.util.ArrayList<>();
         private PhantomSlotBridge<ServerPlayer> phantomSlotBridge;
         private boolean radioEnabled = false;
@@ -742,7 +747,23 @@ public final class ShaurmaLib {
          * {@link InventorySlotAllocation#setAllowedSlots}.
          */
         public Builder withInventorySlotAllocation() {
+            return withInventorySlotAllocation(InventorySlotAllocation.CreativePolicy.APPLY);
+        }
+
+        /**
+         * Те саме, з явною політикою для CREATIVE/SPECTATOR.
+         * <p>
+         * {@link InventorySlotAllocation.CreativePolicy#APPLY} (дефолт
+         * no-arg overload) — обмеження слотів і приховання хотбару
+         * діють для ВСІХ режимів, включно з креативом. Потрібно там,
+         * де креатив — інструмент адміна, а не ігрова механіка.
+         * {@link InventorySlotAllocation.CreativePolicy#EXEMPT} — гравець
+         * у креативі/спектейті не обмежується (картобудівники, режими,
+         * де креатив використовується у самій грі).
+         */
+        public Builder withInventorySlotAllocation(InventorySlotAllocation.CreativePolicy creativePolicy) {
             this.inventorySlotAllocationEnabled = true;
+            this.inventoryCreativePolicy = creativePolicy;
             return this;
         }
 
@@ -922,8 +943,53 @@ public final class ShaurmaLib {
                 requireOverlays("withChat");
             }
             this.chatTeamContext = teamContext;
+            this.chatChannelProvider = null;
             this.chatFeedId = feedId;
             this.chatEnabled = true;
+            return this;
+        }
+
+        /**
+         * Багатоканальний чат: консюмер описує правила доступу через
+         * {@link dev.shaurmalib.common.chat.ChatChannelProvider}, а самі
+         * канали (для кнопок і кольорів) реєструє в
+         * {@link dev.shaurmalib.common.chat.ChatChannelRegistry}.
+         *
+         * <p>Саме цей шлях дає окремі чати замість одного «global vs
+         * team»: повідомлення каналу йде ЛИШЕ тим, кого поверне
+         * {@link dev.shaurmalib.common.chat.ChatChannelProvider#recipientsOf}.
+         * Глобальний канал обробляє сама бібліотека (усі бачать усіх).</p>
+         *
+         * @param provider  правила каналів консюмера ({@code null} — лише глобальний чат).
+         * @param feedId    бібліотечний {@link dev.shaurmalib.forge.overlay.AlertNotificationSystem}
+         *                  фід для спливаючого повідомлення справа зверху;
+         *                  бібліотека сама його реєструє (потребує
+         *                  {@link #withOverlays()}, якщо не використано
+         *                  {@link #withChatDisplaySink}).
+         */
+        public Builder withChatChannels(dev.shaurmalib.common.chat.ChatChannelProvider provider, String feedId) {
+            if (chatDisplaySink == null) {
+                requireOverlays("withChatChannels");
+            }
+            this.chatChannelProvider = provider;
+            this.chatTeamContext = null;
+            this.chatFeedId = feedId;
+            this.chatEnabled = true;
+            return this;
+        }
+
+        /**
+         * Той самий {@link #withChatChannels} з додатковими налаштуваннями UI:
+         * звук вхідного повідомлення і вертикальний зсув живого фіду (той
+         * самий сенс, що {@code topOffsetSupplier} у
+         * {@link dev.shaurmalib.forge.overlay.AlertNotificationSystem#registerFeed}).
+         */
+        public Builder withChatChannels(dev.shaurmalib.common.chat.ChatChannelProvider provider,
+                                        String feedId,
+                                        java.util.function.Supplier<Integer> feedTopOffset) {
+            withChatChannels(provider, feedId);
+            this.chatFeedTopOffset = feedTopOffset == null ? () -> 0 : feedTopOffset;
+            this.chatSoundEnabled = true;
             return this;
         }
 
@@ -948,6 +1014,17 @@ public final class ShaurmaLib {
          */
         public Builder withChatDisplaySink(dev.shaurmalib.forge.chat.ChatModule.ChatDisplaySink sink) {
             this.chatDisplaySink = sink;
+            return this;
+        }
+
+        /**
+         * Вмикає звук вхідного чат-повідомлення
+         * ({@code shaurma_lib:chat_message}, звук реєструє сама
+         * бібліотека — консюмеру лишається додати {@code .ogg} у свою
+         * звукову теку з тим самим id).
+         */
+        public Builder withChatSound() {
+            this.chatSoundEnabled = true;
             return this;
         }
 
@@ -1038,6 +1115,7 @@ public final class ShaurmaLib {
         public Handle build() {
             if (inventorySlotAllocationEnabled) {
                 InventorySlotAllocation.enable();
+                InventorySlotAllocation.setCreativePolicy(inventoryCreativePolicy);
             }
             if (staminaEnabled) {
                 StaminaService.enable(staminaRules);
@@ -1076,7 +1154,22 @@ public final class ShaurmaLib {
                 }
             }
             if (chatEnabled) {
-                ChatModule.attach(chatTeamContext, chatFeedId);
+                if (chatChannelProvider != null) {
+                    ChatModule.attachChannels(chatChannelProvider, chatFeedId,
+                            chatSoundEnabled, chatFeedTopOffset);
+                } else {
+                    ChatModule.attach(chatTeamContext, chatFeedId);
+                    if (chatSoundEnabled) {
+                        ChatModule.enableSound();
+                    }
+                }
+            }
+            if (isClientDist() && chatEnabled) {
+                // Раніше цього виклику не робив НІХТО: повідомлення пушились
+                // у фід, який ніде не було зареєстровано, тому спливаюче
+                // повідомлення справа зверху (коли чат закритий) не
+                // з'являлось взагалі.
+                ChatModule.attachFeed();
             }
             if (graffitiEnabled) {
                 dev.shaurmalib.forge.graffiti.GraffitiSyncManager.bind(

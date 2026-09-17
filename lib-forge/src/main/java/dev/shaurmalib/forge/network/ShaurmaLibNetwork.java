@@ -1,6 +1,7 @@
 package dev.shaurmalib.forge.network;
 
 import dev.shaurmalib.forge.network.packets.ChatBroadcastPacket;
+import dev.shaurmalib.forge.network.packets.ChatChannelsSyncPacket;
 import dev.shaurmalib.forge.network.packets.ChatSendPacket;
 import dev.shaurmalib.forge.network.packets.GraffitiImageChunkPacket;
 import dev.shaurmalib.forge.network.packets.GraffitiImageStartPacket;
@@ -76,6 +77,11 @@ public final class ShaurmaLibNetwork {
                 InventorySlotAllocationPacket::handle);
         CHANNEL.registerMessage(nextId++, StaminaSyncPacket.class,
                 StaminaSyncPacket::encode, StaminaSyncPacket::decode, StaminaSyncPacket::handle);
+        // Сервер → клієнт: які чат-канали доступні цьому гравцю (кнопки каналів
+        // у T-екрані). Додано в кінець — ID попередніх пакетів не змінились.
+        CHANNEL.registerMessage(nextId++, ChatChannelsSyncPacket.class,
+                ChatChannelsSyncPacket::encode, ChatChannelsSyncPacket::decode,
+                ChatChannelsSyncPacket::handle);
         // Наступні модулі (worldtint, mode settings, ...)
         // додають свій registerMessage(nextId++, ...) тут, у порядку
         // впровадження — ID мають лишатись стабільними між релізами lib,

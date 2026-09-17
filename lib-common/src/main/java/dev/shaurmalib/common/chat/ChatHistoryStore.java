@@ -40,8 +40,19 @@ public final class ChatHistoryStore {
     }
 
     public synchronized void addChat(Component message, UUID senderUuid, String senderTeamId, boolean isTeam) {
+        addChat(message, senderUuid, senderTeamId, null, null, null, isTeam);
+    }
+
+    /**
+     * Структурований варіант: окрім готового компонента зберігає нік,
+     * id каналу, «сирий» текст і колір групи — з них T-екран будує
+     * власну верстку (голова гравця, нік, текст під ним).
+     */
+    public synchronized void addChat(Component message, UUID senderUuid, String channelId,
+                                     String senderName, String rawText, String colorHex,
+                                     boolean isTeam) {
         history.add(new ChatEntry(isTeam ? ChatEntryType.CHAT_TEAM : ChatEntryType.CHAT_GLOBAL,
-                message, senderUuid, senderTeamId));
+                message, senderUuid, channelId, senderName, rawText, colorHex));
         trim();
     }
 

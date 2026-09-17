@@ -4,9 +4,15 @@ import com.mojang.brigadier.ParseResults;
 import com.mojang.brigadier.context.StringRange;
 import com.mojang.brigadier.suggestion.Suggestion;
 import com.mojang.brigadier.suggestion.Suggestions;
+import dev.shaurmalib.common.chat.ChatChannel;
+import dev.shaurmalib.common.chat.ChatChannelRegistry;
 import dev.shaurmalib.common.chat.ChatEntry;
 import dev.shaurmalib.common.chat.ChatFormatEngine;
+import dev.shaurmalib.forge.chat.ChatEntryRenderer;
+import dev.shaurmalib.forge.chat.ChatEntryRendererRegistry;
 import dev.shaurmalib.forge.chat.ChatModule;
+import dev.shaurmalib.forge.chat.ChatScreenButton;
+import dev.shaurmalib.forge.chat.ChatScreenButtonRegistry;
 import dev.shaurmalib.forge.network.ShaurmaLibNetwork;
 import dev.shaurmalib.forge.network.packets.ChatSendPacket;
 import dev.shaurmalib.forge.overlay.OverlayPanelStyle;
@@ -16,72 +22,80 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 /**
- * ChatHistoryScreen — узагальнена заміна ванільного {@code ChatScreen}
- * (план, п. 3.9 + 3.29). Перенесення {@code ChatHistoryScreen}
- * snipers_shaurma, з двома змінами відносно оригіналу:
- * <ol>
- *   <li><b>Виправлений баг подвійного слеша</b> — і в підказках команд
- *       ({@link #onInputChanged}), і при підстановці підказки
- *       ({@link #applySuggestion}) тепер знімаються ВСІ провідні
- *       {@code '/'} через {@link ChatFormatEngine#leadingSlashCount},
- *       а не рівно один. Раніше {@code "//tp @s ~ ~ ~"} парсився як
- *       {@code "/tp ..."} (недійсне ім'я команди для Brigadier),
- *       підказки зникали, і та сама помилка повторювалась на сервері
- *       в {@code ServerChatHandler} — команда мовчки не виконувалась.</li>
- *   <li><b>Узагальнені точки інтеграції</b> — замість жорсткого
- *       {@code ClientGameState.teamMode} і {@code CustomTabOverlay.forceVisible}
- *       консюмер передає {@link BooleanSupplier}/{@link Consumer} у
- *       конструкторі, тому бібліотека не знає нічого про конкретний
- *       tab-overlay клас чи джерело прапорця командного режиму.</li>
- * </ol>
- * Компонує в одному, не блокуючому огляд гри, вікні:
- *  - справа зверху: розгорнутий фід {@link ChatModule#history()} —
- *    та сама історія, що спливає в живому kill-feed, без окремого
- *    чат-логу, з прокруткою по всій історії поточного раунду;
- *  - знизу по центру: поле вводу з автофокусом, кнопками Global/Team
- *    (Team — дефолт у командних режимах; кнопок немає в соло-режимах);
- *  - повноцінні підказки аргументів команд (як у ванільному чаті).
+ * ChatHistoryScreen — кастомний чат бібліотеки.
+ *
+ * <p>Компонує в одному (не блокуючому гру) вікні:</p>
+ * <ul>
+ *   <li><b>канали</b> — кнопки «Загальний» + зареєстровані консюмером
+ *       канали, у які місцевий гравець має право писати (список приходить
+ *       з сервера {@code ChatChannelsSyncPacket}); вибраний канал
+ *       визначає, куди піде повідомлення;</li>
+ *   <li><b>верстку повідомлення</b> — делегується
+ *       {@link ChatEntryRenderer}, зареєстрованому консюмером
+ *       ({@link ChatEntryRendererRegistry}). Бібліотека має лише
+ *       нейтральний текстовий рендер за замовчуванням: голова гравця,
+ *       групова підсвітка ніку та будь-який інший вигляд — це вигляд
+ *       КОНКРЕТНОГО режиму, тому його малює мод, а не бібліотека;</li>
+ *   <li><b>кнопки консюмера</b> — {@link ChatScreenButtonRegistry}
+ *       (напр. «Налаштування» лише для операторів, майбутня
+ *       «Статистика»). Уся логіка кнопок — на боці консюмера;</li>
+ *   <li>поле вводу з підказками команд і історією повідомлень.</li>
+ * </ul>
+ *
+ * <p>Показ вхідних повідомлень у самій грі (спливаючий фід справа
+ * зверху) — не тут, а через {@link ChatModule} +
+ * {@code AlertNotificationSystem} (або власний {@code ChatDisplaySink}
+ * консюмера).</p>
  */
 @OnlyIn(Dist.CLIENT)
 public class ChatHistoryScreen extends Screen {
 
     // ── Розміри/розкладка ────────────────────────────────────────────────
-    private static final int FEED_W = 280;
+    private static final int FEED_W = 330;
     private static final int FEED_TOP_MARGIN = 8;
     private static final int FEED_BOTTOM_MARGIN = 8;
-    private static final int FEED_ENTRY_PAD_X = 12;
+    private static final int FEED_ENTRY_PAD = 5;
     private static final int FEED_ENTRY_GAP = 4;
 
-    private static final int INPUT_PANEL_W = 360;
+    private static final int INPUT_PANEL_W = 420;
     private static final int PANEL_MARGIN_BOTTOM = 40;
     private static final int INPUT_H = 20;
-    private static final int BTN_W = 64;
-    private static final int BTN_GAP = 4;
+    private static final int CHANNEL_BTN_H = 16;
+    private static final int CHANNEL_BTN_GAP = 3;
+    private static final int EXTRA_BTN_H = 16;
     private static final int SUGGESTION_ROW_H = 12;
     private static final int MAX_VISIBLE_SUGGESTIONS = 8;
+    private static final int MAX_HISTORY = 50;
 
-    // ── Точки інтеграції з консюмером (не хардкод snipers-класів) ──────
+    private static final int ACCENT_CYAN = 0xFF39C5F0;
+
+    // ── Точки інтеграції з консюмером ────────────────────────────────────
     private final BooleanSupplier teamModeAvailable;
-    private final Consumer<Boolean> tabOverlayForceVisible; // може бути no-op, якщо консюмер не має tab-overlay
+    private final Consumer<Boolean> tabOverlayForceVisible;
 
     private EditBox inputBox;
-    private boolean teamMode;
+    private String selectedChannel = ChatChannel.GLOBAL_ID;
     private float feedScroll = 0f;
     private int inputPanelX, inputPanelY;
     private int feedX, feedY, feedH;
+    private int channelRowY;
+    private int extraButtonRowY;
 
-    private static final int MAX_HISTORY = 50;
+    private final List<String> channelOrder = new ArrayList<>();
+    private final List<ChatChannel> channels = new ArrayList<>();
+    private final List<ChatScreenButton> extraButtons = new ArrayList<>();
+
     private static final List<String> messageHistory = new ArrayList<>();
     private int historyIndex = -1;
 
@@ -90,14 +104,6 @@ public class ChatHistoryScreen extends Screen {
     private int highlightedSuggestion = -1;
     private int suggestionScrollTop = 0;
 
-    /**
-     * @param teamModeAvailable       чи показувати кнопки Global/Team
-     *                                (в оригіналі — {@code ClientGameState.teamMode}).
-     * @param tabOverlayForceVisible  консюмер тримає свій tab-list
-     *                                видимим, поки {@code true} —
-     *                                передайте {@code b -> {}}, якщо
-     *                                вашому мод немає такого оверлею.
-     */
     public ChatHistoryScreen(BooleanSupplier teamModeAvailable, Consumer<Boolean> tabOverlayForceVisible) {
         super(Component.translatable("gui.shaurma_lib.chat.title"));
         this.teamModeAvailable = teamModeAvailable;
@@ -110,18 +116,19 @@ public class ChatHistoryScreen extends Screen {
 
     @Override
     protected void init() {
-        feedX = this.width - FEED_W - FEED_TOP_MARGIN;
-        feedY = FEED_TOP_MARGIN;
-        feedH = this.height - FEED_TOP_MARGIN - FEED_BOTTOM_MARGIN - INPUT_H - PANEL_MARGIN_BOTTOM;
+        selectedChannel = ChannelSelection.resolveDefault();
+        refreshChannels();
 
+        channelRowY = this.height - PANEL_MARGIN_BOTTOM - INPUT_H - 4 - CHANNEL_BTN_H;
+        extraButtonRowY = channelRowY - 4 - EXTRA_BTN_H;
         inputPanelX = (this.width - INPUT_PANEL_W) / 2;
         inputPanelY = this.height - PANEL_MARGIN_BOTTOM - INPUT_H;
 
-        boolean hasTeams = teamModeAvailable.getAsBoolean();
-        teamMode = hasTeams;
+        feedX = this.width - FEED_W - FEED_TOP_MARGIN;
+        feedY = FEED_TOP_MARGIN;
+        feedH = Math.max(40, channelRowY - 6 - FEED_TOP_MARGIN);
 
-        int inputW = hasTeams ? INPUT_PANEL_W - (BTN_W * 2 + BTN_GAP) - 6 : INPUT_PANEL_W;
-        inputBox = new EditBox(this.font, inputPanelX, inputPanelY, inputW, INPUT_H,
+        inputBox = new EditBox(this.font, inputPanelX, inputPanelY, INPUT_PANEL_W, INPUT_H,
                 Component.translatable("gui.shaurma_lib.chat.input_hint"));
         inputBox.setMaxLength(ChatFormatEngine.MAX_LENGTH);
         inputBox.setBordered(true);
@@ -134,6 +141,30 @@ public class ChatHistoryScreen extends Screen {
         tabOverlayForceVisible.accept(true);
     }
 
+    /** Перечитує канали з реєстру + клієнтського дзеркала доступу. */
+    private void refreshChannels() {
+        channels.clear();
+        channelOrder.clear();
+        LinkedHashSet<String> ids = new LinkedHashSet<>();
+        ids.add(ChatChannel.GLOBAL_ID);
+        ids.addAll(ChatModule.clientWritableChannels());
+        if (teamModeAvailable.getAsBoolean()) {
+            ids.add(ChatChannel.TEAM_ID);
+        }
+        for (String id : ids) {
+            channels.add(ChatChannelRegistry.byIdOrSynthetic(id));
+            channelOrder.add(id);
+        }
+        if (!channelOrder.contains(selectedChannel)) {
+            selectedChannel = ChannelSelection.resolveDefault();
+        }
+
+        extraButtons.clear();
+        for (ChatScreenButton button : ChatScreenButtonRegistry.all()) {
+            if (button.isVisible()) extraButtons.add(button);
+        }
+    }
+
     @Override
     public void removed() {
         super.removed();
@@ -142,7 +173,7 @@ public class ChatHistoryScreen extends Screen {
 
     @Override
     public boolean isPauseScreen() {
-        return false; // гра лишається активною, ESC-меню тут не потрібне
+        return false;
     }
 
     @Override
@@ -157,21 +188,19 @@ public class ChatHistoryScreen extends Screen {
     @Override
     public void render(GuiGraphics g, int mx, int my, float partialTick) {
         renderFeed(g);
-        renderModeButtons(g, mx, my);
         super.render(g, mx, my, partialTick);
+        renderChannelButtons(g, mx, my);
+        renderExtraButtons(g, mx, my);
         renderCommandSuggestions(g, mx, my);
 
-        String modeHint = Component.translatable(teamMode
-                ? "gui.shaurma_lib.chat.mode_team"
-                : "gui.shaurma_lib.chat.mode_global").getString();
-        g.drawString(this.font, modeHint, inputPanelX, inputPanelY + INPUT_H + 4, OverlayPanelStyle.applyAlpha(0xFF9AA0A6, 1f), true);
+        ChatChannel channel = ChatChannelRegistry.byIdOrSynthetic(selectedChannel);
+        String hint = Component.translatable(channel.labelKey()).getString();
+        g.drawString(this.font, hint, inputPanelX, inputPanelY + INPUT_H + 4,
+                OverlayPanelStyle.applyAlpha(channel.colorArgb(), 1f), true);
     }
 
-    /**
-     * Малює розгорнуту {@link ChatModule#history()} — усю історію
-     * записів поточного раунду, знизу вгору (найновіші внизу), з
-     * прокруткою.
-     */
+    // ── Історія ──────────────────────────────────────────────────────────
+
     private void renderFeed(GuiGraphics g) {
         List<ChatEntry> entries = ChatModule.history().snapshot();
         if (entries.isEmpty()) {
@@ -181,14 +210,11 @@ public class ChatHistoryScreen extends Screen {
             return;
         }
 
-        int maxLineW = FEED_W - FEED_ENTRY_PAD_X * 2;
+        int maxLineW = FEED_W - FEED_ENTRY_PAD * 2;
         int[] entryHeights = new int[entries.size()];
         int totalH = 0;
         for (int i = 0; i < entries.size(); i++) {
-            Component msg = entries.get(i).message();
-            List<FormattedCharSequence> lines = this.font.split(msg, maxLineW);
-            int lineCount = Math.max(1, lines.size());
-            int h = FEED_ENTRY_PAD_X / 2 + lineCount * this.font.lineHeight + (lineCount - 1) * 2 + FEED_ENTRY_PAD_X / 2;
+            int h = entryHeight(entries.get(i), maxLineW);
             entryHeights[i] = h;
             totalH += h + FEED_ENTRY_GAP;
         }
@@ -196,75 +222,93 @@ public class ChatHistoryScreen extends Screen {
         int maxScroll = Math.max(0, totalH - feedH);
         feedScroll = Mth.clamp(feedScroll, 0f, maxScroll);
 
-        int cursorYFromBottom = (int) feedScroll;
         int bottomY = feedY + feedH;
-
-        int y = bottomY + cursorYFromBottom;
+        int y = bottomY + (int) feedScroll;
         for (int i = entries.size() - 1; i >= 0; i--) {
             int h = entryHeights[i];
             y -= h;
             if (y + h < feedY) break;
-            if (y > bottomY) { y -= FEED_ENTRY_GAP; continue; }
-
-            ChatEntry entry = entries.get(i);
-            Component msg = entry.message();
-            int accent = accentFor(entry);
-            List<FormattedCharSequence> lines = this.font.split(msg, maxLineW);
-
-            OverlayPanelStyle.drawPanel(g, feedX, y, FEED_W, h, 1f, accent);
-            int textY = y + FEED_ENTRY_PAD_X / 2;
-            for (FormattedCharSequence line : lines) {
-                g.drawString(this.font, line, feedX + FEED_ENTRY_PAD_X, textY, OverlayPanelStyle.TEXT_DEFAULT, true);
-                textY += this.font.lineHeight + 2;
+            if (y > bottomY) {
+                y -= FEED_ENTRY_GAP;
+                continue;
             }
-
+            renderEntry(g, entries.get(i), y, h, maxLineW);
             y -= FEED_ENTRY_GAP;
         }
     }
 
     /**
-     * Акцентна лінія панелі запису в T-екрані. Колір ніку відправника
-     * вже "запечений" усередині {@code entry.message()} (застосований
-     * один раз на сервері через {@code ChatFormatEngine.formatChatLine}),
-     * тому тут лишається лише нейтральний акцент по замовчуванню —
-     * панель сама не перефарбовує лінію під команду (те саме, що робив
-     * живий kill-feed для CHAT-записів в оригіналі: акцентна лінія була
-     * нейтрально-сірою, кольоровим був лише текст ніку всередині рядка).
+     * Висота рядка = вміст від поточного {@link ChatEntryRenderer} плюс
+     * внутрішні відступи панелі. Сам вигляд рядка бібліотека не знає.
      */
+    private int entryHeight(ChatEntry entry, int maxLineW) {
+        ChatEntryRenderer renderer = ChatEntryRendererRegistry.get();
+        int contentH = Math.max(1, renderer.contentHeight(entry, this.font, maxLineW));
+        return contentH + FEED_ENTRY_PAD * 2;
+    }
+
+    private void renderEntry(GuiGraphics g, ChatEntry entry, int y, int h, int maxLineW) {
+        int accent = accentFor(entry);
+        OverlayPanelStyle.drawPanel(g, feedX, y, FEED_W, h, 1f, accent);
+
+        int contentH = Math.max(1, h - FEED_ENTRY_PAD * 2);
+        ChatEntryRendererRegistry.get().render(g, entry, this.font,
+                feedX + FEED_ENTRY_PAD, y + FEED_ENTRY_PAD, maxLineW, contentH, accent);
+    }
+
     private int accentFor(ChatEntry entry) {
         return switch (entry.type()) {
             case DEATH -> OverlayPanelStyle.ACCENT_RED;
-            case CHAT_GLOBAL, CHAT_TEAM -> ChatFormatEngine.resolveAccent(null);
+            case CHAT_GLOBAL, CHAT_TEAM -> ChatFormatEngine.parseColorOrDefault(entry.colorHex(), 0xFFAAAAAA);
             case SYSTEM -> OverlayPanelStyle.withAlpha(0xFFAAAAAA, 255);
         };
     }
 
-    private void renderModeButtons(GuiGraphics g, int mx, int my) {
-        if (!teamModeAvailable.getAsBoolean()) return;
+    // ── Кнопки ───────────────────────────────────────────────────────────
 
-        int btnY = inputPanelY;
-        int globalX = inputPanelX + INPUT_PANEL_W - (BTN_W * 2 + BTN_GAP);
-        int teamX = inputPanelX + INPUT_PANEL_W - BTN_W;
-
-        drawModeButton(g, globalX, btnY, "gui.shaurma_lib.chat.btn_global", !teamMode, mx, my);
-        drawModeButton(g, teamX, btnY, "gui.shaurma_lib.chat.btn_team", teamMode, mx, my);
+    private void renderChannelButtons(GuiGraphics g, int mx, int my) {
+        int x = inputPanelX;
+        for (ChatChannel channel : channels) {
+            int w = this.font.width(Component.translatable(channel.labelKey()).getString()) + 12;
+            boolean active = channel.id().equals(selectedChannel);
+            drawButton(g, x, channelRowY, w, CHANNEL_BTN_H,
+                    Component.translatable(channel.labelKey()).getString(), active,
+                    channel.colorArgb(), mx, my);
+            x += w + CHANNEL_BTN_GAP;
+        }
     }
 
-    private void drawModeButton(GuiGraphics g, int x, int y, String labelKey, boolean active, int mx, int my) {
-        boolean hovered = mx >= x && mx < x + BTN_W && my >= y && my < y + INPUT_H;
-        int accentCyan = 0xFF39C5F0;
-        int fill = active ? OverlayPanelStyle.withAlpha(accentCyan, 90)
+    private void renderExtraButtons(GuiGraphics g, int mx, int my) {
+        if (extraButtons.isEmpty()) return;
+        int totalW = 0;
+        for (ChatScreenButton button : extraButtons) {
+            totalW += this.font.width(button.label()) + 12 + CHANNEL_BTN_GAP;
+        }
+        int x = inputPanelX + INPUT_PANEL_W - totalW + CHANNEL_BTN_GAP;
+        for (ChatScreenButton button : extraButtons) {
+            int w = this.font.width(button.label()) + 12;
+            drawButton(g, x, extraButtonRowY, w, EXTRA_BTN_H, button.label().getString(),
+                    false, ACCENT_CYAN, mx, my);
+            x += w + CHANNEL_BTN_GAP;
+        }
+    }
+
+    private void drawButton(GuiGraphics g, int x, int y, int w, int h,
+                            String label, boolean active, int accent, int mx, int my) {
+        boolean hovered = mx >= x && mx < x + w && my >= y && my < y + h;
+        int fill = active ? OverlayPanelStyle.withAlpha(accent, 90)
                 : (hovered ? 0x33FFFFFF : OverlayPanelStyle.withAlpha(0x000000, 140));
-        int border = active ? accentCyan : OverlayPanelStyle.BORDER;
+        int border = active ? accent : OverlayPanelStyle.BORDER;
 
-        g.fill(x, y, x + BTN_W, y + INPUT_H, fill);
-        OverlayPanelStyle.border1px(g, x, y, BTN_W, INPUT_H, border);
+        g.fill(x, y, x + w, y + h, fill);
+        OverlayPanelStyle.border1px(g, x, y, w, h, border);
 
-        String label = Component.translatable(labelKey).getString();
         int tw = this.font.width(label);
-        g.drawString(this.font, label, x + (BTN_W - tw) / 2, y + (INPUT_H - 8) / 2,
+        g.drawString(this.font, label, x + (w - tw) / 2, y + (h - 8) / 2,
                 active ? 0xFFFFFFFF : 0xFF9AA0A6, false);
     }
+
+    // ── Підказки команд ──────────────────────────────────────────────────
 
     private void renderCommandSuggestions(GuiGraphics g, int mx, int my) {
         if (currentSuggestions == null || currentSuggestions.getList().isEmpty()) return;
@@ -278,7 +322,7 @@ public class ChatHistoryScreen extends Screen {
         int h = visibleCount * SUGGESTION_ROW_H + 4;
         int y = inputBox.getY() - 2 - h;
 
-        OverlayPanelStyle.drawPanel(g, x, y, w, h, 0.92f, 0xFF39C5F0);
+        OverlayPanelStyle.drawPanel(g, x, y, w, h, 0.92f, ACCENT_CYAN);
 
         for (int row = 0; row < visibleCount; row++) {
             int idx = suggestionScrollTop + row;
@@ -291,16 +335,8 @@ public class ChatHistoryScreen extends Screen {
             if (hovered || keyboardSelected) {
                 g.fill(x + 1, rowY, x + w - 1, rowY + SUGGESTION_ROW_H, 0x33FFFFFF);
             }
-
-            int color = keyboardSelected ? 0xFF39C5F0 : (hovered ? 0xFFFFFFFF : 0xFF9AA0A6);
+            int color = keyboardSelected ? ACCENT_CYAN : (hovered ? 0xFFFFFFFF : 0xFF9AA0A6);
             g.drawString(this.font, list.get(idx).getText(), x + 4, rowY + 2, color, false);
-        }
-
-        if (total > visibleCount) {
-            String counter = (suggestionScrollTop + 1) + "-" + Math.min(total, suggestionScrollTop + visibleCount)
-                    + "/" + total;
-            int cw = this.font.width(counter);
-            g.drawString(this.font, counter, x + w - cw - 4, y + h - SUGGESTION_ROW_H + 2, 0xFF9AA0A6, false);
         }
     }
 
@@ -308,18 +344,6 @@ public class ChatHistoryScreen extends Screen {
     //  Логіка підказок команд (Brigadier, публічний API)
     // ══════════════════════════════════════════════════════════════════
 
-    /**
-     * Викликається при кожній зміні тексту в полі вводу. Парсить текст
-     * через клієнтський {@code CommandDispatcher}, якщо він починається
-     * з {@code '/'}.
-     * <p>
-     * <b>Виправлено:</b> раніше {@code text.substring(1)} знімав рівно
-     * один провідний {@code '/'}, тому {@code "//tp"} парсився як
-     * {@code "/tp"} — недійсне ім'я команди, підказки не з'являлись.
-     * Тепер знімаються всі провідні слеші через
-     * {@link ChatFormatEngine#leadingSlashCount}, і позиція курсора
-     * перераховується на їхню кількість, а не на фіксовану 1.
-     */
     private void onInputChanged(String text) {
         currentSuggestions = null;
         highlightedSuggestion = -1;
@@ -353,12 +377,6 @@ public class ChatHistoryScreen extends Screen {
         }
     }
 
-    /**
-     * Підставляє обрану підказку в поле вводу, зберігаючи ВСІ провідні
-     * слеші, введені гравцем (не форсуючи рівно один) — узгоджено з
-     * фіксом у {@link #onInputChanged}, щоб текст, який реально піде на
-     * сервер, точно відповідав тому, що бачив gравець при виборі підказки.
-     */
     private void applySuggestion(int index) {
         if (currentSuggestions == null) return;
         List<Suggestion> list = currentSuggestions.getList();
@@ -382,7 +400,6 @@ public class ChatHistoryScreen extends Screen {
         int newCursor = slashCount + start + chosen.getText().length();
         inputBox.setCursorPosition(newCursor);
         inputBox.setHighlightPos(newCursor);
-
         onInputChanged(newValue);
     }
 
@@ -406,7 +423,7 @@ public class ChatHistoryScreen extends Screen {
     }
 
     // ══════════════════════════════════════════════════════════════════
-    //  Ввід (клавіатура/миша)
+    //  Ввід
     // ══════════════════════════════════════════════════════════════════
 
     @Override
@@ -426,7 +443,6 @@ public class ChatHistoryScreen extends Screen {
             applySuggestion(highlightedSuggestion >= 0 ? highlightedSuggestion : 0);
             return true;
         }
-
         if (keyCode == KEY_ENTER || keyCode == KEY_KP_ENTER) {
             if (highlightedSuggestion >= 0 && suggestionCount() > 0) {
                 applySuggestion(highlightedSuggestion);
@@ -445,15 +461,8 @@ public class ChatHistoryScreen extends Screen {
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
         if (button == 0) {
-            if (teamModeAvailable.getAsBoolean()) {
-                int btnY = inputPanelY;
-                int globalX = inputPanelX + INPUT_PANEL_W - (BTN_W * 2 + BTN_GAP);
-                int teamX = inputPanelX + INPUT_PANEL_W - BTN_W;
-                if (my >= btnY && my < btnY + INPUT_H) {
-                    if (mx >= globalX && mx < globalX + BTN_W) { teamMode = false; return true; }
-                    if (mx >= teamX && mx < teamX + BTN_W) { teamMode = true; return true; }
-                }
-            }
+            if (handleChannelClick(mx, my)) return true;
+            if (handleExtraButtonClick(mx, my)) return true;
 
             if (currentSuggestions != null && !currentSuggestions.getList().isEmpty()) {
                 int total = currentSuggestions.getList().size();
@@ -475,6 +484,40 @@ public class ChatHistoryScreen extends Screen {
         return super.mouseClicked(mx, my, button);
     }
 
+    private boolean handleChannelClick(double mx, double my) {
+        if (my < channelRowY || my >= channelRowY + CHANNEL_BTN_H) return false;
+        int x = inputPanelX;
+        for (ChatChannel channel : channels) {
+            int w = this.font.width(Component.translatable(channel.labelKey()).getString()) + 12;
+            if (mx >= x && mx < x + w) {
+                selectedChannel = channel.id();
+                return true;
+            }
+            x += w + CHANNEL_BTN_GAP;
+        }
+        return false;
+    }
+
+    private boolean handleExtraButtonClick(double mx, double my) {
+        if (extraButtons.isEmpty()) return false;
+        if (my < extraButtonRowY || my >= extraButtonRowY + EXTRA_BTN_H) return false;
+
+        int totalW = 0;
+        for (ChatScreenButton button : extraButtons) {
+            totalW += this.font.width(button.label()) + 12 + CHANNEL_BTN_GAP;
+        }
+        int x = inputPanelX + INPUT_PANEL_W - totalW + CHANNEL_BTN_GAP;
+        for (ChatScreenButton button : extraButtons) {
+            int w = this.font.width(button.label()) + 12;
+            if (mx >= x && mx < x + w) {
+                button.press(this);
+                return true;
+            }
+            x += w + CHANNEL_BTN_GAP;
+        }
+        return false;
+    }
+
     @Override
     public boolean mouseScrolled(double mx, double my, double delta) {
         if (currentSuggestions != null && !currentSuggestions.getList().isEmpty()) {
@@ -490,7 +533,6 @@ public class ChatHistoryScreen extends Screen {
                 return true;
             }
         }
-
         feedScroll = Math.max(0f, feedScroll + (float) delta * 12f);
         return true;
     }
@@ -502,12 +544,13 @@ public class ChatHistoryScreen extends Screen {
             return;
         }
         String stripped = text.strip();
-        if (!stripped.isEmpty() && (messageHistory.isEmpty() || !messageHistory.get(messageHistory.size() - 1).equals(stripped))) {
+        if (!stripped.isEmpty() && (messageHistory.isEmpty()
+                || !messageHistory.get(messageHistory.size() - 1).equals(stripped))) {
             messageHistory.add(stripped);
             if (messageHistory.size() > MAX_HISTORY) messageHistory.remove(0);
         }
         historyIndex = -1;
-        ShaurmaLibNetwork.sendToServer(new ChatSendPacket(stripped, teamMode));
+        ShaurmaLibNetwork.sendToServer(new ChatSendPacket(stripped, selectedChannel));
         inputBox.setValue("");
         this.onClose();
     }
@@ -536,6 +579,18 @@ public class ChatHistoryScreen extends Screen {
             String msg = messageHistory.get(historyIndex);
             inputBox.setValue(msg);
             inputBox.setCursorPosition(msg.length());
+        }
+    }
+
+    /**
+     * Куди ставити курсор каналу при відкритті: серверний default (перший
+     * доступний рольовий канал), або глобальний. Виноситься окремо, щоб
+     * логіку вибору можна було змінити в одному місці.
+     */
+    private static final class ChannelSelection {
+        static String resolveDefault() {
+            String def = ChatModule.clientDefaultChannel();
+            return def == null || def.isBlank() ? ChatChannel.GLOBAL_ID : def;
         }
     }
 }

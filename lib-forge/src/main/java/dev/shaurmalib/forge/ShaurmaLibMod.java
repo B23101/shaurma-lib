@@ -42,6 +42,17 @@ public final class ShaurmaLibMod {
             "intro_music",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("shaurma_lib", "intro_music")));
 
+    /**
+     * Звук вхідного чат-повідомлення ({@code ChatModule.SOUND_ID}).
+     * Реєструється бібліотекою, щоб консюмеру не треба було дублювати
+     * реєстр звуків у себе: йому лишається покласти {@code chat_message.ogg}
+     * у {@code assets/shaurma_lib/sounds/} (або перекрити власним файлом
+     * з тим самим id).
+     */
+    public static final RegistryObject<SoundEvent> CHAT_MESSAGE = SOUND_EVENTS.register(
+            "chat_message",
+            () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("shaurma_lib", "chat_message")));
+
     public ShaurmaLibMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         SOUND_EVENTS.register(modEventBus);

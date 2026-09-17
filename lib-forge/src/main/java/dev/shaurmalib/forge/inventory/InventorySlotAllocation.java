@@ -4,9 +4,11 @@ import dev.shaurmalib.forge.network.ShaurmaLibNetwork;
 import dev.shaurmalib.forge.network.packets.InventorySlotAllocationPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -30,8 +32,27 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class InventorySlotAllocation {
 
+    /**
+     * Чи поширюються обмеження слотів на гравців у CREATIVE/SPECTATOR.
+     *
+     * <p>{@link #APPLY} (дефолт) — правила діють для всіх режимів: адмін
+     * у креативі посеред матчу бачить ті самі 0/2/4 слоти, що й гравець.
+     * Саме це потрібно режимам, де креатив — лише інструмент адміна, а не
+     * ігрова механіка.</p>
+     *
+     * <p>{@link #EXEMPT} — гравець у CREATIVE/SPECTATOR не обмежується
+     * взагалі (обмеження знімається, не застосовується заново, доки
+     * гравець не повернеться у звичайний режим). Це потрібно картобудівникам
+     * і режимам, де креатив використовується у самій грі.</p>
+     */
+    public enum CreativePolicy {
+        APPLY,
+        EXEMPT
+    }
+
     private static final Map<UUID, Allocation> ALLOCATIONS = new ConcurrentHashMap<>();
     private static volatile boolean enabled;
+    private static volatile CreativePolicy creativePolicy = CreativePolicy.APPLY;
 
     private InventorySlotAllocation() {}
 
@@ -41,6 +62,33 @@ public final class InventorySlotAllocation {
 
     public static boolean isEnabled() {
         return enabled;
+    }
+
+    /**
+     * Вмикає/вимикає звільнення гравців у CREATIVE/SPECTATOR. Дефолт —
+     * {@link CreativePolicy#APPLY} (обмеження чинні і в креативі).
+     * Викликати на старті сервера (або під час reload конфігу) — значення
+     * читається при кожному {@link #setAllowedSlots} і при кожній зміні
+     * ігрового режиму.
+     */
+    public static void setCreativePolicy(CreativePolicy policy) {
+        if (policy == null) {
+            throw new IllegalArgumentException("Політика для креативу не може бути null.");
+        }
+        creativePolicy = policy;
+    }
+
+    public static CreativePolicy creativePolicy() {
+        return creativePolicy;
+    }
+
+    /**
+     * Чи цього гравця звільнено від обмежень лише через ігровий режим
+     * (CREATIVE/SPECTATOR) згідно з поточною {@link #creativePolicy()}.
+     */
+    public static boolean isGameModeExempt(ServerPlayer player) {
+        if (player == null || creativePolicy == CreativePolicy.APPLY) return false;
+        return player.isCreative() || player.isSpectator();
     }
 
     public static void setHotbarSlotCount(ServerPlayer player, int count) {
@@ -66,6 +114,14 @@ public final class InventorySlotAllocation {
         requireEnabled();
         if (player == null || slots == null) {
             throw new IllegalArgumentException("Гравець і slots не можуть бути null.");
+        }
+
+        // Політика креативу вирішується ТУТ, а не в консюмері: якщо гравець
+        // звільнений — не зберігаємо обмеження взагалі і надсилаємо клієнту
+        // "без обмежень" (інакше на клієнті лишився б попередній пакет).
+        if (isGameModeExempt(player)) {
+            clear(player);
+            return;
         }
 
         Set<Integer> copy = new LinkedHashSet<>();
@@ -168,6 +224,124 @@ public final class InventorySlotAllocation {
         if (allocation != null) {
             syncToClient(player, allocation);
         }
+    }
+
+    // ══════════════════════════════════════════════════════════════
+    //  Підбирання предметів — дозволені слоти, а не "весь інвентар"
+    // ══════════════════════════════════════════════════════════════
+
+    /**
+     * Чи є куди покласти стек, зважаючи ЛИШЕ на дозволені слоти.
+     * <p>
+     * <b>Це той самий пропущений шлях, через який "0 слотів" все одно
+     * підбирав предмети:</b> ванільний {@code Inventory#add} кладе стек у
+     * будь-який вільний слот (включно з 9..35, 36..40), тому навіть з
+     * нулем дозволених слотів підбирання "вдавалось" — предмет просто
+     * зникав у недоступному слоті. Тут перевіряються рівно ті слоти, які
+     * гравець реально бачить і може використати.</p>
+     *
+     * @return {@code true}, якщо весь стек влізе (дозволені слоти
+     *         можуть доповнити наявні стеки або мають вільне місце).
+     */
+    public static boolean canAccept(ServerPlayer player, ItemStack stack) {
+        if (player == null || stack == null) return false;
+        Allocation allocation = ALLOCATIONS.get(player.getUUID());
+        if (allocation == null) return true; // гравець без обмежень
+        return simulateAdd(player.getInventory(), allocation, stack.copy(), true).isEmpty();
+    }
+
+    /**
+     * Кладе стек ЛИШЕ у дозволені слоти. Повертає залишок
+     * ({@link ItemStack#EMPTY}, якщо все влізло).
+     * <p>
+     * Консюмер використовує це замість {@code player.getInventory().add(...)}
+     * для власних шляхів видачі/підбирання предметів (напр. кастомна
+     * сутність лежачого луту). Для ванільного {@code ItemEntity} той самий
+     * інваріант тримає {@code InventorySlotAllocationHooks} через
+     * {@code EntityItemPickupEvent}.
+     */
+    public static ItemStack addToAllowedSlots(ServerPlayer player, ItemStack stack) {
+        requireEnabled();
+        if (player == null || stack == null) {
+            throw new IllegalArgumentException("Гравець і стек не можуть бути null.");
+        }
+        Allocation allocation = ALLOCATIONS.get(player.getUUID());
+        if (allocation == null) {
+            // Немає обмежень — звичайна ванільна поведінка, щоб консюмер
+            // міг викликати цей метод безумовно.
+            boolean added = player.getInventory().add(stack);
+            return added ? ItemStack.EMPTY : stack;
+        }
+        ItemStack remaining = simulateAdd(player.getInventory(), allocation, stack.copy(), false);
+        if (remaining.getCount() != stack.getCount()) {
+            player.getInventory().setChanged();
+        }
+        return remaining;
+    }
+
+    /**
+     * Спільна логіка перевірки/розкладки по дозволених слотах.
+     *
+     * @param dryRun {@code true} — нічого не змінювати (лише порахувати
+     *               залишок), {@code false} — реально покласти.
+     * @return залишок стека, який не вліз.
+     */
+    private static ItemStack simulateAdd(Inventory inventory,
+                                         Allocation allocation,
+                                         ItemStack remaining,
+                                         boolean dryRun) {
+        // 1. Доповнюємо наявні стеки тим самим предметом (як ванільний add).
+        for (Integer slot : allocation.allowedSlots) {
+            if (remaining.isEmpty()) break;
+            ItemStack existing = inventory.getItem(slot);
+            if (existing.isEmpty() || !ItemStack.isSameItemSameTags(existing, remaining)) continue;
+            int space = existing.getMaxStackSize() - existing.getCount();
+            if (space <= 0) continue;
+            int move = Math.min(space, remaining.getCount());
+            if (!dryRun) {
+                existing.grow(move);
+            }
+            remaining.shrink(move);
+        }
+        // 2. Порожні дозволені слоти.
+        for (Integer slot : allocation.allowedSlots) {
+            if (remaining.isEmpty()) break;
+            ItemStack existing = inventory.getItem(slot);
+            if (!existing.isEmpty()) continue;
+            int move = Math.min(remaining.getMaxStackSize(), remaining.getCount());
+            if (!dryRun) {
+                ItemStack placed = remaining.copy();
+                placed.setCount(move);
+                inventory.setItem(slot, placed);
+            }
+            remaining.shrink(move);
+        }
+        return remaining;
+    }
+
+    /**
+     * Переоцінка обмежень при зміні ігрового режиму. Повертає {@code true},
+     * якщо гравця було звільнено політикою (обмеження знято), і викликати
+     * {@link #syncExisting} після цього не потрібно.
+     * <p>
+     * Це потрібно, бо {@code setAllowedSlots} не зберігає обмеження для
+     * звільненого гравця: перехід назад у ADVENTURE/SURVIVAL має знову
+     * застосувати правила — це робить консюмер (повторний виклик
+     * {@code setHotbarSlotCount} на наступному тіку), а на зміні режиму
+     * ми лише прибираємо старі обмеження.
+     */
+    public static boolean applyGameModePolicy(ServerPlayer player, net.minecraft.world.level.GameType newGameMode) {
+        if (player == null) return false;
+        boolean exempt = creativePolicy == CreativePolicy.EXEMPT
+                && (newGameMode == net.minecraft.world.level.GameType.CREATIVE
+                    || newGameMode == net.minecraft.world.level.GameType.SPECTATOR);
+        if (exempt) {
+            if (ALLOCATIONS.containsKey(player.getUUID())) {
+                clear(player);
+            }
+            return true;
+        }
+        return false;
     }
 
     public static long allowedMask(Allocation allocation) {
