@@ -1,6 +1,7 @@
 # Gradle
 .gradle/
 build/
+lib-common/build/
 */build/
 gradle-app.setting
 .gradletasknamecache
