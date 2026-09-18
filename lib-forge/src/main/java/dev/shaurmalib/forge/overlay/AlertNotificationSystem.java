@@ -77,7 +77,7 @@ public final class AlertNotificationSystem {
      * запис у журналі чату.
      */
     public static void pushChatEntry(String feedId, dev.shaurmalib.common.chat.ChatEntry entry,
-                                     int accentArgb, OverlayTimings timings) {
+                                      int accentArgb, OverlayTimings timings) {
         OverlayFeed feed = feeds.computeIfAbsent(feedId, k -> new OverlayFeed());
         String plain = entry.rawText() != null ? entry.rawText()
                 : (entry.message() != null ? entry.message().getString() : "");

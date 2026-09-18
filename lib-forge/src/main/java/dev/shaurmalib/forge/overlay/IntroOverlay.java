@@ -102,9 +102,18 @@ public final class IntroOverlay {
         startedAt = System.currentTimeMillis();
     }
 
+    /**
+     * Ховає інтро-оверлей. НЕ обриває музику: {@code music} має догравати
+     * природно до кінця незалежно від того, зникло інтро чи ні — раніше тут
+     * викликався {@link #stopMusic()}, і будь-яке дострокове закриття
+     * (закінчився час показу, гравець вийшов зі світу, розлогінився, чи
+     * споживач вимкнув {@code enabled} посеред показу) різало трек
+     * посередині. {@link #activate()} на наступному вході так само не
+     * зупиняє попередній трек вручну — Minecraft сам прибирає завершений
+     * {@link SimpleSoundInstance} зі свого пулу, коли той догравання.
+     */
     public static void deactivate() {
         active = false;
-        stopMusic();
         soundsPaused = false;
     }
 
@@ -341,7 +350,13 @@ public final class IntroOverlay {
         }
     }
 
-    private static void stopMusic() {
+    /**
+     * Явно обриває музику інтро, якщо вона ще грає. {@link #deactivate()}
+     * цей метод більше НЕ викликає (музика має догравати до кінця сама),
+     * тож викликати варто лише там, де обрив дійсно потрібен — напр.
+     * споживач сам хоче різко замовкнути трек при релогіні на інший сервер.
+     */
+    public static void stopMusic() {
         if (music != null) {
             Minecraft.getInstance().getSoundManager().stop(music);
             music = null;

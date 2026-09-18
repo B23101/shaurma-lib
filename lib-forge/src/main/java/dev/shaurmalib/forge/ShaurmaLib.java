@@ -12,6 +12,7 @@ import dev.shaurmalib.forge.client.chat.ChatScreenInterceptHandler;
 import dev.shaurmalib.forge.config.ConfigModule;
 import dev.shaurmalib.forge.item.ItemAnimationEngine;
 import dev.shaurmalib.forge.inventory.InventorySlotAllocation;
+import dev.shaurmalib.forge.hunger.FoodControlService;
 import dev.shaurmalib.forge.stamina.StaminaRules;
 import dev.shaurmalib.forge.stamina.StaminaService;
 import dev.shaurmalib.forge.license.LicenseModule;
@@ -198,6 +199,7 @@ public final class ShaurmaLib {
         private boolean inventorySlotAllocationEnabled = false;
         private boolean staminaEnabled = false;
         private StaminaRules staminaRules;
+        private boolean foodControlEnabled = false;
         private RadioVoiceVolumeProvider radioVolumeProvider;
         private SoundEvent radioStartSound;
         private SoundEvent radioNoiseSound;
@@ -532,8 +534,11 @@ public final class ShaurmaLib {
          * (план, п. 3.23) — {@link dev.shaurmalib.forge.fx.ScreenEffectPostChain},
          * заміна {@code BlackAndWhiteScreenEffect} snipers_shaurma одним
          * централізованим реєстром. Консюмер реєструє свій ефект (напр.
-         * монохром) через {@code ScreenEffectPostChain.register(PostChainEffectSpec)}
-         * і керує його активацією через
+         * монохром, або затемнення локації з плавним переходом через
+         * {@link dev.shaurmalib.forge.fx.ScreenEffectPostChain#register(
+         * dev.shaurmalib.common.fx.PostChainEffectSpec,
+         * dev.shaurmalib.common.fx.PostChainFadeSpec)}) і керує його
+         * активацією через
          * {@link dev.shaurmalib.common.fx.PostChainEffectCauses} —
          * {@code activate}/{@code deactivate} з довільним рядком-причиною
          * (той самий "reason key" підхід, що {@code InteractionLockRegistry},
@@ -548,6 +553,22 @@ public final class ShaurmaLib {
          * шейдер-асетів, лише механіку завантаження/ресайзу/reload
          * (той самий принцип, що {@code ShaurmaConfigTree}: дані завжди
          * постачає споживач).
+         * <p>
+         * <b>Виняток — вбудоване затемнення</b> ({@link dev.shaurmalib.forge.fx.ScreenEffectPostChain#enableDarkness()}/
+         * {@code disableDarkness()}): готовий пресет із шейдером у namespace
+         * бібліотеки, керований прапорцем — консюмеру не треба нічого
+         * реєструвати самому. Достатньо один раз підключити рендер-хук
+         * і reload-listener (обидва підписуються на консюмерський
+         * {@code eventBus}, як і решта клієнтських точок бібліотеки):
+         * <pre>{@code
+         * // Client mod-bus setup, один раз:
+         * modEventBus.addListener(ScreenEffectPostChain::registerReloadListener);
+         * MinecraftForge.EVENT_BUS.addListener(ScreenEffectPostChain::onRenderGuiPre);
+         *
+         * // Будь-де далі — просто прапор:
+         * ScreenEffectPostChain.enableDarkness();   // плавно затемнює
+         * ScreenEffectPostChain.disableDarkness();  // плавно повертає як було
+         * }</pre>
          */
         public Builder withScreenEffects() {
             this.screenEffectsEnabled = true;
@@ -777,6 +798,19 @@ public final class ShaurmaLib {
             }
             this.staminaEnabled = true;
             this.staminaRules = rules;
+            return this;
+        }
+
+        /**
+         * Підключає {@link FoodControlService} — керування голодом гравця
+         * поза ванільною механікою (план: "голод у лобі не тратиться").
+         * Сам по собі нічого не змінює: бібліотека не знає, що таке "лобі",
+         * тому споживач сам викликає {@link FoodControlService#setMode}
+         * (і, за потреби, {@link FoodControlService#setFixedFood}) у
+         * потрібний момент — напр. при вході в лобі / поверненні у гру.
+         */
+        public Builder withFoodControl() {
+            this.foodControlEnabled = true;
             return this;
         }
 
@@ -1120,6 +1154,9 @@ public final class ShaurmaLib {
             if (staminaEnabled) {
                 StaminaService.enable(staminaRules);
             }
+            if (foodControlEnabled) {
+                FoodControlService.enable();
+            }
             if (animatedItemsEnabled && phantomSlotBridge != null) {
                 ItemAnimationEngine.registerPhantomSlotBridge(phantomSlotBridge);
             }
@@ -1181,7 +1218,7 @@ public final class ShaurmaLib {
                     animatedBlocksEnabled, skinnableEntitiesEnabled, graffitiEnabled, animationRecordingEnabled, spectatorEnabled, screenEffectsEnabled,
                     configModule, modeContractModule,
                     lifecycleModule, licenseModule, lobbyModule, playerLifecycleModule, interactionLockModule,
-                    modeSettingsModule, inventorySlotAllocationEnabled, staminaEnabled);
+                    modeSettingsModule, inventorySlotAllocationEnabled, staminaEnabled, foodControlEnabled);
         }
     }
 
@@ -1376,6 +1413,7 @@ public final class ShaurmaLib {
         private final boolean screenEffectsEnabled;
         private final boolean inventorySlotAllocationEnabled;
         private final boolean staminaEnabled;
+        private final boolean foodControlEnabled;
         private final ConfigModule configModule;
         private final ModeContractModule modeContractModule;
         private final LifecycleModule lifecycleModule;
@@ -1401,7 +1439,8 @@ public final class ShaurmaLib {
                         PlayerLifecycleModule playerLifecycleModule, InteractionLockModule interactionLockModule,
                         ModeSettingsModule modeSettingsModule,
                         boolean inventorySlotAllocationEnabled,
-                        boolean staminaEnabled) {
+                        boolean staminaEnabled,
+                        boolean foodControlEnabled) {
             this.consumerModId = consumerModId;
             this.eventBus = eventBus;
             this.teleportEnabled = teleportEnabled;
@@ -1426,6 +1465,7 @@ public final class ShaurmaLib {
             this.screenEffectsEnabled = screenEffectsEnabled;
             this.inventorySlotAllocationEnabled = inventorySlotAllocationEnabled;
             this.staminaEnabled = staminaEnabled;
+            this.foodControlEnabled = foodControlEnabled;
             this.configModule = configModule;
             this.modeContractModule = modeContractModule;
             this.lifecycleModule = lifecycleModule;
@@ -1446,6 +1486,10 @@ public final class ShaurmaLib {
 
         public boolean staminaEnabled() {
             return staminaEnabled;
+        }
+
+        public boolean foodControlEnabled() {
+            return foodControlEnabled;
         }
 
         public IEventBus eventBus() {
