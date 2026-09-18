@@ -18,6 +18,17 @@ public final class StaminaService {
     private static final Map<UUID, String> LAST_SYNC = new ConcurrentHashMap<>();
     private static volatile boolean enabled;
 
+    /**
+     * Поріг горизонтальної швидкості (у квадраті — уникаємо sqrt), нижче
+     * якого гравець вважається таким, що фактично не рухається, навіть
+     * якщо {@code isSprinting()} на цей тік {@code true}. Значення взято
+     * помітно нижчим за звичайну ванільну швидкість бігу (~0.2-0.28
+     * блок/тік по горизонталі при спринті) — короткий вертикальний
+     * стрибок з мінімальним forward-імпульсом під нього не підпадає,
+     * реальний спринт-біг завжди підпадає.
+     */
+    private static final double MIN_SPRINT_MOTION_SQR = 0.01d;
+
     private StaminaService() {}
 
     public static void enable(StaminaRules defaults) {
@@ -150,7 +161,15 @@ public final class StaminaService {
         if (depleted) {
             player.setSprinting(false);
         }
-        boolean sprinting = !depleted && player.isSprinting() && player.getVehicle() == null;
+        // Ванільний isSprinting() може стати true на короткий сплеск і
+        // під час стрибка вперед (клієнт іноді виставляє прапор спринту
+        // разом із forward-імпульсом стрибка, навіть без реального
+        // безперервного бігу) — витрата стаміни на такий одиничний тік
+        // виглядає як "стрибнув без спринту, а стаміна трохи впала".
+        // Довжина руху по горизонталі — надійніший сигнал "гравець
+        // справді біжить", ніж сам по собі isSprinting().
+        boolean actuallyMoving = player.getDeltaMovement().horizontalDistanceSqr() > MIN_SPRINT_MOTION_SQR;
+        boolean sprinting = !depleted && player.isSprinting() && actuallyMoving && player.getVehicle() == null;
         if (sprinting && rules.drainPerSecond() > 0) {
             stamina -= rules.drainPerSecond() / 20.0f;
             LAST_USE_TICK.put(player.getUUID(), player.tickCount);
