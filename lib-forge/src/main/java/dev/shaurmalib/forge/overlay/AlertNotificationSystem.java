@@ -2,6 +2,7 @@ package dev.shaurmalib.forge.overlay;
 
 import dev.shaurmalib.common.overlay.AlertSpec;
 import dev.shaurmalib.common.overlay.OverlayFeed;
+import dev.shaurmalib.common.overlay.OverlayTimings;
 import dev.shaurmalib.common.overlay.TimedOverlayEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -76,7 +77,7 @@ public final class AlertNotificationSystem {
      * запис у журналі чату.
      */
     public static void pushChatEntry(String feedId, dev.shaurmalib.common.chat.ChatEntry entry,
-                                      int accentArgb, OverlayTimings timings) {
+                                     int accentArgb, OverlayTimings timings) {
         OverlayFeed feed = feeds.computeIfAbsent(feedId, k -> new OverlayFeed());
         String plain = entry.rawText() != null ? entry.rawText()
                 : (entry.message() != null ? entry.message().getString() : "");
