@@ -120,7 +120,7 @@ public final class InventorySlotAllocationClientHooks {
      */
     @SubscribeEvent
     public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
-        if (event.getScrollDeltaY() == 0) return;
+        if (event.getScrollDelta() == 0) return;
 
         Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.player == null || minecraft.screen != null
@@ -131,11 +131,11 @@ public final class InventorySlotAllocationClientHooks {
         List<Integer> allowed = allowedHotbarSlots();
         if (allowed.isEmpty()) return;
 
-        // Ванільна конвенція: додатний scrollDeltaY (колесо "від себе")
+        // Ванільна конвенція: додатний scrollDelta (колесо "від себе")
         // рухає вибір ВЛІВО по хотбару (selected зменшується); від'ємний
         // — вправо. direction тут виражає той самий знак у термінах
         // кроку по allowed-списку.
-        int direction = event.getScrollDeltaY() > 0 ? -1 : 1;
+        int direction = event.getScrollDelta() > 0 ? -1 : 1;
 
         int selected = minecraft.player.getInventory().selected;
         int currentIndex = allowed.indexOf(selected);
