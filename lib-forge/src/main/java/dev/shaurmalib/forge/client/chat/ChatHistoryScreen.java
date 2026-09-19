@@ -285,11 +285,25 @@ public class ChatHistoryScreen extends Screen {
             totalW += this.font.width(button.label()) + 12 + CHANNEL_BTN_GAP;
         }
         int x = inputPanelX + INPUT_PANEL_W - totalW + CHANNEL_BTN_GAP;
+        // Тултіп малюється ПІСЛЯ всього ряду кнопок (не одразу під час
+        // ітерації) — інакше тултіп однієї кнопки міг би лягти під
+        // фон наступної, намальованої вже поверх нього.
+        Component hoveredTooltip = null;
+        int hoveredX = 0, hoveredY = 0;
         for (ChatScreenButton button : extraButtons) {
             int w = this.font.width(button.label()) + 12;
             drawButton(g, x, extraButtonRowY, w, EXTRA_BTN_H, button.label().getString(),
                     false, ACCENT_CYAN, mx, my);
+            if (button.tooltip() != null
+                    && mx >= x && mx < x + w && my >= extraButtonRowY && my < extraButtonRowY + EXTRA_BTN_H) {
+                hoveredTooltip = button.tooltip();
+                hoveredX = mx;
+                hoveredY = my;
+            }
             x += w + CHANNEL_BTN_GAP;
+        }
+        if (hoveredTooltip != null) {
+            g.renderTooltip(this.font, hoveredTooltip, hoveredX, hoveredY);
         }
     }
 
