@@ -10,17 +10,24 @@ public final class StaminaSyncPacket {
     private final float stamina;
     private final float maxStamina;
     private final boolean blockJumpWhenDepleted;
+    /**
+     * Чи заборонено зараз спринт. Обчислює СЕРВЕР (stamina == 0 або гравець
+     * ще "перезаряджається" після виснаження), клієнт лише читає цей
+     * прапорець — так стан "перезарядки" має єдине джерело правди.
+     */
+    private final boolean sprintBlocked;
 
     public StaminaSyncPacket(boolean active, float stamina, float maxStamina,
-                             boolean blockJumpWhenDepleted) {
+                             boolean blockJumpWhenDepleted, boolean sprintBlocked) {
         this.active = active;
         this.stamina = stamina;
         this.maxStamina = maxStamina;
         this.blockJumpWhenDepleted = blockJumpWhenDepleted;
+        this.sprintBlocked = sprintBlocked;
     }
 
     public static StaminaSyncPacket disabled() {
-        return new StaminaSyncPacket(false, 0, 0, false);
+        return new StaminaSyncPacket(false, 0, 0, false, false);
     }
 
     public static void encode(StaminaSyncPacket packet, FriendlyByteBuf buf) {
@@ -28,11 +35,13 @@ public final class StaminaSyncPacket {
         buf.writeFloat(packet.stamina);
         buf.writeFloat(packet.maxStamina);
         buf.writeBoolean(packet.blockJumpWhenDepleted);
+        buf.writeBoolean(packet.sprintBlocked);
     }
 
     public static StaminaSyncPacket decode(FriendlyByteBuf buf) {
         return new StaminaSyncPacket(
-                buf.readBoolean(), buf.readFloat(), buf.readFloat(), buf.readBoolean());
+                buf.readBoolean(), buf.readFloat(), buf.readFloat(), buf.readBoolean(),
+                buf.readBoolean());
     }
 
     public static void handle(StaminaSyncPacket packet, Supplier<NetworkEvent.Context> context) {
@@ -45,6 +54,7 @@ public final class StaminaSyncPacket {
         private static float stamina;
         private static float maxStamina;
         private static boolean blockJumpWhenDepleted;
+        private static boolean sprintBlocked;
 
         private ClientState() {}
 
@@ -53,6 +63,7 @@ public final class StaminaSyncPacket {
             stamina = packet.stamina;
             maxStamina = packet.maxStamina;
             blockJumpWhenDepleted = packet.blockJumpWhenDepleted;
+            sprintBlocked = packet.sprintBlocked;
         }
 
         public static void clear() {
@@ -60,6 +71,7 @@ public final class StaminaSyncPacket {
             stamina = 0;
             maxStamina = 0;
             blockJumpWhenDepleted = false;
+            sprintBlocked = false;
         }
 
         public static boolean isActive() { return active; }
@@ -67,6 +79,11 @@ public final class StaminaSyncPacket {
         public static float getMaxStamina() { return maxStamina; }
         public static boolean shouldBlockJump() {
             return active && blockJumpWhenDepleted && stamina <= 0;
+        }
+
+        /** Спринт заборонено (stamina 0 або "перезарядка" після виснаження) — рішення сервера. */
+        public static boolean shouldBlockSprint() {
+            return active && sprintBlocked;
         }
     }
 }

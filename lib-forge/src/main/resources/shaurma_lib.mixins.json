@@ -10,6 +10,7 @@
     "MixinItemInHandRenderer",
     "MixinLocalPlayerInventoryDrop",
     "MixinLivingEntityStaminaJump",
+    "MixinLivingEntityStaminaSprint",
     "MixinChatComponent",
     "MixinSoundEngineDuckOnStart",
     "SoundEngineAccessor",
@@ -20,6 +21,7 @@
     "MixinAbstractContainerMenu",
     "MixinServerGamePacketListenerImpl",
     "MixinLivingEntityStaminaJump",
+    "MixinLivingEntityStaminaSprint",
     "SlotContainerAccess"
   ]
 }

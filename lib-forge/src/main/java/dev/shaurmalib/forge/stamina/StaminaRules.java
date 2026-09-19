@@ -3,6 +3,18 @@ package dev.shaurmalib.forge.stamina;
 /**
  * Правила stamina для одного гравця. Час задається в секундах, значення
  * витрати/відновлення — stamina за секунду.
+ * <p>
+ * <b>Спринт.</b> Поки stamina активна, бібліотека сама блокує спринт (і на
+ * клієнті, і на сервері — див. {@code MixinLivingEntityStaminaSprint}):
+ * <ul>
+ *   <li>stamina {@code == 0} — бігти не можна;</li>
+ *   <li>після повного виснаження гравець "перезаряджається" — бігти не
+ *       можна, доки stamina не відновиться до
+ *       {@link #sprintResumeFraction()} від максимуму;</li>
+ *   <li>інакше спринт вмикається як у ваніли, але щотіку витрачає stamina
+ *       (а не відновлює її).</li>
+ * </ul>
+ * Голод для блокування спринту НЕ використовується.
  */
 public record StaminaRules(
         boolean active,
@@ -13,7 +25,8 @@ public record StaminaRules(
         float recoveryDelaySeconds,
         boolean recoveryEnabled,
         boolean forceFullHungerWhileActive,
-        boolean blockJumpWhenDepleted
+        boolean blockJumpWhenDepleted,
+        float sprintResumeFraction
 ) {
     public StaminaRules {
         if (!Float.isFinite(maxStamina)
@@ -25,7 +38,10 @@ public record StaminaRules(
                 || drainPerSecond < 0
                 || recoveryPerSecond < 0
                 || emptyRecoveryDelaySeconds < 0
-                || recoveryDelaySeconds < 0) {
+                || recoveryDelaySeconds < 0
+                || !Float.isFinite(sprintResumeFraction)
+                || sprintResumeFraction < 0
+                || sprintResumeFraction > 1) {
             throw new IllegalArgumentException("Некоректні параметри stamina.");
         }
     }
@@ -48,6 +64,7 @@ public record StaminaRules(
         private boolean recoveryEnabled = true;
         private boolean forceFullHungerWhileActive = true;
         private boolean blockJumpWhenDepleted = false;
+        private float sprintResumeFraction = 0.2f;
 
         public Builder active(boolean value) { active = value; return this; }
         public Builder maxStamina(float value) { maxStamina = value; return this; }
@@ -65,10 +82,21 @@ public record StaminaRules(
             return this;
         }
 
+        /**
+         * Яку частку максимуму stamina треба відновити після повного
+         * виснаження (0), щоб знову дозволити спринт. {@code 0} — спринт
+         * заблокований лише поки stamina рівно 0; {@code 1} — доки не
+         * відновиться повністю. За замовчуванням {@code 0.2}.
+         */
+        public Builder sprintResumeFraction(float value) {
+            sprintResumeFraction = value;
+            return this;
+        }
+
         public StaminaRules build() {
             return new StaminaRules(active, maxStamina, drainPerSecond, recoveryPerSecond,
                     emptyRecoveryDelaySeconds, recoveryDelaySeconds, recoveryEnabled,
-                    forceFullHungerWhileActive, blockJumpWhenDepleted);
+                    forceFullHungerWhileActive, blockJumpWhenDepleted, sprintResumeFraction);
         }
     }
 }

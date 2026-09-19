@@ -7,6 +7,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,6 +17,12 @@ public final class StaminaService {
     private static final Map<UUID, Float> VALUES = new ConcurrentHashMap<>();
     private static final Map<UUID, Integer> LAST_USE_TICK = new ConcurrentHashMap<>();
     private static final Map<UUID, String> LAST_SYNC = new ConcurrentHashMap<>();
+    /**
+     * Гравці в стані "перезарядки": stamina впала до 0 і ще не відновилась до
+     * {@link StaminaRules#sprintResumeFraction()}. Поки гравець тут — спринт
+     * заблокований, навіть якщо stamina вже трохи піднялась над нулем.
+     */
+    private static final Set<UUID> EXHAUSTED = ConcurrentHashMap.newKeySet();
     private static volatile boolean enabled;
 
     private StaminaService() {}
@@ -42,6 +49,7 @@ public final class StaminaService {
         float oldStamina = getStamina(player);
         if (previous == null || previous.active() != rules.active()) {
             LAST_USE_TICK.put(player.getUUID(), player.tickCount);
+            EXHAUSTED.remove(player.getUUID());
         }
         setStamina(player, Math.min(oldStamina, rules.maxStamina()), false);
         sync(player);
@@ -76,8 +84,8 @@ public final class StaminaService {
         StaminaRules rules = getRules(player);
         float oldValue = getStamina(player);
         float clamped = Mth.clamp(value, 0, rules.maxStamina());
-        VALUES.put(player.getUUID(), clamped);
-        player.getPersistentData().putFloat(PERSISTED_STAMINA, clamped);
+        store(player, clamped);
+        updateExhausted(player.getUUID(), rules, clamped);
         if (resetRecoveryDelay && clamped < oldValue) {
             LAST_USE_TICK.put(player.getUUID(), player.tickCount);
         }
@@ -106,6 +114,17 @@ public final class StaminaService {
                 && getStamina(player) <= 0;
     }
 
+    /**
+     * Чи заборонено гравцю спринт просто зараз: stamina активна і або
+     * дорівнює 0, або гравець ще "перезаряджається" після виснаження.
+     * Викликається з {@code MixinLivingEntityStaminaSprint} на сервері;
+     * клієнт дізнається те саме з {@link StaminaSyncPacket}.
+     */
+    public static boolean shouldBlockSprint(Player player) {
+        return isActive(player)
+                && (getStamina(player) <= 0 || EXHAUSTED.contains(player.getUUID()));
+    }
+
     public static void syncNow(ServerPlayer player) {
         requireEnabled();
         if (player == null) {
@@ -120,6 +139,7 @@ public final class StaminaService {
         VALUES.remove(player.getUUID());
         LAST_USE_TICK.remove(player.getUUID());
         LAST_SYNC.remove(player.getUUID());
+        EXHAUSTED.remove(player.getUUID());
         player.getPersistentData().remove(PERSISTED_STAMINA);
         ShaurmaLibNetwork.sendToPlayer(player, StaminaSyncPacket.disabled());
     }
@@ -131,6 +151,7 @@ public final class StaminaService {
         VALUES.remove(uuid);
         LAST_USE_TICK.remove(uuid);
         LAST_SYNC.remove(uuid);
+        EXHAUSTED.remove(uuid);
     }
 
     static void tick(ServerPlayer player) {
@@ -145,29 +166,37 @@ public final class StaminaService {
             return;
         }
 
+        UUID id = player.getUUID();
         float stamina = getStamina(player);
-        boolean depleted = stamina <= 0;
-        if (depleted) {
+        // Спринт блокується ДО того, як він почався (міксин на setSprinting,
+        // клієнт + сервер), тож тут лише прибираємо прапорець, що міг
+        // лишитись з попереднього тіку (наприклад stamina щойно впала в 0).
+        // Жодного "скинули на сервері — клієнт знову ввімкнув": клієнт
+        // отримує sprintBlocked у StaminaSyncPacket і сам не вмикає спринт.
+        boolean exhausted = updateExhausted(id, rules, stamina);
+        if (exhausted && player.isSprinting()) {
             player.setSprinting(false);
         }
-        boolean sprinting = !depleted && player.isSprinting() && player.getVehicle() == null;
+
+        // Спринт дозволений і активний — stamina ТРАТИТЬСЯ (а не відновлюється).
+        boolean sprinting = !exhausted && player.isSprinting() && player.getVehicle() == null;
         if (sprinting && rules.drainPerSecond() > 0) {
             stamina -= rules.drainPerSecond() / 20.0f;
-            LAST_USE_TICK.put(player.getUUID(), player.tickCount);
+            LAST_USE_TICK.put(id, player.tickCount);
             if (stamina <= 0) {
                 stamina = 0;
                 player.setSprinting(false);
             }
-            VALUES.put(player.getUUID(), stamina);
-            player.getPersistentData().putFloat(PERSISTED_STAMINA, stamina);
+            store(player, stamina);
+            updateExhausted(id, rules, stamina);
         } else if (rules.recoveryEnabled() && stamina < rules.maxStamina()) {
-            int lastUse = LAST_USE_TICK.getOrDefault(player.getUUID(), player.tickCount);
+            int lastUse = LAST_USE_TICK.getOrDefault(id, player.tickCount);
             float delay = stamina <= 0 ? rules.emptyRecoveryDelaySeconds() : rules.recoveryDelaySeconds();
             if (player.tickCount - lastUse >= Math.round(delay * 20.0f)) {
                 float recovered = Math.min(rules.maxStamina(),
                         stamina + rules.recoveryPerSecond() / 20.0f);
-                VALUES.put(player.getUUID(), recovered);
-                player.getPersistentData().putFloat(PERSISTED_STAMINA, recovered);
+                store(player, recovered);
+                updateExhausted(id, rules, recovered);
             }
         }
 
@@ -185,14 +214,42 @@ public final class StaminaService {
     static void sync(ServerPlayer player, boolean force) {
         StaminaRules rules = getRules(player);
         boolean active = rules.active() && !player.isCreative() && !player.isSpectator();
-        String state = active + ":" + getStamina(player) + ":" + rules.maxStamina();
+        boolean sprintBlocked = active && shouldBlockSprint(player);
+        String state = active + ":" + getStamina(player) + ":" + rules.maxStamina()
+                + ":" + sprintBlocked;
         if (!force && state.equals(LAST_SYNC.get(player.getUUID()))) {
             return;
         }
         LAST_SYNC.put(player.getUUID(), state);
         ShaurmaLibNetwork.sendToPlayer(player,
                 new StaminaSyncPacket(active, getStamina(player), rules.maxStamina(),
-                        rules.blockJumpWhenDepleted()));
+                        rules.blockJumpWhenDepleted(), sprintBlocked));
+    }
+
+    private static void store(ServerPlayer player, float value) {
+        VALUES.put(player.getUUID(), value);
+        player.getPersistentData().putFloat(PERSISTED_STAMINA, value);
+    }
+
+    /**
+     * Оновлює й повертає стан "перезарядки": 0 stamina вмикає його, а
+     * відновлення до {@code maxStamina * sprintResumeFraction} вимикає.
+     * При {@code sprintResumeFraction == 0} спринт заблокований лише поки
+     * stamina рівно 0.
+     */
+    private static boolean updateExhausted(UUID id, StaminaRules rules, float stamina) {
+        if (stamina <= 0f) {
+            EXHAUSTED.add(id);
+            return true;
+        }
+        if (EXHAUSTED.contains(id)) {
+            if (stamina >= rules.maxStamina() * rules.sprintResumeFraction()) {
+                EXHAUSTED.remove(id);
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     private static void requireEnabled() {
