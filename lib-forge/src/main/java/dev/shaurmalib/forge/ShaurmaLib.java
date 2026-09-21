@@ -316,6 +316,33 @@ public final class ShaurmaLib {
          * підтверджує свідоме підключення на {@link Handle}, як решта
          * "статичних сервісів" лібу ({@link #withTeleport()}, {@link
          * #withPlayerFreeze()}).
+         * <p>
+         * <b>Рушій анімацій.</b> Понад це підключення, {@link
+         * PlayerPoseController} тепер дає:
+         * <ul>
+         *   <li><b>fade-in/out</b> ({@link
+         *       dev.shaurmalib.common.playeranim.PoseSource#withFade}) з
+         *       кривою {@link dev.shaurmalib.common.playeranim.PoseEase};</li>
+         *   <li><b>авто-завершення one-shot</b>: файл із {@code looping:false}
+         *       рушій сам плавно знімає по кінці кліпа — без {@code
+         *       durationTicks} і без {@code stop()} від консюмера;</li>
+         *   <li><b>шар {@link
+         *       dev.shaurmalib.common.playeranim.PoseLayerId#ITEM_ACTION}</b>
+         *       для дій із предметом (ліхтарик, каністра, ремонт, кидок);</li>
+         *   <li><b>іменовані дії</b> ({@link
+         *       dev.shaurmalib.common.playeranim.PoseActionRegistry} +
+         *       {@code playAction/stopAction});</li>
+         *   <li><b>опційну</b> динамічну правку кісток ({@code
+         *       applyBoneAdjustment}) — не вмикається автоматично;</li>
+         *   <li><b>опційний</b> шар {@link
+         *       dev.shaurmalib.common.playeranim.PoseLayerId#LOCOMOTION_OVERRIDE}
+         *       для кастомної ходьби/бігу/шифту — теж лише за явним
+         *       {@code trigger}.</li>
+         * </ul>
+         * Третя особа працює без мережевого пакета (PAL сам застосовує стек
+         * будь-якого {@code AbstractClientPlayer}); умова — shaurma-lib і PAL
+         * встановлені в усіх клієнтів сервера. Повний опис: {@code
+         * docs/playeranim.md}.
          */
         public Builder withPlayerAnim() {
             this.playerAnimEnabled = true;
