@@ -28,9 +28,15 @@ package dev.shaurmalib.common.playeranim;
  * @param fadeInTicks   тривалість появи в тіках, {@code 0..40}
  * @param fadeOutTicks  тривалість згасання в тіках, {@code 0..40}
  * @param ease          крива fade; {@code null} замінюється на {@link PoseEase#DEFAULT}
+ * @param cameraFollow  <b>опційно, за замовчуванням 0 = вимкнено.</b> Наскільки камера
+ *                      першої особи <i>власного</i> гравця повторює поворот кістки
+ *                      {@code head} з цієї пози (діапазон {@code [-1, 1]}; від'ємне значення
+ *                      віддзеркалює знак, якщо в грі вийшло навпаки). Не змінює реальний
+ *                      напрямок погляду/прицілу — лише візуальний зсув камери. Вмикається
+ *                      через {@link #withCameraFollow(float)}.
  */
 public record PoseSource(String namespace, String resourceId, boolean looping,
-                         int fadeInTicks, int fadeOutTicks, PoseEase ease) {
+                         int fadeInTicks, int fadeOutTicks, PoseEase ease, float cameraFollow) {
 
     /** Верхня межа fade у тіках (2 секунди). */
     public static final int MAX_FADE_TICKS = 40;
@@ -47,11 +53,20 @@ public record PoseSource(String namespace, String resourceId, boolean looping,
         if (ease == null) {
             ease = PoseEase.DEFAULT;
         }
+        if (!Float.isFinite(cameraFollow) || cameraFollow < -1f || cameraFollow > 1f) {
+            throw new IllegalArgumentException("cameraFollow мусить бути в [-1,1], а не " + cameraFollow);
+        }
+    }
+
+    /** Сумісність: без стеження камери. */
+    public PoseSource(String namespace, String resourceId, boolean looping,
+                      int fadeInTicks, int fadeOutTicks, PoseEase ease) {
+        this(namespace, resourceId, looping, fadeInTicks, fadeOutTicks, ease, 0f);
     }
 
     /** Сумісність зі старим API: без fade, поведінка як до появи рушія. */
     public PoseSource(String namespace, String resourceId, boolean looping) {
-        this(namespace, resourceId, looping, 0, 0, PoseEase.DEFAULT);
+        this(namespace, resourceId, looping, 0, 0, PoseEase.DEFAULT, 0f);
     }
 
     /** Сумісність зі старим API. */
@@ -70,7 +85,7 @@ public record PoseSource(String namespace, String resourceId, boolean looping,
     }
 
     public PoseSource withFade(int fadeIn, int fadeOut) {
-        return new PoseSource(namespace, resourceId, looping, fadeIn, fadeOut, ease);
+        return new PoseSource(namespace, resourceId, looping, fadeIn, fadeOut, ease, cameraFollow);
     }
 
     public PoseSource withFadeIn(int fadeIn) {
@@ -82,6 +97,19 @@ public record PoseSource(String namespace, String resourceId, boolean looping,
     }
 
     public PoseSource withEase(PoseEase newEase) {
-        return new PoseSource(namespace, resourceId, looping, fadeInTicks, fadeOutTicks, newEase);
+        return new PoseSource(namespace, resourceId, looping, fadeInTicks, fadeOutTicks, newEase, cameraFollow);
+    }
+
+    /**
+     * Вмикає (або вимикає значенням 0) стеження камери першої особи за кісткою
+     * {@code head} цієї пози. <b>Опційно й вимкнено за замовчуванням</b> —
+     * дія без цього виклику камеру не чіпає.
+     */
+    public PoseSource withCameraFollow(float strength) {
+        return new PoseSource(namespace, resourceId, looping, fadeInTicks, fadeOutTicks, ease, strength);
+    }
+
+    public boolean followsCamera() {
+        return cameraFollow != 0f;
     }
 }

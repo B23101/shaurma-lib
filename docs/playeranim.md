@@ -82,6 +82,25 @@ PlayerPoseController.applyBoneAdjustment(player, PoseLayerId.ITEM_ACTION,
 * Живе одну «сесію» пози: скидається на завершенні / `stopAll(player, true)`.
 * Через `PoseAction.withAdjustment(...)` ставиться автоматично в `playAction`.
 
+## Камера першої особи за головою (опційно, вимкнено за замовчуванням)
+
+Голова моделі повертається сама, якщо в `.json` є keyframe-и `head` (третя особа, чужі гравці). Камеру
+**власного** гравця в першій особі PAL не чіпає — для цього є окремий опційний механізм:
+
+```java
+PoseSource.oneShot("maniac", "medkit").withFade(3, 4).withCameraFollow(1f);   // камера повторює нахил голови з пози
+PlayerPoseController.setCameraFollowEnabled(false);                            // глобальний вимикач для моду / конфігу
+```
+
+* **Нічого не відбувається**, доки хоч одна поза не викликала `withCameraFollow(k != 0)`.
+* `k ∈ [-1, 1]`: `0.5` — напівсила, **від'ємне віддзеркалює знак** (осі я з коду не виводив — перший тест у грі
+  покаже, чи треба `-1`).
+* Зсув камери тримається на самому шарі, тож з'являється й згасає **разом із fade позою**. Кілька шарів сумуються.
+* Кліп без keyframe-ів `head` дає нульовий зсув. `head` без `bend`.
+* **Суто візуально:** реальний напрямок погляду, приціл і зона удару не змінюються.
+* Працює лише в першій особі (`ViewportEvent.ComputeCameraAngles`); `PlayerPoseEvents` я не міг зібрати без Forge —
+  це перевіряється лише у грі.
+
 ## Що рушій виправляє відносно «голого» PAL 1.0.2-rc1
 
 Усе нижче відтворено запуском реального коду, не прочитано з вихідників.
@@ -114,7 +133,7 @@ PlayerPoseController.applyBoneAdjustment(player, PoseLayerId.ITEM_ACTION,
 
 ## Тести
 
-`tools/playeranim-harness/run.sh <шлях до minecraftPlayerAnimator-port-1.20>` — 345 перевірок проти **справжнього**
+`tools/playeranim-harness/run.sh <шлях до minecraftPlayerAnimator-port-1.20>` — 379 перевірок проти **справжнього**
 coreLib PAL (без Minecraft; JDK 17+, python3, Maven Central не потрібен). **Не покриває:** `PlayerPoseEvents`,
 реальні міксини PAL, рендер, JSON-завантаження кліпів, збірку Gradle/ForgeGradle — це перевіряється лише
 збіркою й запуском у грі.

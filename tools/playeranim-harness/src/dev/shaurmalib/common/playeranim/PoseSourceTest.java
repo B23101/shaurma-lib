@@ -35,6 +35,19 @@ public final class PoseSourceTest {
         T.throwsIae("Integer.MAX_VALUE відхиляється", () -> new PoseSource("a", "b", true, 0, Integer.MAX_VALUE, null));
         T.throwsIae("withFade поза межами відхиляється", () -> PoseSource.hold("a", "b").withFade(100, 0));
 
+        // cameraFollow
+        T.eq("cameraFollow за замовчуванням 0", PoseSource.hold("a", "b").cameraFollow(), 0.0, 0);
+        T.ok("followsCamera() за замовчуванням false", !PoseSource.hold("a", "b").followsCamera());
+        T.ok("withCameraFollow(1) вмикає", PoseSource.hold("a", "b").withCameraFollow(1f).followsCamera());
+        T.eq("withFade зберігає cameraFollow", PoseSource.hold("a", "b").withCameraFollow(0.5f).withFade(3, 3).cameraFollow(), 0.5, 1e-6);
+        T.eq("withEase зберігає cameraFollow", PoseSource.hold("a", "b").withCameraFollow(0.5f).withEase(PoseEase.OUTCUBIC).cameraFollow(), 0.5, 1e-6);
+        T.eq("withCameraFollow зберігає fade", PoseSource.hold("a", "b").withFade(3, 5).withCameraFollow(1f).fadeOutTicks(), 5);
+        T.eq("6-арг конструктор → cameraFollow=0", new PoseSource("a", "b", true, 1, 1, null).cameraFollow(), 0.0, 0);
+        T.ok("withCameraFollow(-1) дозволено", PoseSource.hold("a", "b").withCameraFollow(-1f).followsCamera());
+        T.throwsIae("cameraFollow=1.5 відхиляється", () -> PoseSource.hold("a", "b").withCameraFollow(1.5f));
+        T.throwsIae("cameraFollow=NaN відхиляється", () -> PoseSource.hold("a", "b").withCameraFollow(Float.NaN));
+        T.throwsIae("cameraFollow=+Inf відхиляється", () -> PoseSource.hold("a", "b").withCameraFollow(Float.POSITIVE_INFINITY));
+
         // PoseEase
         boolean noExcluded = true;
         for (PoseEase e : PoseEase.values()) {

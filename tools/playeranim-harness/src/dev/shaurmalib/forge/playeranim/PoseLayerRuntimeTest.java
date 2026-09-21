@@ -67,6 +67,7 @@ public final class PoseLayerRuntimeTest {
         adjustment();
         adjustmentRobustness();
         angleWrap();
+        cameraFollow();
         hardStopAndMisc();
     }
 
@@ -458,6 +459,64 @@ public final class PoseLayerRuntimeTest {
         nn.rt.setAdjustment(bone -> null);
         nn.rt.start(Clips.arm(0, 10, true, 1.0f), src(true), true);
         T.eq("провайдер повернув null (не Optional) → прозоро", nn.rot("rightArm"), 1.0, 1e-5);
+    }
+
+    private static void cameraFollow() {
+        T.section("Опційний зсув камери за кісткою head");
+
+        Sim off = new Sim();
+        off.rt.start(Clips.head(0, 10, true, 0.5f), src(true), true);
+        T.ok("за замовчуванням (cameraFollow=0) зсуву нема", off.rt.cameraOffset(0f) == null);
+        T.eq("…але сама голова моделі рухається (rot=0.5)", off.rot("head"), 0.5, 1e-5);
+
+        Sim on = new Sim();
+        on.rt.start(Clips.head(0, 10, true, 0.5f), src(true).withCameraFollow(1f), true);
+        T.eq("cameraFollow=1: pitch=0.5", on.rt.cameraOffset(0f).getX(), 0.5, 1e-5);
+        T.eq("yaw=0", on.rt.cameraOffset(0f).getY(), 0.0, 1e-6);
+
+        Sim half = new Sim();
+        half.rt.start(Clips.head(0, 10, true, 0.5f), src(true).withCameraFollow(0.5f), true);
+        T.eq("cameraFollow=0.5: pitch=0.25", half.rt.cameraOffset(0f).getX(), 0.25, 1e-5);
+
+        Sim neg = new Sim();
+        neg.rt.start(Clips.head(0, 10, true, 0.5f), src(true).withCameraFollow(-1f), true);
+        T.eq("cameraFollow=-1 віддзеркалює знак", neg.rt.cameraOffset(0f).getX(), -0.5, 1e-5);
+
+        Sim noHead = new Sim();
+        noHead.rt.start(Clips.arm(0, 10, true, 1.0f), src(true).withCameraFollow(1f), true);
+        T.eq("кліп без keyframe-ів head → зсув 0 (камеру не чіпаємо)", noHead.rt.cameraOffset(0f).getX(), 0.0, 1e-6);
+
+        // fade-in: зсув з'являється разом із позою
+        Sim fi = new Sim();
+        fi.rt.start(Clips.head(0, 10, true, 0.8f), src(true).withFadeIn(4).withCameraFollow(1f), true);
+        T.eq("fade-in k=0 → 0", fi.rt.cameraOffset(0f).getX(), 0.0, 1e-5);
+        fi.steps(2);
+        T.eq("fade-in k=2 → 0.4", fi.rt.cameraOffset(0f).getX(), 0.4, 1e-4);
+        fi.steps(4);
+        T.eq("після fade-in → 0.8", fi.rt.cameraOffset(0f).getX(), 0.8, 1e-4);
+
+        // fade-out: зсув згасає й зникає
+        Sim fo = new Sim();
+        fo.rt.start(Clips.head(0, 10, true, 0.8f), src(true).withFadeOut(4).withCameraFollow(1f), true);
+        fo.steps(1);
+        fo.rt.requestStop();
+        fo.steps(2);
+        float mid = fo.rt.cameraOffset(0f).getX();
+        T.ok("під час fade-out зсув між 0 і 0.8 (" + mid + ")", mid > 0.05f && mid < 0.75f);
+        fo.steps(2);
+        T.ok("після завершення зсуву нема (null)", fo.rt.cameraOffset(0f) == null);
+
+        Sim hs = new Sim();
+        hs.rt.start(Clips.head(0, 10, true, 0.5f), src(true).withCameraFollow(1f), true);
+        hs.rt.hardStop();
+        T.ok("після hardStop зсуву нема", hs.rt.cameraOffset(0f) == null);
+        T.ok("порожній шар → null", new Sim().rt.cameraOffset(0f) == null);
+
+        // one-shot: після авто-завершення камера повертається
+        Sim os = new Sim();
+        os.rt.start(Clips.head(0, 10, false, 0.5f), src(false).withFadeOut(3).withCameraFollow(1f), true);
+        os.steps(14);
+        T.ok("one-shot завершився → зсуву нема", os.rt.cameraOffset(0f) == null);
     }
 
     private static void angleWrap() {

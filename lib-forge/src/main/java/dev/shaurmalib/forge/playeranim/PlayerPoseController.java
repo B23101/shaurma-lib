@@ -317,6 +317,51 @@ public final class PlayerPoseController {
         }
     }
 
+    // ─────────────── камера першої особи (опційно) ───────────────
+
+    private static volatile boolean cameraFollowEnabled = true;
+
+    /**
+     * Глобальний вимикач стеження камери за головою (типово {@code true}, але
+     * саме по собі нічого не робить: камеру чіпають лише пози з
+     * {@code PoseSource.withCameraFollow(k != 0)}). Мод, якому ця функція не
+     * потрібна (або гравець вимкнув її в конфігу), ставить {@code false} —
+     * тоді камера не рухається за жодною позою, хоч би що було в її джерелі.
+     */
+    public static void setCameraFollowEnabled(boolean enabled) {
+        cameraFollowEnabled = enabled;
+    }
+
+    public static boolean isCameraFollowEnabled() {
+        return cameraFollowEnabled;
+    }
+
+    /**
+     * Сумарний зсув камери гравця від усіх його шарів, що просили стеження:
+     * {@code {pitch, yaw, roll}} у <b>радіанах</b>, або {@code null}, якщо
+     * зсуву нема (не вмикали, вимкнено глобально, шари порожні). Викликається
+     * з {@link PlayerPoseEvents} для власного гравця в першій особі.
+     */
+    public static float[] cameraOffset(AbstractClientPlayer player, float partialTick) {
+        if (!cameraFollowEnabled) return null;
+        Map<PoseLayerId, LayerEntry> perPlayer = LAYERS.get(player.getUUID());
+        if (perPlayer == null) return null;
+        float x = 0, y = 0, z = 0;
+        boolean any = false;
+        for (LayerEntry entry : perPlayer.values()) {
+            if (!entry.ownedBy(player)) continue;
+            try {
+                dev.kosmx.playerAnim.core.util.Vec3f v = entry.runtime.cameraOffset(partialTick);
+                if (v == null) continue;
+                x += v.getX(); y += v.getY(); z += v.getZ();
+                any = true;
+            } catch (Throwable t) {
+                LOGGER.debug("PlayerPoseController.cameraOffset() пропущено для шару", t);
+            }
+        }
+        return any ? new float[] {x, y, z} : null;
+    }
+
     // ───────────────────────────── тік ─────────────────────────────
 
     /**

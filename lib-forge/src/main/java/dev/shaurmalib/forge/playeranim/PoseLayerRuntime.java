@@ -1,10 +1,12 @@
 package dev.shaurmalib.forge.playeranim;
 
+import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.api.layered.IAnimation;
 import dev.kosmx.playerAnim.api.layered.KeyframeAnimationPlayer;
 import dev.kosmx.playerAnim.api.layered.ModifierLayer;
 import dev.kosmx.playerAnim.api.layered.modifier.AbstractFadeModifier;
 import dev.kosmx.playerAnim.core.data.KeyframeAnimation;
+import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.shaurmalib.common.playeranim.BoneAdjustment;
 import dev.shaurmalib.common.playeranim.PoseLifecycle;
 import dev.shaurmalib.common.playeranim.PoseSource;
@@ -264,6 +266,26 @@ final class PoseLayerRuntime {
             adjustment = null;
             adjustmentProvider = null;
         }
+    }
+
+    // ─────────────────── зсув камери за кісткою head ───────────────────
+
+    /**
+     * Поворот кістки {@code head} цього шару (радіани: x=pitch, y=yaw, z=roll),
+     * помножений на {@link PoseSource#cameraFollow()}; {@code null}, якщо шар
+     * порожній або стеження вимкнено. Береться з самого шару (разом із fade-in/out
+     * і правкою), тому зсув камери з'являється й згасає разом із позою.
+     * Значення {@code value0=ZERO}: кістка без keyframe-ів дає 0, тобто
+     * "нічого не додавати".
+     */
+    Vec3f cameraOffset(float delta) {
+        PoseSource src = active;
+        if (src == null || !src.followsCamera() || lifecycle.state() == PoseLifecycle.State.IDLE) return null;
+        Vec3f r = layer.get3DTransform("head", TransformType.ROTATION, delta, Vec3f.ZERO);
+        float k = src.cameraFollow();
+        float x = r.getX() * k, y = r.getY() * k, z = r.getZ() * k;
+        if (!Float.isFinite(x) || !Float.isFinite(y) || !Float.isFinite(z)) return null;
+        return new Vec3f(x, y, z);
     }
 
     // ───────────────────────────── стан ───────────────────────────────

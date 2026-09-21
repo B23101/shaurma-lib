@@ -141,6 +141,27 @@ public final class PlayerPoseControllerTest {
         T.eq("зняли ITEM_ACTION → знов локомоція", rot(m, "rightArm"), 1.0, 1e-4);
         PlayerPoseController.stopAll(m, true);
 
+        // ── камера: опційна, глобальний вимикач
+        PlayerAnimationRegistry.M.put(new ResourceLocation("t", "headtilt"), Clips.head(0, 10, true, 0.5f));
+        AbstractClientPlayer c = new AbstractClientPlayer(UUID.randomUUID());
+        PlayerPoseController.trigger(c, PoseLayerId.ITEM_ACTION, PoseSource.hold("t", "headtilt"));
+        T.ok("камера: без withCameraFollow зсуву нема", PlayerPoseController.cameraOffset(c, 0f) == null);
+        PlayerPoseController.trigger(c, PoseLayerId.ITEM_ACTION, PoseSource.hold("t", "headtilt").withCameraFollow(1f));
+        float[] off = PlayerPoseController.cameraOffset(c, 0f);
+        T.ok("камера: withCameraFollow(1) → зсув є", off != null);
+        T.eq("камера: pitch=0.5", off[0], 0.5, 1e-5);
+        PlayerPoseController.setCameraFollowEnabled(false);
+        T.ok("глобальний вимикач → зсуву нема", PlayerPoseController.cameraOffset(c, 0f) == null);
+        PlayerPoseController.setCameraFollowEnabled(true);
+        T.ok("вимикач знову ввімкнено → зсув повернувся", PlayerPoseController.cameraOffset(c, 0f) != null);
+
+        // два шари разом — зсуви сумуються
+        PlayerPoseController.trigger(c, PoseLayerId.CUSTOM, PoseSource.hold("t", "headtilt").withCameraFollow(0.5f));
+        T.eq("два шари: 0.5 + 0.25 = 0.75", PlayerPoseController.cameraOffset(c, 0f)[0], 0.75, 1e-5);
+        PlayerPoseController.stopAll(c, true);
+        T.ok("після hard stopAll зсуву нема", PlayerPoseController.cameraOffset(c, 0f) == null);
+        T.ok("гравець без записів → null", PlayerPoseController.cameraOffset(new AbstractClientPlayer(UUID.randomUUID()), 0f) == null);
+
         // ── витік: гравці, що зникли без cleanup, не накопичуються
         for (int i = 0; i < 200; i++) {
             AbstractClientPlayer ghost = new AbstractClientPlayer(UUID.randomUUID());

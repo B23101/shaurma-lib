@@ -1,10 +1,12 @@
 package dev.shaurmalib.forge.playeranim;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -28,6 +30,8 @@ import net.minecraftforge.fml.common.Mod;
  *   <li>{@link TickEvent.ClientTickEvent} (END) → {@code tickAll}: рушій
  *       тікає стан шарів сам (авто-завершення one-shot, пре-емптивний
  *       fade-out, чистка модифікаторів);</li>
+ *   <li>{@link ViewportEvent.ComputeCameraAngles} → <b>опційний</b> зсув камери
+ *       першої особи за головою пози (діє лише для поз із {@code withCameraFollow});</li>
  *   <li>перезавантаження ресурсів (F3+T) → скидання кешу
  *       {@code KeyframeAnimation}, щоб змінений {@code .json} підхоплювався
  *       без перезапуску клієнта.</li>
@@ -62,6 +66,24 @@ public final class PlayerPoseEvents {
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         PlayerPoseController.tickAll();
+    }
+
+    /**
+     * Опційний зсув камери першої особи за кісткою {@code head} активної пози
+     * (лише для пози з {@code withCameraFollow(k != 0)}). Без такої пози
+     * {@link PlayerPoseController#cameraOffset} повертає {@code null} і камера
+     * не чіпається. Зсув суто візуальний — реальний напрямок погляду й приціл
+     * не змінюються.
+     */
+    @SubscribeEvent
+    public static void onComputeCameraAngles(ViewportEvent.ComputeCameraAngles event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || !mc.options.getCameraType().isFirstPerson()) return;
+        float[] off = PlayerPoseController.cameraOffset(mc.player, (float) event.getPartialTick());
+        if (off == null) return;
+        event.setPitch(event.getPitch() + (float) Math.toDegrees(off[0]));
+        event.setYaw(event.getYaw() + (float) Math.toDegrees(off[1]));
+        event.setRoll(event.getRoll() + (float) Math.toDegrees(off[2]));
     }
 
     /**

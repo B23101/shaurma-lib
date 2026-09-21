@@ -19,4 +19,17 @@ final class Clips {
         b.fullyEnableParts();
         return b.build();
     }
+
+    /** Кліп, де голова має константний pitch = value (рука не чіпається). */
+    static KeyframeAnimation head(int beginTick, int endTick, boolean loop, float value) {
+        KeyframeAnimation.AnimationBuilder b = new KeyframeAnimation.AnimationBuilder(AnimationFormat.JSON_EMOTECRAFT);
+        b.beginTick = beginTick;
+        b.endTick = endTick;
+        b.isLooped = loop;
+        b.returnTick = 0;
+        b.head.pitch.addKeyFrame(0, value, Ease.LINEAR);
+        b.head.pitch.addKeyFrame(endTick, value, Ease.LINEAR);
+        b.fullyEnableParts();
+        return b.build();
+    }
 }
