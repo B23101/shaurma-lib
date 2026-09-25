@@ -123,6 +123,7 @@ public final class InteractionLockHooks {
         }
     }
 
+
     private static ServerPlayer asServerPlayer(PlayerInteractEvent event) {
         return event.getEntity() instanceof ServerPlayer sp ? sp : null;
     }

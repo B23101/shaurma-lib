@@ -123,16 +123,73 @@ public class AnimatedGeoItemRenderer<T extends Item & AnimatedGeoItem> extends G
                 red, green, blue, alpha);
     }
 
-    /** Шукає, чи ця кістка задекларована модом як заміна руки гравця для якогось слоту. */
+    /**
+     * Шукає, чи ця кістка задекларована модом як заміна руки гравця для
+     * ЦЬОГО конкретного рендер-виклику.
+     * <p>
+     * <b>Виправлення бага "перекидання в іншу руку" (swapHands, F):</b>
+     * стара версія перебирала {@code def.armOverrides.values()} і брала
+     * ПЕРШИЙ {@link ArmOverride}, чия {@code boneName} збігається з
+     * поточною кісткою — незалежно від того, чи предмет РЕАЛЬНО зараз
+     * лежить у {@code MAIN_HAND} чи в {@code OFF_HAND}. Якщо художник
+     * задав різним слотам різні {@code ArmOverride} (наприклад, різне
+     * зміщення для правої й лівої руки — фізично природно, бо руки
+     * дзеркальні), при {@code F} (swapHands) стек фізично переїжджає в
+     * інший слот інвентаря, але рендерер ПРОДОВЖУВАВ би застосовувати
+     * override для СТАРОГО слоту, бо він орієнтувався лише на ім'я
+     * кістки, не на актуальний {@link ItemDisplayContext}.
+     * <p>
+     * Тут замість перебору всіх override-ів модель шукає ЛИШЕ той,
+     * {@link ArmOverride#handSlot()} якого відповідає поточному
+     * {@link #transformType} (яку саме "екранну" руку зараз рендерить
+     * Forge — {@code *_RIGHT_HAND} чи {@code *_LEFT_HAND}, обидва
+     * контексти для 1st і 3rd особи). Forge сам обчислює це значення зі
+     * {@code player.getMainArm()} і того, MAIN_HAND чи OFF_HAND зараз
+     * рендериться — тобто вже враховує і swapHands, і ліворукість
+     * гравця (див. {@link #resolveCurrentHandSlot}), тож нам не треба
+     * повторювати цю логіку самим.
+     */
     private Optional<ArmOverride> findArmOverride(T animatable, String boneName) {
         ItemDefinition<?, ?> def = ItemDefinitionRegistry
                 .<Object, Object>get(animatable.getClass())
                 .orElse(null);
         if (def == null) return Optional.empty();
-        for (ArmOverride ov : def.armOverrides.values()) {
-            if (ov.boneName().equals(boneName)) return Optional.of(ov);
+
+        HandSlot currentSlot = resolveCurrentHandSlot();
+        if (currentSlot == null) {
+            // GUI/GROUND/FIXED тощо — не "рука" взагалі, тут нема чого
+            // замінювати на скін гравця. Порожньо — кістка рендериться
+            // як звичайна частина гео-моделі (той самий фолбек, що й
+            // раніше для "override не задекларовано").
+            return Optional.empty();
+        }
+
+        ArmOverride ov = def.armOverrides.get(currentSlot);
+        if (ov != null && ov.boneName().equals(boneName)) {
+            return Optional.of(ov);
         }
         return Optional.empty();
+    }
+
+    /**
+     * Яку "реальну" руку (MAIN_HAND/OFF_HAND) зараз рендерить Forge,
+     * судячи з {@link #transformType}. {@code null}, якщо контекст не
+     * "рука" (GUI, GROUND, FIXED, HEAD тощо) — override там незастосовний.
+     * <p>
+     * {@code THIRD_PERSON_RIGHT_HAND}/{@code FIRST_PERSON_RIGHT_HAND} —
+     * це вже ЕКРАННА права рука (Forge сам звів {@code getMainArm()} і
+     * {@code InteractionHand} докупи при виборі {@code ItemDisplayContext}
+     * для рендеру), тому ця мапа коректна і для ліворуких гравців, і
+     * після {@code F} (swapHands) — жодної додаткової логіки на це не
+     * треба, досить читати вже обчислений Forge-ом контекст.
+     */
+    private HandSlot resolveCurrentHandSlot() {
+        if (transformType == null) return null;
+        return switch (transformType) {
+            case THIRD_PERSON_RIGHT_HAND, FIRST_PERSON_RIGHT_HAND -> HandSlot.MAIN_HAND;
+            case THIRD_PERSON_LEFT_HAND, FIRST_PERSON_LEFT_HAND -> HandSlot.OFF_HAND;
+            default -> null;
+        };
     }
 
     private void renderArmSkinOverBone(PoseStack stack, GeoBone bone, ArmOverride override) {

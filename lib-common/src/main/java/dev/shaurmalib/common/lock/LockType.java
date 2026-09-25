@@ -23,4 +23,17 @@ public enum LockType {
     BLOCK_INTERACT,
     /** Надсилання повідомлень у чат. */
     CHAT
+    // Перемикання слоту хотбару й викидання предмета (Q) під час "живої"
+    // playerlib-анімації НЕ додаються сюди окремим LockType: для цього
+    // вже є готовий, спеціалізований механізм — dev.shaurmalib.forge
+    // .inventory.InventorySlotAllocation (setHotbarSlotCount + set
+    // ItemDropBlocked). Він не просто скасовує подію постфактум, а й
+    // синхронізує заборону на клієнт (гравець не бачить курсор/скрол на
+    // недоступних слотах), тож дублювати той самий ефект ще одним
+    // LockType-заходом через InteractionLockRegistry means two competing
+    // sources of truth for "чи можна перемкнути слот" — саме той клас
+    // багів, заради уникнення якого й існує цей реєстр (див. клас-
+    // докстрінг InteractionLockRegistry). Консюмер, що запускає "живу"
+    // позу предмета, викликає InventorySlotAllocation напряму — приклад
+    // у ItemArchetype.playLiveAction() (maniacmod).
 }
