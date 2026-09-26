@@ -43,7 +43,11 @@ public final class DarkZoneEffect {
     public static void setActive(String zoneId, boolean active, DarkZoneSpec spec) {
         ensureTickListener();
         Channel channel = channels.computeIfAbsent(zoneId, id -> new Channel());
-        channel.spec = spec;
+        // Захист бібліотеки: консюмер (напр. maniacmod) міг ще не мати
+        // валідного spec (сервер ще не надіслав стан) і передати null.
+        // Раніше це просто записувалось у channel.spec, і onClientTick()
+        // падав з NPE на channel.spec.transitionTicks() на наступному тіку.
+        channel.spec = spec != null ? spec : DarkZoneSpec.defaults();
         channel.targetActive = active;
     }
 
