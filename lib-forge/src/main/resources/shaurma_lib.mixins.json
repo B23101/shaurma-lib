@@ -12,6 +12,8 @@
     "MixinLivingEntityStaminaJump",
     "MixinLivingEntityStaminaSprint",
     "MixinChatComponent",
+    "MixinLightTextureDarkZone",
+    "MixinDynamicTextureDarkZone",
     "MixinSoundEngineDuckOnStart",
     "SoundEngineAccessor",
     "SoundManagerAccessor",
