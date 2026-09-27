@@ -51,14 +51,30 @@ public final class DarkZoneEffect {
         channel.targetActive = active;
     }
 
-    /** Поточний множник затемнення (0 = звичайне освітлення) — макс. серед усіх активних каналів. */
+    /**
+     * Поточний множник затемнення (0 = звичайне освітлення) — макс.
+     * серед усіх активних каналів, затиснутий до {@code [0,1]}.
+     * <p>
+     * {@code channel.currentIntensity} може перевищити 1 (конфіг
+     * {@code darkzones.intensity} дозволяє до 3.0 — див.
+     * {@link DarkZoneSpec} клас-докстрінг), тому
+     * {@code intensity * MAX_DARKEN_FACTOR} сам по собі теж може вийти
+     * за межі {@code [0, MAX_DARKEN_FACTOR]}. Це БЕЗПЕЧНО для
+     * {@code TickHandler} (переходи інтерполюються в необмеженому
+     * просторі, як і задумано — "3.0 темніше за 1.0" усе ще правда),
+     * але НЕБЕЗПЕЧНО для {@code MixinDynamicTextureDarkZone.darken()}:
+     * той рахує {@code keep = 1 - factor} і множить r/g/b на нього —
+     * при {@code factor > 1} колірні канали "переповнюються" у
+     * від'ємну зону (артефакти кольору), а не просто "ще темніше".
+     * Тому клампимо РІВНО тут, на межі з mixin-ом, а не раніше.
+     */
     public static float currentDarkenFactor() {
         float max = 0f;
         for (Channel channel : channels.values()) {
             float factor = channel.currentIntensity * DarkZoneSpec.MAX_DARKEN_FACTOR;
             if (factor > max) max = factor;
         }
-        return max;
+        return Math.min(1f, max);
     }
 
     public static boolean isAnyActive() {
