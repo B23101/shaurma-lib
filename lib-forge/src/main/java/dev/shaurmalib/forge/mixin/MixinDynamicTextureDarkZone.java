@@ -36,6 +36,21 @@ public class MixinDynamicTextureDarkZone implements DarkZoneTextureAccess {
         darkzone_isLightmap = true;
     }
 
+    /**
+     * {@code upload()} для 16×16 lightmap затемнює r/g/b кожного block/sky
+     * пікселя — АЛЕ пропускає кутовий піксель {@code (15,15)}. Той піксель
+     * — це координата {@code LightTexture.FULL_BRIGHT} (packedLight
+     * {@code 0xF000F0}), яку GUI-рендер предметів (включно з GeckoLib
+     * {@code GeoItemRenderer} — див. {@code ItemGeoRenderer} клас-докстрінг:
+     * рендерер малює й слот інвентарю/хотбару, не лише руку/землю) семплить
+     * як "завжди максимально яскраво", незалежно від освітлення світу.
+     * Раніше цей піксель теж затемнювався разом з рештою lightmap — тому
+     * при активній темній зоні (factor до 0.92) іконки предметів у GUI
+     * ставали видимо темними: FULL_BRIGHT координата вказувала вже не на
+     * "яскраво", а на потемнілий піксель тієї самої текстури. 3D-сцена
+     * від пропуску цього одного пікселя не постраждала — там реальний
+     * block/sky-рівень майже ніколи не (15,15) одночасно.
+     */
     @Inject(method = "upload", at = @At(value = "HEAD"))
     private void darkzone_onUpload(CallbackInfo ci) {
         if (!darkzone_isLightmap || pixels == null) return;
@@ -45,6 +60,7 @@ public class MixinDynamicTextureDarkZone implements DarkZoneTextureAccess {
 
         for (int blockIndex = 0; blockIndex < 16; blockIndex++) {
             for (int skyIndex = 0; skyIndex < 16; skyIndex++) {
+                if (blockIndex == 15 && skyIndex == 15) continue; // FULL_BRIGHT — не чіпати
                 int argb = pixels.getPixelRGBA(blockIndex, skyIndex);
                 pixels.setPixelRGBA(blockIndex, skyIndex, darken(argb, factor));
             }
