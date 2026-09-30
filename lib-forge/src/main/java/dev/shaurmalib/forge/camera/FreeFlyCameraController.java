@@ -66,6 +66,7 @@ public final class FreeFlyCameraController implements CameraOwner {
         mc.setCameraEntity(freeCamera);
         token = CameraOwnershipRegistry.acquire(this);
         speed = DEFAULT_SPEED;
+        FreeCameraChunkLink.update(x, z);
     }
 
     /** Вимикає вільний політ і повертає камеру гравцю (або наступному власнику в стеку, якщо такий є). */
@@ -81,6 +82,7 @@ public final class FreeFlyCameraController implements CameraOwner {
         if (releaseOwnership && token != null) {
             CameraOwnershipRegistry.release(token);
             token = null;
+            FreeCameraChunkLink.release();
         }
     }
 
@@ -155,6 +157,7 @@ public final class FreeFlyCameraController implements CameraOwner {
         double newZ = freeCamera.getZ() + dz;
 
         freeCamera.moveSmooth(newX, newY, newZ, freeCamera.getYRot(), freeCamera.getXRot());
+        FreeCameraChunkLink.update(newX, newZ);
     }
 
     private static float axisValue(KeyMapping positive, KeyMapping negative) {

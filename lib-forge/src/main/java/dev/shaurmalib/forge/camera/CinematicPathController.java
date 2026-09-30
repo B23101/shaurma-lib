@@ -68,6 +68,7 @@ public final class CinematicPathController implements CameraOwner {
         token = CameraOwnershipRegistry.acquire(this);
         moving = true;
         startTimeMs = System.currentTimeMillis();
+        FreeCameraChunkLink.update(from.x, from.z);
     }
 
     /** Викликати щотік (клієнтський тік) поки рух активний. */
@@ -77,6 +78,7 @@ public final class CinematicPathController implements CameraOwner {
         long elapsed = System.currentTimeMillis() - startTimeMs;
         CameraPose pose = motion.poseAt(elapsed);
         freeCamera.moveSmooth(pose.position().x(), pose.position().y(), pose.position().z(), pose.yaw(), pose.pitch());
+        FreeCameraChunkLink.update(pose.position().x(), pose.position().z());
 
         if (motion.isFinished(elapsed)) {
             moving = false; // рух завершено — камера завмирає на кінцевій позиції
@@ -106,6 +108,7 @@ public final class CinematicPathController implements CameraOwner {
         if (token != null) {
             CameraOwnershipRegistry.release(token);
             token = null;
+            FreeCameraChunkLink.release();
         }
         if (freeCamera != null) {
             freeCamera.despawn();

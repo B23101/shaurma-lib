@@ -59,12 +59,15 @@ public final class StationaryCameraController implements CameraOwner {
         freeCamera.spawn();
         mc.setCameraEntity(freeCamera);
         token = CameraOwnershipRegistry.acquire(this);
+        // Сервер має слати чанки НАВКОЛО КАМЕРИ, а не лише навколо гравця.
+        FreeCameraChunkLink.update(x, z);
     }
 
     /** Пересуває вже активну камеру на нову позицію без повторного спавну (для дрейфу/ручного апдейту позиції). */
     public void moveTo(double x, double y, double z, float yaw, float pitch) {
         if (freeCamera != null) {
             freeCamera.moveSmooth(x, y, z, yaw, pitch);
+            FreeCameraChunkLink.update(x, z);
         }
     }
 
@@ -95,6 +98,7 @@ public final class StationaryCameraController implements CameraOwner {
         if (releaseOwnership && token != null) {
             CameraOwnershipRegistry.release(token);
             token = null;
+            FreeCameraChunkLink.release();
         }
         if (freeCamera != null) {
             freeCamera.despawn();

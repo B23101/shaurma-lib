@@ -12,7 +12,10 @@ import dev.shaurmalib.forge.network.packets.InventorySlotAllocationPacket;
 import dev.shaurmalib.forge.network.packets.ItemAnimPacket;
 import dev.shaurmalib.forge.network.packets.PlaySoundPacket;
 import dev.shaurmalib.forge.network.packets.RadioDialogPacket;
+import dev.shaurmalib.forge.network.packets.FreeCameraChunkRequestPacket;
 import dev.shaurmalib.forge.network.packets.RadioDialogStopPacket;
+import dev.shaurmalib.forge.network.packets.ReplayPlayPacket;
+import dev.shaurmalib.forge.network.packets.ReplayStopPacket;
 import dev.shaurmalib.forge.network.packets.StopSoundPacket;
 import dev.shaurmalib.forge.network.packets.StaminaSyncPacket;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +37,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
  */
 public final class ShaurmaLibNetwork {
 
-    private static final String PROTOCOL_VERSION = "1";
+    private static final String PROTOCOL_VERSION = "2";
 
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
             new ResourceLocation("shaurma_lib", "main"),
@@ -82,6 +85,15 @@ public final class ShaurmaLibNetwork {
         CHANNEL.registerMessage(nextId++, ChatChannelsSyncPacket.class,
                 ChatChannelsSyncPacket::encode, ChatChannelsSyncPacket::decode,
                 ChatChannelsSyncPacket::handle);
+        // Replay-камера і чанки під неї (PROTOCOL_VERSION 2). Додано в кінець —
+        // ID попередніх пакетів не змінились.
+        CHANNEL.registerMessage(nextId++, ReplayPlayPacket.class,
+                ReplayPlayPacket::encode, ReplayPlayPacket::decode, ReplayPlayPacket::handle);
+        CHANNEL.registerMessage(nextId++, ReplayStopPacket.class,
+                ReplayStopPacket::encode, ReplayStopPacket::decode, ReplayStopPacket::handle);
+        CHANNEL.registerMessage(nextId++, FreeCameraChunkRequestPacket.class,
+                FreeCameraChunkRequestPacket::encode, FreeCameraChunkRequestPacket::decode,
+                FreeCameraChunkRequestPacket::handle);
         // Наступні модулі (worldtint, mode settings, ...)
         // додають свій registerMessage(nextId++, ...) тут, у порядку
         // впровадження — ID мають лишатись стабільними між релізами lib,
