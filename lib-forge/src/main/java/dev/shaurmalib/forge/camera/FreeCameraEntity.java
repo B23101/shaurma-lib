@@ -47,8 +47,24 @@ public class FreeCameraEntity extends net.minecraft.client.player.AbstractClient
         setPose(Pose.SWIMMING);
         getAbilities().flying = true;
         noPhysics = true;
+        setInvisible(true);
         moveTo(x, y, z, yaw, pitch);
     }
+
+    /**
+     * Камера — суто «очі»: її модель, тінь, нік і вогонь ніколи не малюються.
+     * {@code Entity#shouldRender} перевіряється першим у
+     * {@code EntityRenderer#shouldRender}, тож сутність відсікається ще до
+     * рендера (у першій особі, від третьої особи й у будь-якому іншому ракурсі).
+     */
+    @Override
+    public boolean shouldRender(double x, double y, double z) { return false; }
+
+    @Override
+    public boolean isInvisibleTo(net.minecraft.world.entity.player.Player viewer) { return true; }
+
+    @Override
+    public boolean shouldShowName() { return false; }
 
     @Override
     public void tick() {
