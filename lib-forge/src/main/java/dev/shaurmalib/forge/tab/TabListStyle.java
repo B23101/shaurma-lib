@@ -47,6 +47,14 @@ import java.util.function.Function;
  * layout-код навколо викликів цього класу; рушій лише малює те, що
  * отримав.
  * <p>
+ * <p>
+ * <b>Тема.</b> Усі візуальні примітиви цього класу делегують у
+ * {@link TabTheme}. За замовчуванням це {@link DefaultTabTheme} (золото
+ * snipers_shaurma, 1:1 як було); власний вигляд підключається другим
+ * аргументом конструктора — див. {@link TabTheme}. Сам клас лишається
+ * рушієм: анімація позицій/значень/прозорості й порядок викликів у
+ * {@link #drawRow} від теми не залежать.
+ * <p>
  * Instance-based — один {@code TabListStyle} на консюмера (типово
  * зберігається в полі клієнтського стану поряд зі {@code StyleTheme}),
  * бо анімаційні мапи (позиція/значення/прозорість по {@code animKey})
@@ -78,6 +86,7 @@ public final class TabListStyle {
     public static final int HDR_H = 14;
 
     private final Function<UUID, ResourceLocation> skinResolver;
+    private final TabTheme theme;
 
     private final Map<String, Float> rowAnimY = new HashMap<>();
     private final Map<String, Float> rowTargetY = new HashMap<>();
@@ -93,7 +102,35 @@ public final class TabListStyle {
      *                     кешу скінів, консюмер підключає свій.
      */
     public TabListStyle(Function<UUID, ResourceLocation> skinResolver) {
+        this(skinResolver, new DefaultTabTheme());
+    }
+
+    /**
+     * @param theme власна тема вигляду (див. {@link TabTheme}); {@code null}
+     *              рівнозначний {@link DefaultTabTheme}.
+     */
+    public TabListStyle(Function<UUID, ResourceLocation> skinResolver, TabTheme theme) {
         this.skinResolver = skinResolver;
+        this.theme = theme != null ? theme : new DefaultTabTheme();
+    }
+
+    /** Активна тема — консюмер може малювати власні елементи в тому ж стилі (метрики, палітра). */
+    public TabTheme theme() {
+        return theme;
+    }
+
+    /** Лічильник кадрів (той самий, що живить пульсації теми) — для власних анімацій консюмера в такт з темою. */
+    public long tickCount() {
+        return pulseTimer;
+    }
+
+    /** Скін гравця через {@code skinResolver} консюмера; {@code null}, якщо ще невідомий. */
+    public ResourceLocation skin(UUID uuid) {
+        try {
+            return skinResolver.apply(uuid);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     /** Викликати рівно один раз на кадр, до будь-яких {@code render*} нижче — просуває pulse-таймер goal/respawn ефектів. */
@@ -105,101 +142,50 @@ public final class TabListStyle {
 
     /** Золота рамка панелі — 1:1 {@code drawModernPanel}. */
     public void drawPanel(GuiGraphics g, int x, int y, int w, int h, float anim) {
-        int a = (int) (anim * 255) & 0xFF;
-        g.fill(x, y, x + w, y + h, ((int) (anim * 0x99) << 24) | 0x000000);
-        g.fill(x, y, x + w, y + 1, (a << 24) | (ACCENT_GOLD & 0xFFFFFF));
-        g.fill(x, y + 1, x + w, y + 2, (Math.max(0, a - 180) << 24) | (ACCENT_GOLD & 0xFFFFFF));
-        int side = (((int) (anim * 0x55)) << 24) | (ACCENT_GOLD_DM & 0xFFFFFF);
-        g.fill(x, y, x + 1, y + h, side);
-        g.fill(x + w - 1, y, x + w, y + h, side);
-        g.fill(x, y + h - 1, x + w, y + h, side);
+        theme.drawPanel(g, x, y, w, h, anim, pulseTimer);
     }
 
     /** Заголовок + підзаголовок по центру — 1:1 {@code drawModernHeader}. */
     public void drawHeader(GuiGraphics g, Font font, int cx, int sy, float anim, String titleKey, String subtitleKey) {
-        int a = (int) (anim * 255);
-        g.drawCenteredString(font, Component.literal(Component.translatable(titleKey).getString().toUpperCase()),
-                cx, sy + 4, (a << 24) | (ACCENT_GOLD & 0xFFFFFF));
-        if (subtitleKey != null) {
-            int subA = (int) (anim * 110);
-            g.drawCenteredString(font, Component.literal(Component.translatable(subtitleKey).getString()),
-                    cx, sy + 15, (subA << 24) | 0xAAAAAA);
-        }
+        theme.drawHeader(g, font, cx, sy, anim, titleKey, subtitleKey, pulseTimer);
     }
 
     /** Онлайн-лічильник під заголовком (лобі-режим оригіналу). */
     public void drawOnlineCount(GuiGraphics g, Font font, int cx, int y, float anim, String countKey, int count) {
-        int color = (int) (alpha(anim) * 0.85f);
-        g.drawCenteredString(font, Component.literal("\u25cf " + Component.translatable(countKey, count).getString()),
-                cx, y, (color << 24) | 0x55FF55);
+        theme.drawOnlineCount(g, font, cx, y, anim, countKey, count, pulseTimer);
     }
 
     /** Фон заголовка колонки — 1:1 {@code drawColHeaderBg} (висота відповідає {@link #HDR_H}=14: фон 13px + роздільник 1px). */
     public void drawColumnHeaderBg(GuiGraphics g, int x, int y, int w, float anim) {
-        g.fill(x, y, x + w, y + 13, ((int) (anim * 40) << 24) | 0x12182A);
-        g.fill(x, y + 13, x + w, y + 14, ((int) (anim * 90) << 24) | COL_HDR_LINE);
+        theme.drawColumnHeaderBg(g, x, y, w, anim, pulseTimer);
     }
 
     /** Малює всі заголовки колонок таблиці в один рядок на висоті {@code y}. */
     public void drawColumns(GuiGraphics g, Font font, int ox, int y, List<TabColumn> columns, float anim) {
-        int hc = alpha(anim) << 24 | COL_GRAY;
-        for (TabColumn col : columns) {
-            g.drawString(font, Component.translatable(col.headerTextKey).getString(), ox + col.offsetX, y, hc, false);
-        }
+        theme.drawColumnHeaders(g, font, ox, y, columns, anim, pulseTimer);
     }
 
     // ── Рядок гравця ─────────────────────────────────────────────────
 
     /** Зебра-фон рядка з опційною "isMe" золотою підсвіткою і лівим акцентним бордером — 1:1 {@code drawRowBg}. */
     public void drawRowBg(GuiGraphics g, int x, int y, int w, int h, int rank, boolean isMe, int teamTint, float anim) {
-        int stripe = (rank % 2 == 0) ? STRIPE_A : STRIPE_B;
-        g.fill(x, y, x + w, y + h, ((int) (anim * 0x38) << 24) | stripe);
-        if (teamTint != 0) g.fill(x, y, x + w, y + h, ((int) (anim * 0x18) << 24) | (teamTint & 0xFFFFFF));
-        if (isMe) {
-            g.fill(x, y, x + w, y + h, ((int) (anim * 0x28) << 24) | 0xFFD700);
-            g.fill(x, y, x + 2, y + h, ((int) (anim * 255) << 24) | (ACCENT_GOLD & 0xFFFFFF));
-        }
+        theme.drawRowBg(g, x, y, w, h, rank, isMe, teamTint, anim, pulseTimer);
     }
 
     /** Золота пульсація "мету досягнуто" замість звичайного фону рядка — 1:1 {@code drawGoalPulse}. */
     public void drawGoalPulse(GuiGraphics g, int x, int y, int w, int h, float anim) {
-        float pulse = (float) (Math.sin(pulseTimer * 0.08) * 0.3 + 0.5);
-        int pA = (int) (anim * pulse * 180);
-        if (pA < 4) return;
-        g.fill(x, y, x + w, y + h, (pA << 24) | 0xFFD700);
-        g.fill(x, y, x + 2, y + h, ((int) (anim * 255) << 24) | (ACCENT_GOLD & 0xFFFFFF));
+        theme.drawGoalPulse(g, x, y, w, h, anim, pulseTimer);
     }
 
     /** Помаранчева пульсація "відродження" з {@code [ВІДРОДЖЕННЯ]}-бейджем (скорочується до {@code [\u21ba]}, якщо не вміщається) — 1:1 {@code drawRespawning}. */
     public void drawRespawning(GuiGraphics g, Font font, int x0, int rowW, int rowH,
                                 int textX, int textY, String name, String respawnLabel, float anim) {
-        float pulse = (float) (Math.sin(pulseTimer * 0.10) * 0.35 + 0.65);
-        int rowY = textY - (rowH - font.lineHeight) / 2;
-        int aFill = (int) (anim * pulse * 60);
-        if (aFill > 4) g.fill(x0, rowY, x0 + rowW, rowY + rowH, (aFill << 24) | (RESPAWN_ORANGE & 0xFFFFFF));
-        int aBar = (int) (anim * pulse * 255);
-        if (aBar > 6) g.fill(x0, rowY, x0 + 2, rowY + rowH, (aBar << 24) | (RESPAWN_ORANGE & 0xFFFFFF));
-        int aName = (int) (anim * (0.7f + 0.3f * pulse) * 255);
-        g.drawString(font, name, textX, textY, (aName << 24) | (RESPAWN_ORANGE & 0xFFFFFF), false);
-
-        String badge = "[" + respawnLabel + "]";
-        int badgeX = textX + font.width(name) + 3;
-        int availW = x0 + rowW - badgeX - 2;
-        if (font.width(badge) > availW) badge = "[\u21ba]";
-        if (availW > 6) {
-            g.fill(badgeX - 1, textY - 1, badgeX + font.width(badge) + 2, textY + font.lineHeight,
-                    ((int) (anim * 0x55) << 24) | 0x1A1F2E);
-            g.drawString(font, badge, badgeX, textY, ((int) (anim * pulse * 255) << 24) | (ACCENT_GOLD & 0xFFFFFF), false);
-        }
+        theme.drawRespawning(g, font, x0, rowW, rowH, textX, textY, name, respawnLabel, anim, pulseTimer);
     }
 
     /** Приглушений перекреслений текст (спектатор) — 1:1 {@code drawStrikeSubtle}. */
     public void drawStrikeThrough(GuiGraphics g, Font font, String text, int x, int y, float anim) {
-        int aText = (int) (anim * 140);
-        g.drawString(font, text, x, y, (aText << 24) | TEXT_DIM, false);
-        int midY = y + font.lineHeight / 2;
-        int aLine = (int) (anim * 180);
-        g.fill(x, midY, x + font.width(text), midY + 1, (aLine << 24) | STRIKE_LINE);
+        theme.drawStrikeThrough(g, font, text, x, y, anim, pulseTimer);
     }
 
     /**
@@ -254,19 +240,20 @@ public final class TabListStyle {
             drawRowBg(g, x, y, w, rowH, rank, row.isMe, teamTint, rowAlpha);
         }
 
-        int headX = x + 14;
-        int headY = y + (rowH - HEAD_SIZE) / 2;
+        int headX = x + theme.headOffsetX();
+        int headSize = theme.headSize();
+        int headY = y + (rowH - headSize) / 2;
         if (row.skinUuid != null) {
-            drawHead(g, row.skinUuid, headX, headY, rowAlpha);
+            drawHead(g, row.skinUuid, headX, headY, headSize, rowAlpha);
         }
 
         int textY = y + (rowH - font.lineHeight) / 2;
         if (row.rankText != null) {
-            g.drawString(font, row.rankText, x + 3, textY, alpha(rowAlpha) << 24 | (rankColor & 0xFFFFFF), false);
+            g.drawString(font, row.rankText, x + theme.rankOffsetX(), textY, alpha(rowAlpha) << 24 | (rankColor & 0xFFFFFF), false);
         }
 
         String nameText = row.cells.isEmpty() ? "" : row.cells.get(0).text;
-        int nameX = x + 30;
+        int nameX = x + theme.nameOffsetX();
         if (row.isRespawning && respawnLabel != null) {
             drawRespawning(g, font, x, w, rowH, nameX, textY, nameText, respawnLabel, rowAlpha);
         } else if (row.isSpectator) {
@@ -296,33 +283,19 @@ public final class TabListStyle {
 
     /** Базова командна панель (кольорова смуга, назва зліва, значення справа) — 1:1 {@code drawTeamBar}. SD-специфічні квадрати прогресу перемог НЕ входять — план 3.3, докстрінг {@link TabTeamBarSpec}. */
     public void drawTeamBar(GuiGraphics g, Font font, int x, int y, int w, int h, TabTeamBarSpec spec, float anim) {
-        int a = (int) (anim * 255);
-        g.fill(x, y, x + w, y + h - 1, ((int) (anim * 0x55) << 24) | (spec.colorRGB & 0xFFFFFF));
-        g.fill(x, y, x + w, y + h - 1, ((int) (anim * 0x77) << 24) | 0x05080F);
-        g.fill(x, y + h - 1, x + w, y + h, (a << 24) | (spec.colorRGB & 0xFFFFFF));
-        int textY = y + (h - font.lineHeight) / 2;
-        g.drawString(font, "\u25cf", x + 6, textY, (a << 24) | (spec.colorRGB & 0xFFFFFF), false);
-        g.drawString(font, spec.nameText, x + 18, textY, (a << 24) | 0xFFFFFF, false);
-        if (spec.valueText != null && !spec.valueText.isEmpty()) {
-            int vw = font.width(spec.valueText);
-            g.drawString(font, spec.valueText, x + w - vw - 8, textY, (a << 24) | (ACCENT_GOLD & 0xFFFFFF), false);
-        }
+        theme.drawTeamBar(g, font, x, y, w, h, spec, anim, pulseTimer);
     }
 
     // ── Голова гравця ───────────────────────────────────────────────
 
     /** 3D-голова гравця (front+hat layer) — 1:1 {@code drawHead}; {@code null}-результат {@code skinResolver} тихо пропускається (як try/catch-ignore оригіналу). */
     public void drawHead(GuiGraphics g, UUID uuid, int x, int y, float anim) {
-        try {
-            ResourceLocation skin = skinResolver.apply(uuid);
-            if (skin == null) return;
-            RenderSystem.setShaderColor(1f, 1f, 1f, anim);
-            g.blit(skin, x, y, HEAD_SIZE, HEAD_SIZE, 8, 8, 8, 8, 64, 64);
-            g.blit(skin, x, y, HEAD_SIZE, HEAD_SIZE, 40, 8, 8, 8, 64, 64);
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        } catch (Exception ignored) {
-            RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
-        }
+        drawHead(g, uuid, x, y, theme.headSize(), anim);
+    }
+
+    /** Те саме, але з довільним розміром голови (тема може мати власні метрики). */
+    public void drawHead(GuiGraphics g, UUID uuid, int x, int y, int size, float anim) {
+        theme.drawHead(g, skin(uuid), x, y, size, anim, pulseTimer);
     }
 
     // ── Анімаційні хелпери ───────────────────────────────────────────
