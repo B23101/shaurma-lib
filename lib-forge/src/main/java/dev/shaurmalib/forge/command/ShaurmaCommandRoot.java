@@ -160,6 +160,9 @@ public final class ShaurmaCommandRoot {
                     .executes(ctx -> executeSettings(ctx.getSource())));
         }
 
+        // Налагодження офлайн-присутності: /<root> offline ... (відповідає помилкою, якщо модуль не ввімкнено).
+        root.then(dev.shaurmalib.forge.offline.OfflineDebugCommand.build());
+
         modeRegistry.all().forEach(mode ->
                 mode.getModeCommand().ifPresent(cmd -> cmd.registerSubcommands(root)));
 

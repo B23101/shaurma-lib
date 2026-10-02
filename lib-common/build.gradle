@@ -41,6 +41,7 @@ dependencies {
     compileOnly 'org.yaml:snakeyaml:2.2'
 }
 
+
 // ── Architecture Sniffer ────────────────────────────────────────────────
 // Гарантія майбутньої Fabric-портованості: жоден .java файл у lib-common
 // не повинен містити "net.minecraftforge" імпорт. Порушення = build fail.

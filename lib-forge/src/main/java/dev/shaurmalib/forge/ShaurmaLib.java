@@ -7,6 +7,7 @@ import dev.shaurmalib.common.lifecycle.DisconnectPolicy;
 import dev.shaurmalib.common.lifecycle.JoinPolicy;
 import dev.shaurmalib.common.lobby.LobbySpawnPointProvider;
 import dev.shaurmalib.common.modesettings.SettingsSyncBridge;
+import dev.shaurmalib.common.offline.OfflineCloseReason;
 import dev.shaurmalib.forge.chat.ChatModule;
 import dev.shaurmalib.forge.client.chat.ChatScreenInterceptHandler;
 import dev.shaurmalib.forge.config.ConfigModule;
@@ -24,6 +25,8 @@ import dev.shaurmalib.forge.mode.ModeContractModule;
 import dev.shaurmalib.forge.mode.PlayerLifecycleModule;
 import dev.shaurmalib.forge.mode.PlayerReturnFlow;
 import dev.shaurmalib.forge.modesettings.ModeSettingsModule;
+import dev.shaurmalib.forge.offline.OfflinePresenceConfig;
+import dev.shaurmalib.forge.offline.OfflinePresenceModule;
 import dev.shaurmalib.forge.overlay.ActionBarMessageSystem;
 import dev.shaurmalib.forge.overlay.AnimatedCountdownSystem;
 import dev.shaurmalib.forge.overlay.OverlayEngine;
@@ -95,7 +98,8 @@ import java.util.function.Function;
  * {@link #withSkinnableEntities}, {@link #withGraffiti} (серверне ядро —
  * дивись докстрінг методу для того, що навмисно лишилось поза цим
  * етапом), {@link #withAnimationRecording},
- * {@link #withSpectator}, {@link #withScreenEffects} і {@link #withModeSettings} — робочі, повністю
+ * {@link #withSpectator}, {@link #withScreenEffects}, {@link #withOfflinePresence}
+ * (тіло гравця, що вийшов під час матчу) і {@link #withModeSettings} — робочі, повністю
  * реалізовані модулі (звірені рядок-в-рядок з оригінальним кодом
  * snipers_shaurma, дивись docs/ARCHITECTURE.md).
  * <p>
@@ -200,6 +204,7 @@ public final class ShaurmaLib {
         private boolean staminaEnabled = false;
         private StaminaRules staminaRules;
         private boolean foodControlEnabled = false;
+        private OfflinePresenceConfig offlinePresenceConfig;
         private RadioVoiceVolumeProvider radioVolumeProvider;
         private SoundEvent radioStartSound;
         private SoundEvent radioNoiseSound;
@@ -1138,6 +1143,35 @@ public final class ShaurmaLib {
             return this;
         }
 
+        /**
+         * Вмикає систему «офлайн-присутності» (план офлайн-присутності) —
+         * {@link OfflinePresenceModule}: коли гравець виходить із сервера під час
+         * матчу, у світі лишається його фізичне тіло (скін, броня, предмет, поза,
+         * правила урону як у гравця), а при вході гравець повертається в це тіло.
+         * Бібліотека не знає про ваш режим: що тримати, як приймати урон, що
+         * дропати й що робити при поверненні, задає {@link OfflinePresenceConfig}.
+         * <p>
+         * Вимагає {@link #withTeleport()} (повернення власника йде через
+         * {@code TeleportReason.OFFLINE_RETURN}) — перевіряється в {@link #build()}
+         * незалежно від порядку викликів. Якщо підключено
+         * {@link #withModeContract}, scope автоматично закривається при деактивації
+         * режиму. Доступ після збірки: {@link Handle#offlinePresenceModule()}.
+         * <p>
+         * Консюмер сам реєструє {@code EntityType} тіла (підклас
+         * {@code OfflineAvatarBase}), його атрибути
+         * ({@code OfflineAvatarBase.createAttributes()}) і клієнтський рендерер
+         * ({@code OfflineAvatarRendererBase}), а також відкриває/закриває scope
+         * (вручну через {@code openScope()}/{@code closeScope(...)} або
+         * {@code bindScopeToLifecycle(...)} у конфігу).
+         */
+        public Builder withOfflinePresence(OfflinePresenceConfig config) {
+            if (config == null) {
+                throw new IllegalArgumentException("withOfflinePresence(config) вимагає непорожню конфігурацію.");
+            }
+            this.offlinePresenceConfig = config;
+            return this;
+        }
+
         /** Чи поточний рантайм — клієнт (визначає, чи можна торкатись @OnlyIn(CLIENT) класів). */
         private static boolean isClientDist() {
             return net.minecraftforge.fml.loading.FMLEnvironment.dist
@@ -1174,6 +1208,11 @@ public final class ShaurmaLib {
         }
 
         public Handle build() {
+            if (offlinePresenceConfig != null && !teleportEnabled) {
+                throw new IllegalStateException(
+                        "withOfflinePresence() вимагає withTeleport() на Builder: повернення власника " +
+                        "в тіло телепортує його через TeleportReason.OFFLINE_RETURN.");
+            }
             if (inventorySlotAllocationEnabled) {
                 InventorySlotAllocation.enable();
                 InventorySlotAllocation.setCreativePolicy(inventoryCreativePolicy);
@@ -1239,13 +1278,24 @@ public final class ShaurmaLib {
                 dev.shaurmalib.forge.graffiti.GraffitiSyncManager.bind(
                         new dev.shaurmalib.forge.graffiti.GraffitiFileStore(graffitiNamespace));
             }
+            OfflinePresenceModule offlinePresenceModule = null;
+            if (offlinePresenceConfig != null) {
+                offlinePresenceModule = new OfflinePresenceModule(consumerModId, offlinePresenceConfig);
+                offlinePresenceModule.attach();
+                if (modeContractModule != null) {
+                    final OfflinePresenceModule module = offlinePresenceModule;
+                    modeContractModule.registry().onDeactivation(
+                            server -> module.closeScope(OfflineCloseReason.MODE_DEACTIVATED));
+                }
+            }
             return new Handle(consumerModId, eventBus, teleportEnabled, animatedItemsEnabled,
                     playerFreezeEnabled, playerAnimEnabled, freeCameraEnabled, overlaysEnabled, actionBarEnabled, animatedCountdownEnabled,
                     soundEnabled, chatEnabled, radioEnabled, mixinsConfigured, damageGuardEnabled, invisibleZonesEnabled,
                     animatedBlocksEnabled, skinnableEntitiesEnabled, graffitiEnabled, animationRecordingEnabled, spectatorEnabled, screenEffectsEnabled,
                     configModule, modeContractModule,
                     lifecycleModule, licenseModule, lobbyModule, playerLifecycleModule, interactionLockModule,
-                    modeSettingsModule, inventorySlotAllocationEnabled, staminaEnabled, foodControlEnabled);
+                    modeSettingsModule, inventorySlotAllocationEnabled, staminaEnabled, foodControlEnabled,
+                    offlinePresenceModule);
         }
     }
 
@@ -1449,6 +1499,7 @@ public final class ShaurmaLib {
         private final PlayerLifecycleModule playerLifecycleModule;
         private final InteractionLockModule interactionLockModule;
         private final ModeSettingsModule modeSettingsModule;
+        private final OfflinePresenceModule offlinePresenceModule;
 
         private Handle(String consumerModId, IEventBus eventBus, boolean teleportEnabled,
                         boolean animatedItemsEnabled, boolean playerFreezeEnabled, boolean playerAnimEnabled, boolean freeCameraEnabled,
@@ -1467,7 +1518,8 @@ public final class ShaurmaLib {
                         ModeSettingsModule modeSettingsModule,
                         boolean inventorySlotAllocationEnabled,
                         boolean staminaEnabled,
-                        boolean foodControlEnabled) {
+                        boolean foodControlEnabled,
+                        OfflinePresenceModule offlinePresenceModule) {
             this.consumerModId = consumerModId;
             this.eventBus = eventBus;
             this.teleportEnabled = teleportEnabled;
@@ -1501,6 +1553,7 @@ public final class ShaurmaLib {
             this.playerLifecycleModule = playerLifecycleModule;
             this.interactionLockModule = interactionLockModule;
             this.modeSettingsModule = modeSettingsModule;
+            this.offlinePresenceModule = offlinePresenceModule;
         }
 
         public String consumerModId() {
@@ -1810,6 +1863,21 @@ public final class ShaurmaLib {
                         "ModeSettings-модуль не підключено — викличте withModeSettings(...) на Builder.");
             }
             return modeSettingsModule;
+        }
+
+        /**
+         * {@link OfflinePresenceModule} — тіло гравця, що вийшов під час матчу.
+         * Доступний на {@link Handle}, бо консюмер типово тримає його довготривало і
+         * викликає {@code openScope()}/{@code closeScope(...)}/{@code hasAvatar(...)}/
+         * {@code takeReturn(...)} з різних місць режиму. Див. докстрінг
+         * {@link Builder#withOfflinePresence}.
+         */
+        public OfflinePresenceModule offlinePresenceModule() {
+            if (offlinePresenceModule == null) {
+                throw new IllegalStateException(
+                        "OfflinePresence-модуль не підключено — викличте withOfflinePresence(...) на Builder.");
+            }
+            return offlinePresenceModule;
         }
 
         /**

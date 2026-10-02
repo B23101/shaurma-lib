@@ -22,5 +22,7 @@ public enum TeleportReason {
     TRAINING_ROOM,
     MOVEMENT_LOCK_RETURN,
     ENDGAME_CAMERA,
+    /** Гравець повернувся в тіло, яке лишив в офлайні (система офлайн-присутності). */
+    OFFLINE_RETURN,
     CUSTOM
 }

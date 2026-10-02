@@ -1,11 +1,13 @@
 package dev.shaurmalib.forge;
 
 import dev.shaurmalib.forge.network.ShaurmaLibNetwork;
+import dev.shaurmalib.forge.offline.OfflineChunkAnchor;
 import dev.shaurmalib.forge.overlay.IntroOverlay;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -25,6 +27,9 @@ import net.minecraft.sounds.SoundEvent;
  * Конструктор реєструє власний мережевий канал бібліотеки
  * ({@link ShaurmaLibNetwork#register()}, namespace {@code shaurma_lib}) —
  * окремий канал від каналів модів-споживачів (план, розділ 6, п. 2).
+ * <p>
+ * Також у {@link FMLCommonSetupEvent} реєструє валідацію чанк-тікетів
+ * {@code OfflineChunkAnchor} (знімає лише власні осиротілі тікети).
  * <p>
  * <b>Нічого більше тут не активується.</b> Усі модулі бібліотеки вмикаються
  * виключно через {@code ShaurmaLib.init(consumerModId, modEventBus).withXxx(...)}
@@ -58,6 +63,13 @@ public final class ShaurmaLibMod {
         SOUND_EVENTS.register(modEventBus);
         // Стабільний мережевий канал lib (packet IDs фіксовані між релізами).
         ShaurmaLibNetwork.register();
+
+        // Валідація чанк-тікетів офлайн-присутності: після рестарту реєстр порожній, тож старі тікети
+        // осиротіли й знімаються при завантаженні світу. Реєструється тут, а не з ShaurmaLib.Builder:
+        // консюмер будує Handle у ServerAboutToStartEvent, тобто вже після FMLCommonSetupEvent.
+        // Зачіпає лише тікети modId shaurma_lib, тож без модуля нічого не змінює.
+        modEventBus.addListener((FMLCommonSetupEvent event) ->
+                event.enqueueWork(OfflineChunkAnchor::registerValidationCallback));
 
         // Базове intro вмикається автоматично для всіх споживачів бібліотеки.
         // Головний мод може повторно викликати IntroOverlay.attach(...) зі

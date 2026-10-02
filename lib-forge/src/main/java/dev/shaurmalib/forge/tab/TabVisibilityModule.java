@@ -71,30 +71,12 @@ public final class TabVisibilityModule {
                     net.minecraft.client.gui.GuiGraphics graphics,
                     float partialTick, int screenWidth, int screenHeight,
                     float progress);
-
-        /**
-         * Викликається ОДИН раз у момент, коли гравець натиснув Tab (або
-         * {@link #setForceVisible}) і таблиця починає з'являтись — до
-         * першого {@link #render} цього показу. Місце для старту вступної
-         * анімації, звуку відкриття, скидання «дельта-детекторів».
-         * За замовчуванням нічого не робить, тому інтерфейс лишається
-         * функціональним (лямбда-консюмери не ламаються).
-         */
-        default void onOpen() {}
-
-        /**
-         * Викликається ОДИН раз, коли Tab відпущено й таблиця починає
-         * згасати ({@code progress} ще > 0 кілька кадрів). Звук закриття,
-         * зупинка ефектів.
-         */
-        default void onClose() {}
     }
 
     private static volatile TabRenderer renderer = null;
     private static volatile boolean forceVisible = false;
     private static volatile boolean attached = false;
     private static float progress = 0f;
-    private static boolean open = false;
 
     /**
      * Підключає модуль: скасовує ванільний {@code player_list} і сам
@@ -142,11 +124,6 @@ public final class TabVisibilityModule {
         forceVisible = visible;
     }
 
-    /** Чи Tab затиснуто (або форс-показ) саме зараз — раніше за {@link #getProgress()}, який ще згасає. */
-    public static boolean isOpen() {
-        return open;
-    }
-
     /** Поточний прогрес появи (0..1) — для консюмерів, яким потрібне значення поза {@link TabRenderer#render}, напр. для синхронізації іншого UI. */
     public static float getProgress() {
         return progress;
@@ -174,18 +151,11 @@ public final class TabVisibilityModule {
                                float partialTick, int screenWidth, int screenHeight) {
         Minecraft mc = Minecraft.getInstance();
         boolean tabDown = mc.options.keyPlayerList.isDown() || forceVisible;
-        TabRenderer current = renderer;
-        if (tabDown != open) {
-            open = tabDown;
-            if (current != null) {
-                if (open) current.onOpen(); else current.onClose();
-            }
-        }
         progress = tabDown
                 ? Math.min(1f, progress + 0.12f)
                 : Math.max(0f, progress - 0.15f);
         if (progress <= 0.01f) return;
-        if (current == null) return;
-        current.render(gui, graphics, partialTick, screenWidth, screenHeight, progress);
+        if (renderer == null) return;
+        renderer.render(gui, graphics, partialTick, screenWidth, screenHeight, progress);
     }
 }
