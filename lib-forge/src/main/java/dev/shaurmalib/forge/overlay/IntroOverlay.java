@@ -44,6 +44,8 @@ public final class IntroOverlay {
     private static final String CIPHER = "!@#$%^&*<>?/\\|01ABCDEFGHKLMNPQRSTUVWXYZ░▒▓█";
 
     private static volatile BooleanSupplier enabled = () -> true;
+    /** Додаткові «ворота» старту: споживач може відкласти інтро (напр. до кінця власного переходу). */
+    private static volatile BooleanSupplier activationGate = () -> true;
     private static volatile Supplier<SoundEvent> soundSupplier = () -> null;
     private static volatile DoubleSupplier volumeSupplier = () -> 1.0;
     private static volatile String titleKey = "gui.shaurma_lib.intro.title";
@@ -92,6 +94,30 @@ public final class IntroOverlay {
         MinecraftForge.EVENT_BUS.register(IntroOverlay.class);
         OverlayEngine.register("shaurma_intro", IntroOverlay::render, () -> active);
         attached = true;
+    }
+
+    /** Інтро стартує лише коли ворота повертають true (за замовчуванням завжди). */
+    public static void setActivationGate(BooleanSupplier gate) {
+        activationGate = gate != null ? gate : () -> true;
+    }
+
+    public static boolean isEnabled() {
+        return enabled.getAsBoolean();
+    }
+
+    /**
+     * Екрани заходу/завантаження світу. Поки вони відкриті, інтро НЕ стартує:
+     * раніше воно запускалось одразу після появи гравця (LoggingIn) і відлічувало
+     * час та грало музику ПІД екраном завантаження, тож до моменту, коли екран
+     * зникав, інтро було вже наполовину «з'їдене», а перехід — різкий.
+     */
+    private static boolean loadingScreenOpen(Minecraft mc) {
+        net.minecraft.client.gui.screens.Screen sc = mc.screen;
+        return sc instanceof net.minecraft.client.gui.screens.ReceivingLevelScreen
+            || sc instanceof net.minecraft.client.gui.screens.LevelLoadingScreen
+            || sc instanceof net.minecraft.client.gui.screens.ConnectScreen
+            || sc instanceof net.minecraft.client.gui.screens.ProgressScreen
+            || sc instanceof net.minecraft.client.gui.screens.GenericDirtMessageScreen;
     }
 
     public static void activate() {
@@ -154,7 +180,8 @@ public final class IntroOverlay {
             if (active) deactivate();
             return;
         }
-        if (pending && inWorld && ++pendingTicks >= 2) {
+        if (pending && inWorld && !loadingScreenOpen(mc) && activationGate.getAsBoolean()
+                && ++pendingTicks >= 2) {
             pending = false;
             activate();
         }
@@ -187,7 +214,7 @@ public final class IntroOverlay {
         PoseStack ps = g.pose();
         ps.pushPose();
         ps.translate(0, 0, 2000);
-        float alpha = t > PH4 ? 1f - easeIn((t - PH4) / (float) EXIT_MS) : 1f;
+        float alpha = t > PH4 ? 1f - easeInOut((t - PH4) / (float) EXIT_MS) : 1f;
         g.fill(0, 0, sw, sh, ((int) (alpha * 255) << 24));
 
         int cx = sw / 2;
@@ -366,6 +393,11 @@ public final class IntroOverlay {
     private static float easeOut(float value) {
         value = Math.max(0f, Math.min(1f, value));
         return 1f - (1f - value) * (1f - value);
+    }
+
+    private static float easeInOut(float value) {
+        value = Math.max(0f, Math.min(1f, value));
+        return value * value * (3f - 2f * value);
     }
 
     private static float easeIn(float value) {
