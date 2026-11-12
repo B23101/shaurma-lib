@@ -1,0 +1,76 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "dev.shaurmalib",
+    "module": "shaurma-lib-meta-fabric-1.20.1",
+    "version": "0.6.0",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.5.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "shaurma-lib-meta-fabric-1.20.1-0.6.0.jar",
+          "url": "shaurma-lib-meta-fabric-1.20.1-0.6.0.jar",
+          "size": 287078,
+          "sha512": "94d58c67f38d226ebc1e75e0fafad8110ac5042b22498e107bdd7484a629d10c22b6ed163478b45878b0aca055b5dde9c51e98d057b590c9809babb5628b5396",
+          "sha256": "4857fd620fbdcc6ebdc80cde810160263e6a7f652452772eeec8c12cc8ac747c",
+          "sha1": "de1a257e09e5f1ed394124bc26699fdd03387b6a",
+          "md5": "a33689bca1b3240279ba844ad35f0aed"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "net.fabricmc",
+          "module": "fabric-loader",
+          "version": {
+            "requires": "0.15.11"
+          }
+        },
+        {
+          "group": "net.fabricmc.fabric-api",
+          "module": "fabric-api",
+          "version": {
+            "requires": "0.92.2+1.20.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "shaurma-lib-meta-fabric-1.20.1-0.6.0.jar",
+          "url": "shaurma-lib-meta-fabric-1.20.1-0.6.0.jar",
+          "size": 287078,
+          "sha512": "94d58c67f38d226ebc1e75e0fafad8110ac5042b22498e107bdd7484a629d10c22b6ed163478b45878b0aca055b5dde9c51e98d057b590c9809babb5628b5396",
+          "sha256": "4857fd620fbdcc6ebdc80cde810160263e6a7f652452772eeec8c12cc8ac747c",
+          "sha1": "de1a257e09e5f1ed394124bc26699fdd03387b6a",
+          "md5": "a33689bca1b3240279ba844ad35f0aed"
+        }
+      ]
+    }
+  ]
+}
