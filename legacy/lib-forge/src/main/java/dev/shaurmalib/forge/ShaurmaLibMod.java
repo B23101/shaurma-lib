@@ -58,6 +58,17 @@ public final class ShaurmaLibMod {
             "chat_message",
             () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("shaurma_lib", "chat_message")));
 
+    /** Звуки екранних ефектів ({@code dev.shaurmalib.forge.fx.screen}): серцебиття і дзвін у вухах. */
+    public static final RegistryObject<SoundEvent> SCREENFX_HEARTBEAT_IN = screenFxSound("screenfx_heartbeat_in");
+    public static final RegistryObject<SoundEvent> SCREENFX_HEARTBEAT_OUT = screenFxSound("screenfx_heartbeat_out");
+    public static final RegistryObject<SoundEvent> SCREENFX_RINGING = screenFxSound("screenfx_ringing");
+    public static final RegistryObject<SoundEvent> SCREENFX_RINGING_SHORT = screenFxSound("screenfx_ringing_short");
+
+    private static RegistryObject<SoundEvent> screenFxSound(String name) {
+        return SOUND_EVENTS.register(name,
+                () -> SoundEvent.createVariableRangeEvent(new ResourceLocation("shaurma_lib", name)));
+    }
+
     public ShaurmaLibMod() {
         // Платформа (SPI core) для Forge 1.20.1 — ПЕРШОЮ: модулі core звертаються до неї.
         dev.shaurmalib.loader.forge.ForgePlatform.install();

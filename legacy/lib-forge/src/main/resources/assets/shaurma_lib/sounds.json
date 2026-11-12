@@ -14,5 +14,37 @@
         "stream": false
       }
     ]
+  },
+  "screenfx_heartbeat_in": {
+    "sounds": [
+      {
+        "name": "shaurma_lib:screenfx/heartbeatin",
+        "stream": false
+      }
+    ]
+  },
+  "screenfx_heartbeat_out": {
+    "sounds": [
+      {
+        "name": "shaurma_lib:screenfx/heartbeatout",
+        "stream": false
+      }
+    ]
+  },
+  "screenfx_ringing": {
+    "sounds": [
+      {
+        "name": "shaurma_lib:screenfx/ringing",
+        "stream": false
+      }
+    ]
+  },
+  "screenfx_ringing_short": {
+    "sounds": [
+      {
+        "name": "shaurma_lib:screenfx/ringing-short",
+        "stream": false
+      }
+    ]
   }
 }

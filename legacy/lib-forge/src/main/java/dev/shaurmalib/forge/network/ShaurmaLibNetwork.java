@@ -98,6 +98,11 @@ public final class ShaurmaLibNetwork {
         // Додано в кінець — ID попередніх пакетів не змінились.
         nextId = dev.shaurmalib.anim.forge.ForgeAnimBootstrap.registerPackets(CHANNEL, nextId);
         nextId = dev.shaurmalib.meta.forge.ForgeMetaBootstrap.registerPackets(CHANNEL, nextId);
+        // Екранні ефекти (кров, спалахи, розмиття): сервер → гравець. Додано в кінець.
+        CHANNEL.registerMessage(nextId++, dev.shaurmalib.forge.fx.screen.ScreenFxPacket.class,
+                dev.shaurmalib.forge.fx.screen.ScreenFxPacket::encode,
+                dev.shaurmalib.forge.fx.screen.ScreenFxPacket::decode,
+                dev.shaurmalib.forge.fx.screen.ScreenFxPacket::handle);
         // Наступні модулі (worldtint, mode settings, ...)
         // додають свій registerMessage(nextId++, ...) тут, у порядку
         // впровадження — ID мають лишатись стабільними між релізами lib,
