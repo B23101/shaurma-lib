@@ -17,13 +17,13 @@ repositories {
 
 | Артефакт `dev.shaurmalib:` | Лоадер / гра | Що всередині | Хто використовує |
 |---|---|---|---|
-| `shaurma-lib-forge-1.20.1:0.5.0` | Forge 1.20.1 | усе (усі модулі + анімації + мета) | maniac_shaurma, snipers_shaurma |
-| `shaurma-lib-meta-fabric-1.20.1:0.5.0` | Fabric 1.20.1 | лише мета-гра | mafia |
-| `shaurma-lib-anim-fabric-1.20.1:0.5.0` | Fabric 1.20.1 | анімації + мета | — |
+| `shaurma-lib-forge-1.20.1:0.6.0` | Forge 1.20.1 | усе (усі модулі + анімації + мета) | maniac_shaurma, snipers_shaurma |
+| `shaurma-lib-meta-fabric-1.20.1:0.6.0` | Fabric 1.20.1 | лише мета-гра | mafia |
+| `shaurma-lib-anim-fabric-1.20.1:0.6.0` | Fabric 1.20.1 | анімації + мета | — |
 
 Forge:
 ```groovy
-jarJar(implementation("dev.shaurmalib:shaurma-lib-forge-1.20.1:${shaurma_lib_version}")) { jarJar.ranged(it, '[0.5.0,0.6.0)') }
+jarJar(implementation("dev.shaurmalib:shaurma-lib-forge-1.20.1:${shaurma_lib_version}")) { jarJar.ranged(it, '[0.6.0,0.7.0)') }
 ```
 Fabric:
 ```groovy
