@@ -1,0 +1,13 @@
+{
+  "key.categories.shaurma_lib": "ShaurmaLib",
+  "key.shaurma_lib.emote_wheel": "Колесо емоцій (утримати)",
+  "shaurma_lib.emote.wheel": "Емоції",
+  "shaurma_lib.emote.wheel.hint": "Відпусти — зіграти · у центрі — скасувати · ПКМ — налаштувати",
+  "shaurma_lib.emote.settings": "Колесо емоцій — налаштування",
+  "shaurma_lib.emote.settings.hint": "Перетягни емоцію в слот або вибери її і клацни слот · ПКМ по слоту — очистити",
+  "shaurma_lib.emote.done": "Готово",
+  "shaurma_lib.emote.reset": "Скинути",
+  "shaurma_lib.emote.can_move": "можна йти",
+  "shaurma_lib.emote.full_body": "усе тіло",
+  "shaurma_lib.emote.denied": "Зараз не можна"
+}

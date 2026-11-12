@@ -1,0 +1,18 @@
+{
+  "intro_music": {
+    "sounds": [
+      {
+        "name": "shaurma_lib:intro_music",
+        "stream": true
+      }
+    ]
+  },
+  "chat_message": {
+    "sounds": [
+      {
+        "name": "shaurma_lib:chat_message",
+        "stream": false
+      }
+    ]
+  }
+}

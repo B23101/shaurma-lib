@@ -1,0 +1,186 @@
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+base {
+    archivesName = 'shaurma-lib-forge'
+}
+
+minecraft {
+    // Той самий mappings channel/версія що і snipers_shaurma — обов'язково,
+    // інакше mixin refmap і навіть прості типи в сигнатурах (ServerLevel,
+    // ServerPlayer, ...) не гарантовано збігаються між lib і споживачем.
+    mappings channel: 'official', version: mc_version
+    copyIdeResources = true
+
+    runs {
+        configureEach {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            property 'mixin.env.allowAccessTransformer', 'true'
+            mods {
+                "shaurma_lib" {
+                    source sourceSets.main
+                    // core (lib-common) — частина того самого мода: у jar він вшитий, у dev-запуску теж має бути в моді
+                    source project(':lib-common').sourceSets.main
+                }
+            }
+        }
+        client {}
+        server { args '--nogui' }
+        // Smoke-тест: ./gradlew :lib-forge:runGameTestServer — вантажить мод на сервері без EULA і виходить.
+        gameTestServer {}
+    }
+}
+
+mixin {
+    add sourceSets.main, "shaurma_lib.refmap.json"
+    config "shaurma_lib.mixins.json"
+    config "shaurma_anim.mixins.json"
+}
+
+// ── Шар версії (mc/<mc_layer>) і клей лоадера (loader/forge) з shaurma-lib-mv: anim, meta, адаптери Mc*, платформа ──
+// Так само як ядро в lib-common: джерело одне, у build/ лише синхронізована копія.
+def mvRoot = file('../..')
+def syncMvAnimMc = tasks.register('syncMvAnimMc', Sync) {
+    from(new File(mvRoot, "mc/${mc_layer}/src/main/java")) { include 'dev/shaurmalib/anim/**', 'dev/shaurmalib/meta/**', 'dev/shaurmalib/mc/**', 'dev/shaurmalib/loader/**' }
+    from(new File(mvRoot, 'loader/forge/src/main/java')) { include 'dev/shaurmalib/anim/**', 'dev/shaurmalib/meta/**', 'dev/shaurmalib/mc/**', 'dev/shaurmalib/loader/**' }
+    into layout.buildDirectory.dir('generated/mv-anim-mc/java')
+}
+def syncMvAnimMcRes = tasks.register('syncMvAnimMcRes', Sync) {
+    from(new File(mvRoot, "mc/${mc_layer}/src/main/resources")) { include 'shaurma_anim.mixins.json' }
+    into layout.buildDirectory.dir('generated/mv-anim-mc/resources')
+}
+sourceSets.main.java.srcDir(syncMvAnimMc)
+sourceSets.main.resources.srcDir(syncMvAnimMcRes)
+
+repositories {
+    mavenCentral()
+    // GeckoLib — потрібен для item.animated / blocks.animated / entity.skinnable модулів.
+    maven { url 'https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/' }
+    // PlayerAnimationLib (KosmX) — потрібен для playeranim модуля.
+    maven { url 'https://maven.kosmx.dev/' }
+}
+
+configurations {
+    shade
+    implementation.extendsFrom shade
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    // lib-common — джерело контрактів/даних, компілюється разом у цей jar.
+    implementation project(':lib-common')
+
+    // SnakeYAML — вшивається (shade) так само, як зараз у snipers_shaurma,
+    // щоб і lib, і мод-споживач не тягли дублікат/конфлікт версій рантайму.
+    shade 'org.yaml:snakeyaml:2.2'
+
+    // GeckoLib і PlayerAnimator: compileOnly, бо це "provided"-залежності —
+    // кожен мод-споживач (snipers_shaurma, maniac-mode) сам додає їх версію
+    // у своєму build.gradle через fg.deobf(...), lib-forge лише компілюється
+    // проти їхнього API, не вшиває і не форсує конкретну версію.
+    compileOnly fg.deobf("software.bernie.geckolib:geckolib-forge-${mc_version}:${geckolib}")
+    compileOnly fg.deobf("dev.kosmx.player-anim:player-animation-lib-forge:1.0.2-rc1+1.20")
+}
+
+// lib-common компілюється окремим jar-ом, але в продакшн-артефакт lib-forge
+// його класи мають ПОТРАПЛЯТИ (план: "lib-common — це вихідний код, який
+// компілюється РАЗОМ у lib-forge") — інакше в /mods лежить jar без жодного
+// dev.shaurmalib.common.* класу і перший же виклик будь-якого модуля кидає
+// NoClassDefFoundError. Shadow-конфігурація тягне лише shade-залежності
+// (snakeyaml), тому класи lib-common додаються явно через sourceSets.output
+// в обидва артефакти (slim jar і shadowJar).
+def commonOutput = project(':lib-common').sourceSets.main.output
+
+tasks.named('jar', Jar).configure {
+    archiveClassifier = 'slim'
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from commonOutput
+    manifest {
+        attributes([
+                "Specification-Title"   : "shaurma_lib",
+                "Implementation-Title"  : project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor" : "shaurma-lib",
+                // Див. коментар у snipers_shaurma/build.gradle: без явного
+                // MixinConfigs у маніфесті продакшн-jar Mixin Service Forge
+                // 1.20.1 не гарантовано підхоплює shaurma_lib.mixins.json.
+                "MixinConfigs"          : "shaurma_lib.mixins.json,shaurma_anim.mixins.json"
+        ])
+    }
+}
+
+shadowJar {
+    archiveClassifier = ''
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    configurations = [project.configurations.shade]
+    from commonOutput
+    relocate 'org.yaml.snakeyaml', 'dev.shaurmalib.libs.snakeyaml'
+    mergeServiceFiles()
+    manifest {
+        attributes([
+                "Specification-Title"   : "shaurma_lib",
+                "Implementation-Title"  : project.name,
+                "Implementation-Version": project.version,
+                "Implementation-Vendor" : "shaurma-lib",
+                "MixinConfigs"          : "shaurma_lib.mixins.json,shaurma_anim.mixins.json"
+        ])
+    }
+}
+
+reobf {
+    shadowJar {}
+}
+
+tasks.named('shadowJar').configure {
+    dependsOn tasks.named('jar')
+}
+tasks.named('build').configure {
+    dependsOn tasks.named('reobfShadowJar')
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// ═════════════════════════════════════════════════════════════════════════════
+//  Публікація: Maven-репозиторій у гілці `maven` на GitHub (див. tools/publish.sh)
+// ═════════════════════════════════════════════════════════════════════════════
+// Публікується reobfShadowJar: класи lib-common, релокований snakeyaml, mixin-конфіги,
+// MixinConfigs у маніфесті та Forge-реобфускація. Саме його мод вшиває (jarJar).
+// Координати: dev.shaurmalib:shaurma-lib-forge:<libVersion з version.properties>
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId    = 'dev.shaurmalib'
+            artifactId = "shaurma-lib-forge-${mc_version}"
+            def reobfArtifact = layout.buildDirectory.file('reobfShadowJar/output.jar')
+            artifact(reobfArtifact) { builtBy tasks.named('reobfShadowJar') }
+            artifact tasks.named('sourcesJar')
+            pom {
+                name        = "ShaurmaLib (Forge ${mc_version})"
+                description = "Спільна бібліотека модулів ShaurmaLib для Forge ${mc_version}."
+                url         = 'https://github.com/B23101/shaurma-lib'
+                licenses { license { name = 'All Rights Reserved' } }
+            }
+        }
+    }
+    repositories {
+        maven { name = 'ShaurmaRepo'; url = uri(file('../../build/maven-repo')) }
+    }
+}
+
+tasks.withType(PublishToMavenRepository).configureEach {
+    dependsOn tasks.named('reobfShadowJar')
+}

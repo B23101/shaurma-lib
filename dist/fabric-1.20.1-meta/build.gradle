@@ -1,0 +1,44 @@
+// Fabric 1.20.1 — ЛИШЕ мета-двигун (профіль, статистика, економіка, косметика, компас, підсумки).
+// Для модів, яким потрібна тільки ця технологія (мафія): без рушія анімацій, міксинів і клавіш бібліотеки,
+// тож нічого стороннього в мод не потрапляє. Джерела не копіюються — беруться з трьох шарів mv.
+plugins {
+    id 'fabric-loom' version '1.17.19'
+    id 'maven-publish'
+}
+
+def v = new Properties(); file('../../version.properties').withInputStream { v.load(it) }
+group = 'dev.shaurmalib'
+version = v.libVersion
+base { archivesName = "shaurma-lib-meta-fabric-${mc_version}" }
+
+def mv = file('../..')
+
+repositories { mavenCentral() }
+
+dependencies {
+    minecraft "com.mojang:minecraft:${mc_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api}"
+}
+
+sourceSets.main.java {
+    srcDir new File(mv, 'core/src/main/java')
+    srcDir new File(mv, "mc/${mc_layer}/src/main/java")
+    srcDir new File(mv, 'loader/fabric/src/main/java')
+    include 'dev/shaurmalib/meta/**', 'dev/shaurmalib/anim/io/Json.java'
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand 'version': project.version }
+}
+
+java { toolchain.languageVersion = JavaLanguageVersion.of(java_version as int) }
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = java_version as int }
+
+// ./gradlew publishToMavenLocal → dev.shaurmalib:shaurma-lib-meta-fabric-1.20.1:<версія> (для мафії: include + modImplementation)
+publishing {
+    publications { create('mavenJava', MavenPublication) { artifactId = base.archivesName.get(); from components.java } }
+    repositories { maven { name = 'ShaurmaRepo'; url = uri(file('../../build/maven-repo')) } }
+}

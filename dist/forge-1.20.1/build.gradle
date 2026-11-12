@@ -1,0 +1,19 @@
+// Forge 1.20.1 — повна бібліотека (усі модулі старого shaurma-lib + анімації + мета).
+//   lib-common — увесь core (чиста логіка, спільна для всіх версій)
+//   lib-forge  — legacy/lib-forge  (+ mc/v1_20_1 і loader/forge: anim / meta) → shaurma-lib-forge.jar
+def v = new Properties(); file('../../version.properties').withInputStream { v.load(it) }
+
+allprojects {
+    group = 'dev.shaurmalib'
+    version = v.libVersion
+}
+
+subprojects {
+    apply plugin: 'java'
+    java {
+        toolchain.languageVersion = JavaLanguageVersion.of(java_version as int)
+        withSourcesJar()
+    }
+    tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+    repositories { mavenCentral() }
+}

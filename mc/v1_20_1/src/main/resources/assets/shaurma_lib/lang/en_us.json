@@ -1,0 +1,13 @@
+{
+  "key.categories.shaurma_lib": "ShaurmaLib",
+  "key.shaurma_lib.emote_wheel": "Emote wheel (hold)",
+  "shaurma_lib.emote.wheel": "Emotes",
+  "shaurma_lib.emote.wheel.hint": "Release to play · centre to cancel · RMB to customise",
+  "shaurma_lib.emote.settings": "Emote wheel — settings",
+  "shaurma_lib.emote.settings.hint": "Drag an emote onto a slot, or pick it and click a slot · RMB on a slot clears it",
+  "shaurma_lib.emote.done": "Done",
+  "shaurma_lib.emote.reset": "Reset",
+  "shaurma_lib.emote.can_move": "can walk",
+  "shaurma_lib.emote.full_body": "full body",
+  "shaurma_lib.emote.denied": "Not now"
+}

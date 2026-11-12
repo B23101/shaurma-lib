@@ -1,0 +1,106 @@
+{
+  "format": "shaurma_anim",
+  "format_version": 1,
+  "rig": "player",
+  "//": "Вбудована локомоція гравця ShaurmaLib (вмикається ShaurmaAnim.setPlayerLocomotion(true)). Цикли кроку: q.anim_time = фаза 0..1 від пройденої відстані. Перекрити: покласти файл з тими ж іменами в assets/shaurma_lib/shaurma_anim/player/ свого ресурс-пака або задати свій LocomotionSet.",
+  "animations": {
+    "player/idle": {
+      "loop": true,
+      "length": 4,
+      "bones": {
+        "right_arm": { "rotation": ["math.sin(q.anim_time * 90 + 40) * 1.5", 0, "3 + math.sin(q.anim_time * 90) * 2"] },
+        "left_arm": { "rotation": ["-math.sin(q.anim_time * 90 + 40) * 1.5", 0, "-3 - math.sin(q.anim_time * 90) * 2"] },
+        "torso": { "position": [0, "math.sin(q.anim_time * 90) * 0.12", 0] },
+        "head": { "rotation": ["math.sin(q.anim_time * 90 - 30) * 1.2", 0, 0] }
+      }
+    },
+    "player/walk": {
+      "loop": true,
+      "length": 1,
+      "stride": 1,
+      "bones": {
+        "right_leg": { "rotation": ["math.cos(q.anim_time * 360) * 34", 0, 0] },
+        "left_leg": { "rotation": ["-math.cos(q.anim_time * 360) * 34", 0, 0] },
+        "right_arm": { "rotation": ["-math.cos(q.anim_time * 360) * 28", 0, 2] },
+        "left_arm": { "rotation": ["math.cos(q.anim_time * 360) * 28", 0, -2] },
+        "torso": { "rotation": [0, "math.cos(q.anim_time * 360) * 4", 0] },
+        "head": { "rotation": [0, "-math.cos(q.anim_time * 360) * 2", 0] },
+        "body": { "position": [0, "(1 - math.abs(math.cos(q.anim_time * 360))) * 0.4", 0] }
+      }
+    },
+    "player/run": {
+      "loop": true,
+      "length": 1,
+      "stride": 1,
+      "bones": {
+        "right_leg": { "rotation": ["math.cos(q.anim_time * 360) * 52 - 4", 0, 0] },
+        "left_leg": { "rotation": ["-math.cos(q.anim_time * 360) * 52 - 4", 0, 0] },
+        "right_arm": { "rotation": ["-math.cos(q.anim_time * 360) * 50 - 6", 0, 6] },
+        "left_arm": { "rotation": ["math.cos(q.anim_time * 360) * 50 - 6", 0, -6] },
+        "torso": { "rotation": [7, "math.cos(q.anim_time * 360) * 7", 0], "position": [0, 0, -0.6] },
+        "head": { "rotation": [-5, "-math.cos(q.anim_time * 360) * 3", 0], "position": [0, 0, -0.8] },
+        "body": { "position": [0, "(1 - math.abs(math.cos(q.anim_time * 360))) * 0.9", 0] }
+      }
+    },
+    "player/sneak": {
+      "loop": true,
+      "length": 4,
+      "bones": {
+        "torso": { "rotation": [28.6, 0, 0], "position": [0, -3.2, 0] },
+        "head": { "position": [0, -4.2, 0] },
+        "right_arm": { "rotation": ["22.9 + math.sin(q.anim_time * 90) * 1.5", 0, 3], "position": [0, -3.2, 0] },
+        "left_arm": { "rotation": ["22.9 - math.sin(q.anim_time * 90) * 1.5", 0, -3], "position": [0, -3.2, 0] },
+        "right_leg": { "position": [0, -0.2, 4] },
+        "left_leg": { "position": [0, -0.2, 4] }
+      }
+    },
+    "player/sneak_walk": {
+      "loop": true,
+      "length": 1,
+      "stride": 1,
+      "bones": {
+        "torso": { "rotation": [28.6, "math.cos(q.anim_time * 360) * 3", 0], "position": [0, -3.2, 0] },
+        "head": { "position": [0, -4.2, 0] },
+        "right_arm": { "rotation": ["22.9 - math.cos(q.anim_time * 360) * 16", 0, 3], "position": [0, -3.2, 0] },
+        "left_arm": { "rotation": ["22.9 + math.cos(q.anim_time * 360) * 16", 0, -3], "position": [0, -3.2, 0] },
+        "right_leg": { "rotation": ["math.cos(q.anim_time * 360) * 24", 0, 0], "position": [0, -0.2, 4] },
+        "left_leg": { "rotation": ["-math.cos(q.anim_time * 360) * 24", 0, 0], "position": [0, -0.2, 4] }
+      }
+    },
+    "player/jump": {
+      "loop": "hold",
+      "length": 0.5,
+      "bones": {
+        "right_leg": { "rotation": { "0.0": [0, 0, 0], "0.2": { "post": [-28, 0, 2], "lerp_mode": "catmullrom" }, "0.5": [-20, 0, 2] } },
+        "left_leg": { "rotation": { "0.0": [0, 0, 0], "0.2": { "post": [14, 0, -2], "lerp_mode": "catmullrom" }, "0.5": [10, 0, -2] } },
+        "right_arm": { "rotation": { "0.0": [0, 0, 0], "0.2": [-14, 0, 12], "0.5": [-10, 0, 14] } },
+        "left_arm": { "rotation": { "0.0": [0, 0, 0], "0.2": [-6, 0, -12], "0.5": [-4, 0, -14] } }
+      }
+    },
+    "player/fall": {
+      "loop": true,
+      "length": 1,
+      "bones": {
+        "right_arm": { "rotation": [-18, 0, "20 + math.sin(q.anim_time * 360) * 5"] },
+        "left_arm": { "rotation": [-18, 0, "-20 - math.sin(q.anim_time * 360 + 60) * 5"] },
+        "right_leg": { "rotation": ["-8 + math.sin(q.anim_time * 360) * 4", 0, 3] },
+        "left_leg": { "rotation": ["8 - math.sin(q.anim_time * 360) * 4", 0, -3] }
+      }
+    },
+    "player/attack": {
+      "loop": "once",
+      "length": 0.3,
+      "blend_in": 0.03,
+      "blend_out": 0.1,
+      "bones": {
+        "right_arm": { "rotation": {
+          "0.0": { "post": [0, 0, 0], "lerp_mode": "catmullrom" },
+          "0.08": { "post": [-112, 12, 6], "lerp_mode": "catmullrom" },
+          "0.18": { "post": [-34, -18, 0], "lerp_mode": "catmullrom" },
+          "0.3": { "post": [0, 0, 0], "lerp_mode": "catmullrom" } } },
+        "torso": { "rotation": {
+          "0.0": [0, 0, 0], "0.08": [0, 12, 0], "0.2": [0, -10, 0], "0.3": [0, 0, 0] } }
+      }
+    }
+  }
+}

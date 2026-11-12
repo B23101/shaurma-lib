@@ -1,0 +1,13 @@
+.gradle/
+build/
+**/build/
+run/
+runs/
+*.iml
+.idea/
+.vscode/
+bin/
+*.zip
+graphify-out/
+!gradle/wrapper/gradle-wrapper.jar
+out/

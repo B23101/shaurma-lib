@@ -1,0 +1,10 @@
+{
+    "targets": ["swap"],
+    "passes": [
+        {
+            "name": "shaurma_lib:darkness",
+            "intarget": "minecraft:main",
+            "outtarget": "minecraft:main"
+        }
+    ]
+}

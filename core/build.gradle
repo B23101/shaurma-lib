@@ -1,0 +1,60 @@
+// core — ЧИСТА Java. Ні Minecraft, ні лоадер, ні Mixin на classpath. Компілюється під Java 17
+// (байткод 17 запускається і на Java 21 для 1.21.1, і на Java 25 для 26.x), тож ОДИН артефакт
+// ядра йде у всі 9 фінальних jar-ів.
+plugins {
+    id 'java-library'
+}
+
+java {
+    withSourcesJar()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+repositories { mavenCentral() }
+
+dependencies {
+    // Шейдиться/релокується у dist-проєктах (як і раніше: dev.shaurmalib.libs.snakeyaml).
+    compileOnly 'org.yaml:snakeyaml:2.2'
+    testImplementation 'org.yaml:snakeyaml:2.2'
+}
+
+// ── Architecture Sniffer v2 ───────────────────────────────────────────────
+// Було: забороняв лише net.minecraftforge, а net.minecraft.* дозволяв — через це lib-common
+// не міг компілюватись без Forge-класпасу і не був переносним між версіями.
+// Тепер: ядро не знає НІЧОГО про гру і лоадери.
+def forbidden = ['net.minecraft', 'com.mojang', 'net.minecraftforge', 'net.neoforged',
+                 'net.fabricmc', 'org.spongepowered', 'cpw.mods', 'software.bernie', 'dev.kosmx']
+
+tasks.register('architectureSniffer') {
+    group = 'verification'
+    description = 'core не має імпортувати Minecraft/лоадери/Mixin/GeckoLib'
+    def srcDir = file('src/main/java')
+    doLast {
+        def offenders = []
+        fileTree(srcDir).matching { include '**/*.java' }.each { f ->
+            f.eachLine { line ->
+                def m = (line =~ /^\s*import\s+(?:static\s+)?([\w.]+)/)
+                if (m.find() && forbidden.any { m.group(1).startsWith(it + '.') }) {
+                    offenders << "${f.name}: ${line.trim()}"
+                }
+            }
+        }
+        if (offenders) throw new GradleException("Architecture Sniffer: заборонені імпорти в core:\n" + offenders.join('\n'))
+        println "Architecture Sniffer: OK (${fileTree(srcDir).matching { include '**/*.java' }.files.size()} файлів)"
+    }
+}
+
+// Тести без фреймворку (див. src/test): рендер, телепорт, чат, шкода — все без гри.
+sourceSets { smoke { java.srcDir 'src/test/java'
+    compileClasspath += sourceSets.main.output + configurations.testImplementation
+    runtimeClasspath += output + compileClasspath } }
+tasks.register('smokeTest', JavaExec) {
+    group = 'verification'
+    classpath = sourceSets.smoke.runtimeClasspath
+    mainClass = 'dev.shaurmalib.CoreSmokeTest'
+}
+tasks.named('check') { dependsOn 'architectureSniffer', 'smokeTest' }

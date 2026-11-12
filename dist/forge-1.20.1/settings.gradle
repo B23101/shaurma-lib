@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    }
+}
+
+// Forge 1.20.1: оригінальний код (legacy/) + рушій анімацій і мета з шарів core/mc/loader.
+rootProject.name = 'shaurma-lib-forge-1.20.1'
+include 'lib-common', 'lib-forge'
+project(':lib-common').projectDir = file('core')   // = shaurma-lib-mv/core, скомпільований під Forge 1.20.1
+project(':lib-forge').projectDir = file('../../legacy/lib-forge')

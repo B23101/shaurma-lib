@@ -1,0 +1,9 @@
+rootProject.name = 'shaurma-lib'
+
+// Фаза 1 (готова, перевірена javac): чисте ядро без Minecraft.
+include 'core'
+
+// Фаза 2+ (див. docs/ARCHITECTURE.md §7) — підключаються по мірі порту:
+//   include 'mc:v1_20_1', 'mc:v1_21_1', 'mc:v26_3'                     // адаптери ванілі
+//   include 'loader:fabric', 'loader:forge', 'loader:neoforge'         // клей лоадерів (спільний API)
+//   + 9 тонких "dist"-проєктів (версія × лоадер), що збирають фінальні jar-и

@@ -1,0 +1,6 @@
+// Корінь: лише ядро (core). Ігрові збірки — окремі Gradle-проєкти в dist/* (різні плагіни й версії Gradle).
+def v = new Properties(); file('version.properties').withInputStream { v.load(it) }
+allprojects {
+    group = 'dev.shaurmalib'
+    version = v.libVersion
+}

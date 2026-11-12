@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "shaurma_lib_meta",
+  "version": "${version}",
+  "name": "Shaurma Lib · Meta",
+  "description": "Мета-двигун ShaurmaLib: профіль, статистика, лідерборди, економіка, косметика, магазин, пропуск, компас, підсумки матчу.",
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.shaurmalib.meta.fabric.FabricMetaBootstrap"],
+    "client": ["dev.shaurmalib.meta.fabric.FabricMetaClient"]
+  },
+  "depends": { "fabricloader": ">=0.15", "minecraft": "~1.20.1", "fabric-api": "*" }
+}

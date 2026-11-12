@@ -1,0 +1,19 @@
+{
+  "required": true,
+  "package": "dev.shaurmalib.anim.mc.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "minVersion": "0.8",
+  "refmap": "shaurma_lib.refmap.json",
+  "client": [
+    "MixinLivingEntityRendererAnim",
+    "MixinPlayerModelAnim",
+    "MixinItemInHandLayerAnim",
+    "MixinItemInHandRendererAnim",
+    "MixinPlayerRendererAnim",
+    "MixinCameraAnim",
+    "MixinGameRendererAnimRoll"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

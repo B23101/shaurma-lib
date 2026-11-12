@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "shaurma_lib",
+  "version": "${version}",
+  "name": "Shaurma Lib",
+  "description": "ShaurmaLib для Fabric: рушій анімацій і мета-двигун (профіль, статистика, економіка, косметика).",
+  "license": "All Rights Reserved",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["dev.shaurmalib.anim.fabric.FabricAnimBootstrap", "dev.shaurmalib.meta.fabric.FabricMetaBootstrap"],
+    "client": ["dev.shaurmalib.anim.fabric.FabricAnimClient", "dev.shaurmalib.meta.fabric.FabricMetaClient"]
+  },
+  "mixins": ["shaurma_anim.mixins.json"],
+  "depends": {
+    "fabricloader": ">=0.15",
+    "minecraft": "~1.20.1",
+    "fabric-api": "*"
+  },
+  "suggests": { "geckolib": "*" }
+}
