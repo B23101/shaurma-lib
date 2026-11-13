@@ -80,7 +80,7 @@ public final class FirstPersonRenderer {
 
         renderHeld(ps, buffers, light, player, model, pose, HumanoidArm.RIGHT);
         renderHeld(ps, buffers, light, player, model, pose, HumanoidArm.LEFT);
-        PropRenderer.renderProps(ps, buffers, light, player, model, pose);
+        PropRenderer.renderProps(ps, buffers, light, player, model, pose, false);
         ps.popPose();
         buffers.endBatch();
         return true;

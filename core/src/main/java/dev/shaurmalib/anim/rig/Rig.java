@@ -62,11 +62,17 @@ public final class Rig {
         .bone("head", "body", 0, 24, 0)
         .bone("torso", "body", 0, 24, 0)
         .bone("right_arm", "body", 5, 22, 0)
-        .bone("right_item", "right_arm", 6, 12, -2)
+        // Нижні сегменти кінцівок (лікоть / коліно — середина кубоїда). Адаптер не рухає їх як ModelPart,
+        // а згинає сітку руки/ноги (див. anim.bend.BendMath). Предмет у руці — під передпліччям.
+        .bone("right_forearm", "right_arm", 6, 18, 0)
+        .bone("right_item", "right_forearm", 6, 12, -2)
         .bone("left_arm", "body", -5, 22, 0)
-        .bone("left_item", "left_arm", -6, 12, -2)
+        .bone("left_forearm", "left_arm", -6, 18, 0)
+        .bone("left_item", "left_forearm", -6, 12, -2)
         .bone("right_leg", "body", 1.9f, 12, 0)
+        .bone("right_shin", "right_leg", 1.9f, 6, 0)
         .bone("left_leg", "body", -1.9f, 12, 0)
+        .bone("left_shin", "left_leg", -1.9f, 6, 0)
         .eye(0, 25.92f, 0) // ванільна висота очей 1.62 блока
         .build();
 

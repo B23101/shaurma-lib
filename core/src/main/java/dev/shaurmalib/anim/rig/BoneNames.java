@@ -22,7 +22,20 @@ public final class BoneNames {
         Map.entry("biped_right_arm", "right_arm"), Map.entry("biped_left_arm", "left_arm"),
         Map.entry("biped_right_leg", "right_leg"), Map.entry("biped_left_leg", "left_leg"),
         Map.entry("biped_head", "head"), Map.entry("biped_body", "torso"),
-        Map.entry("chest", "torso"), Map.entry("root", "body"));
+        Map.entry("chest", "torso"), Map.entry("root", "body"),
+        // нижні сегменти (DragonCore Right_Arm_Lower, Mixamo-подібні, «лікоть/коліно»)
+        Map.entry("right_arm_lower", "right_forearm"), Map.entry("right_lower_arm", "right_forearm"),
+        Map.entry("lower_arm_right", "right_forearm"), Map.entry("forearm_right", "right_forearm"),
+        Map.entry("right_elbow", "right_forearm"),
+        Map.entry("left_arm_lower", "left_forearm"), Map.entry("left_lower_arm", "left_forearm"),
+        Map.entry("lower_arm_left", "left_forearm"), Map.entry("forearm_left", "left_forearm"),
+        Map.entry("left_elbow", "left_forearm"),
+        Map.entry("right_leg_lower", "right_shin"), Map.entry("right_lower_leg", "right_shin"),
+        Map.entry("lower_leg_right", "right_shin"), Map.entry("shin_right", "right_shin"),
+        Map.entry("right_knee", "right_shin"),
+        Map.entry("left_leg_lower", "left_shin"), Map.entry("left_lower_leg", "left_shin"),
+        Map.entry("lower_leg_left", "left_shin"), Map.entry("shin_left", "left_shin"),
+        Map.entry("left_knee", "left_shin"));
 
     /** camelCase/PascalCase/дефіси → snake_case у нижньому регістрі. */
     public static String snake(String name) {

@@ -86,6 +86,8 @@ public final class AnimSmokeTest {
         channels();
         parserFormats();
         masks();
+        bendRig();
+        bendMath();
         layering();
         crossfade();
         onceAndEvents();
@@ -199,6 +201,135 @@ public final class AnimSmokeTest {
         check(WARN.size() == before + 1, "завантажувач: битий файл → попередження, не виняток");
         check(!AnimResourceLoader.accepts("models/item/x.json") && AnimResourceLoader.accepts("animations/item/a.animation.json"),
             "завантажувач: фільтр шляхів");
+    }
+
+    static void bendRig() {
+        Rig r = Rig.PLAYER;
+        int rf = r.indexOf("right_forearm"), lf = r.indexOf("left_forearm"), rs = r.indexOf("right_shin"), ls = r.indexOf("left_shin");
+        check(rf >= 0 && lf >= 0 && rs >= 0 && ls >= 0, "згин: риг має передпліччя і гомілки");
+        check(r.isDescendant(r.indexOf("right_item"), rf) && r.isDescendant(r.indexOf("left_item"), lf),
+            "згин: предмет у руці — нащадок передпліччя");
+        check(r.indexOf("Right_Arm_Lower") == rf && r.indexOf("leftLowerLeg") == ls && r.indexOf("right_knee") == rs
+            && r.indexOf("forearmLeft") == lf, "згин: синоніми (DragonCore, camelCase, лікоть/коліно)");
+        check(r.mask("arms").weight(rf) == 1 && r.mask("right_arm").weight(rf) == 1 && r.mask("right_arm").weight(lf) == 0
+            && r.mask("left_arm").weight(lf) == 1, "згин: маски рук включають передпліччя");
+        check(r.mask("legs").weight(rs) == 1 && r.mask("legs").weight(ls) == 1 && r.mask("upper_body").weight(rs) == 0
+            && r.mask("full-legs").weight(ls) == 0 && r.mask("upper_body").weight(rf) == 1, "згин: гомілки — у legs, не в upper_body");
+        check(r.mask("right_arm!").weight(rf) == 0, "згин: right_arm! — без передпліччя");
+        check(r.mask("spine").weight(rf) == 0 && r.mask("spine").weight(rs) == 0, "згин: spine без кінцівок");
+    }
+
+    static void bendMath() {
+        dev.shaurmalib.anim.bend.BendMath b = new dev.shaurmalib.anim.bend.BendMath();
+        // права рука у просторі ModelPart: кубоїд (-3,-2,-2)..(1,10,2), шарнір посередині
+        float[] h = new float[3];
+        dev.shaurmalib.anim.bend.BendMath.cubeHinge(-3, -2, -2, 1, 10, 2, h);
+        check(near(h[0], -1) && near(h[1], 4) && near(h[2], 0), "згин: шарнір = центр кубоїда");
+
+        float[] o = new float[3];
+        check(!b.set(0, 0, 0, h[0], h[1], h[2]), "згин: нульовий кут → неактивний");
+        b.transform(-3, 10, 2, o);
+        check(near(o[0], -3) && near(o[1], 10) && near(o[2], 2), "згин: нуль → вершина на місці");
+        check(b.region(-2) == -1 && b.region(4) == 0 && b.region(10) == 1, "згин: кільця upper/mid/lower");
+
+        float[] q = new float[4];
+        dev.shaurmalib.anim.bend.BendMath.eulerZYX((float) Math.toRadians(90), 0, 0, q);
+        dev.shaurmalib.anim.bend.BendMath.rotate(q, 0, 1, 0, o);
+        check(near(o[0], 0) && near(o[1], 0) && near(o[2], 1), "згин: Rx(90)·Y = Z (як ModelPart)");
+
+        // miter: точка шарніра лежить і на верхньому, і на нижньому ребрі — для будь-якого чистого згину
+        float[][] corners = { { -3, 4, -2 }, { 1, 4, -2 }, { 1, 4, 2 }, { -3, 4, 2 } };
+        float[][] rots = { { 1, 0, 0 }, { 0, 0, 1 }, { 1, 0, 1 }, { -1, 0, 0.5f } };
+        boolean miterOk = true, lowerRigid = true;
+        float[] qy = new float[3], m = new float[3], low = new float[3];
+        for (float[] dir : rots) {
+            for (int deg = -150; deg <= 150; deg += 15) {
+                if (deg == 0) continue;
+                float len = (float) Math.sqrt(dir[0] * dir[0] + dir[2] * dir[2]);
+                // Ейлер X+Z разом дає і трохи twist — miter для таких перевіряємо лише без twist (нижче),
+                // жорсткість нижнього сегмента — для всіх
+                b.set(deg * dir[0] / len, 0, deg * dir[2] / len, h[0], h[1], h[2]);
+                float[] full = b.lowerRotation();
+                dev.shaurmalib.anim.bend.BendMath.rotate(full, 0, 1, 0, qy);
+                for (float[] c : corners) {
+                    b.mid(c[0], c[1], c[2], m);
+                    b.lower(c[0], c[1], c[2], low); // = точка нижнього ребра при s = 0
+                    // на верхньому ребрі: x, z не змінились (ребро вертикальне), якщо twist = 0
+                    float twistY = full[1];
+                    boolean noTwist = Math.abs(twistY) < 1e-4f;
+                    if (noTwist && (!near(m[0], c[0], 1e-3f) || !near(m[2], c[2], 1e-3f))) miterOk = false;
+                    // на нижньому ребрі: (m − low) ∥ q·Y
+                    float dx = m[0] - low[0], dy = m[1] - low[1], dz = m[2] - low[2];
+                    float cx = dy * qy[2] - dz * qy[1], cy = dz * qy[0] - dx * qy[2], cz = dx * qy[1] - dy * qy[0];
+                    if (noTwist && Math.sqrt(cx * cx + cy * cy + cz * cz) > 2e-3f) miterOk = false;
+                    // нижній сегмент жорсткий: відстань до шарніра не змінилась
+                    b.lower(c[0], 10, c[2], low);
+                    float d0 = dist(c[0], 10, c[2], h), d1 = dist(low[0], low[1], low[2], h);
+                    if (!near(d0, d1, 1e-3f)) lowerRigid = false;
+                }
+            }
+        }
+        check(miterOk, "згин: miter — шарнір на перетині верхнього і нижнього ребер (без щілин)");
+        check(lowerRigid, "згин: нижній сегмент обертається жорстко");
+
+        // кут 90° по X: товщина ліктя по осі згину не змінилась, зовнішній кут витягнувся на 1/cos(45°)
+        b.set(90, 0, 0, h[0], h[1], h[2]);
+        b.mid(-1, 4, 2, o);
+        float back = o[2] - h[2], drop = o[1] - h[1];
+        check(near(back, 2) && near(Math.abs(drop), 2), "згин: 90° → точка шарніра на бісектрисі 45°");
+        b.mid(-3, 4, 0, o);
+        check(near(o[0], -3) && near(o[1], 4) && near(o[2], 0), "згин: вершини на осі згину нерухомі");
+
+        // обмеження кута
+        b.set(179, 0, 0, h[0], h[1], h[2]);
+        check(near((float) Math.toDegrees(b.swingRadians()), dev.shaurmalib.anim.bend.BendMath.MAX_SWING_DEG, 0.05f),
+            "згин: кут обмежено MAX_SWING_DEG");
+
+        // чистий twist: шарнір повертається наполовину, радіус зберігається, нижній — повністю
+        check(b.set(0, 90, 0, h[0], h[1], h[2]) && near(b.swingRadians(), 0), "згин: twist без swing — активний, swing 0");
+        b.mid(1, 4, 0, o);
+        float r = (float) Math.hypot(o[0] - h[0], o[2] - h[2]);
+        check(near(r, 2) && near(o[1], 4), "згин: twist — шарнір на тому ж радіусі й висоті");
+        check(near((float) Math.toDegrees(Math.atan2(-(o[2] - h[2]), o[0] - h[0])), 45, 0.05f), "згин: twist — шарнір на половині кута");
+        b.lower(1, 10, 0, o);
+        check(near(o[0], h[0]) && near(o[2], h[2] - 2) && near(o[1], 10), "згин: twist — нижнє кільце на повному куті");
+
+        // півот на зовнішньому ребрі: рука 4×12×4, лікоть уперед (-90° по X — нижній сегмент іде в −Z)
+        b.set(-90, 0, 0, h[0], h[1], h[2], 2, 2, 6);
+        float[] pv = b.pivot();
+        check(near(pv[0], -1) && near(pv[1], 4) && near(pv[2], 2), "згин: півот на опуклому боці (зад ліктя, +Z)");
+        float[] top = { -1, -2, 2 }, mo = new float[3], lo = new float[3];
+        b.mid(-1, 4, 2, mo);
+        b.lower(-1, 10, 2, lo);
+        float outer = dist(top[0], top[1], top[2], mo) + dist(lo[0], lo[1], lo[2], mo);
+        check(near(outer, 12, 1e-3f), "згин: зовнішній бік ліктя не розтягується (12 px)");
+        b.mid(-1, 4, -2, mo);
+        b.lower(-1, 10, -2, lo);
+        check(near(mo[1], 0) && near(lo[0], -1) && near(lo[1], 0) && near(lo[2], -4),
+            "згин: внутрішній бік складається в згин (miter на 90°)");
+        // дуже глибокий згин: внутрішнє кільце не виходить за торець сегмента
+        b.set(-150, 0, 0, h[0], h[1], h[2], 2, 2, 6);
+        b.mid(-1, 4, -2, mo);
+        check(Math.abs(mo[1] - h[1]) <= 6 - dev.shaurmalib.anim.bend.BendMath.MID_MARGIN + 1e-4f,
+            "згин: 150° — внутрішнє кільце обмежене довжиною сегмента");
+        b.mid(-1, 4, 2, mo);
+        check(near(mo[0], -1) && near(mo[1], 4) && near(mo[2], 2), "згин: 150° — зовнішнє ребро на півоті, без шпиля");
+        // жорсткість нижнього сегмента з півотом і twist: попарні відстані зберігаються
+        b.set(-70, 30, 20, h[0], h[1], h[2], 2, 2, 6);
+        float[] p1 = new float[3], p2 = new float[3];
+        b.lower(-3, 10, -2, p1);
+        b.lower(1, 7, 2, p2);
+        check(near(dist(p1[0], p1[1], p1[2], p2), dist(-3, 10, -2, new float[] { 1, 7, 2 }), 1e-3f),
+            "згин: півот + twist — нижній сегмент жорсткий");
+
+        // нормаль нижнього сегмента
+        b.set(90, 0, 0, h[0], h[1], h[2]);
+        b.lowerNormal(0, 1, 0, o);
+        check(near(o[0], 0) && near(o[1], 0) && near(o[2], 1), "згин: нормаль низу обертається з сегментом");
+    }
+
+    static float dist(float x, float y, float z, float[] p) {
+        return (float) Math.sqrt((x - p[0]) * (x - p[0]) + (y - p[1]) * (y - p[1]) + (z - p[2]) * (z - p[2]));
     }
 
     static void masks() {

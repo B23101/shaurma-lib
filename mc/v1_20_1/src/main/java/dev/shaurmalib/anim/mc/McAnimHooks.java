@@ -43,6 +43,12 @@ public final class McAnimHooks {
         partial = partialTick;
         Pose pose = McAnim.evaluate(e, partialTick, null, true);
         PlayerModelBridge.applyRoot(ps, pose);
+        // Кліп-стан веде руку: без ванільної пози «тримаю предмет» (рука на 18° вперед) — інакше поза
+        // зі стану стоїть вище, ніж у Blockbench. Змах при ходьбі, шифт і удар лишаються ванільними.
+        if (pose != null && model instanceof HumanoidModel<?> hm && !e.isUsingItem()) {
+            if (pose.stateRightArm && hm.rightArmPose == HumanoidModel.ArmPose.ITEM) hm.rightArmPose = HumanoidModel.ArmPose.EMPTY;
+            if (pose.stateLeftArm && hm.leftArmPose == HumanoidModel.ArmPose.ITEM) hm.leftArmPose = HumanoidModel.ArmPose.EMPTY;
+        }
     }
 
     public static void endRender() {

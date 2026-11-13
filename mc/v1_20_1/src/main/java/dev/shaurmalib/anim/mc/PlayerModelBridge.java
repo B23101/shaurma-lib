@@ -2,6 +2,7 @@ package dev.shaurmalib.anim.mc;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import dev.shaurmalib.anim.mc.bend.BendablePart;
 import dev.shaurmalib.anim.pose.BoneTransform;
 import dev.shaurmalib.anim.pose.Pose;
 import dev.shaurmalib.anim.rig.Rig;
@@ -34,7 +35,13 @@ public final class PlayerModelBridge {
     private static final Rig R = Rig.PLAYER;
     static final int HEAD = R.indexOf("head"), TORSO = R.indexOf("torso"), RIGHT_ARM = R.indexOf("right_arm"),
         LEFT_ARM = R.indexOf("left_arm"), RIGHT_LEG = R.indexOf("right_leg"), LEFT_LEG = R.indexOf("left_leg"),
-        ROOT = R.indexOf("body"), RIGHT_ITEM = R.indexOf("right_item"), LEFT_ITEM = R.indexOf("left_item");
+        ROOT = R.indexOf("body"), RIGHT_ITEM = R.indexOf("right_item"), LEFT_ITEM = R.indexOf("left_item"),
+        RIGHT_FOREARM = R.indexOf("right_forearm"), LEFT_FOREARM = R.indexOf("left_forearm"),
+        RIGHT_SHIN = R.indexOf("right_shin"), LEFT_SHIN = R.indexOf("left_shin");
+
+    /** Нижній сегмент кінцівки → кістка, чия частина згинається ({@link BendablePart}). */
+    private static final int[][] BENDS = {
+        { RIGHT_FOREARM, RIGHT_ARM }, { LEFT_FOREARM, LEFT_ARM }, { RIGHT_SHIN, RIGHT_LEG }, { LEFT_SHIN, LEFT_LEG } };
 
     /** Півот кореня (стегна) у просторі ModelPart, пікселі. */
     private static final float ROOT_PIVOT_Y = 24f - 12f;
@@ -78,6 +85,7 @@ public final class PlayerModelBridge {
             write(part(m, bone), pose.bone(bone));
             any = true;
         }
+        for (int[] limb : BENDS) any |= writeBend(m, pose, limb[0], limb[1]);
         if (any && m instanceof PlayerModel<?> pm) syncOverlays(pm);
         else if (any) m.hat.copyFrom(m.head);
         return any;
@@ -87,7 +95,21 @@ public final class PlayerModelBridge {
     public static void applyArms(HumanoidModel<?> m, Pose pose) {
         if (pose.touched(RIGHT_ARM)) write(m.rightArm, pose.bone(RIGHT_ARM));
         if (pose.touched(LEFT_ARM)) write(m.leftArm, pose.bone(LEFT_ARM));
+        writeBend(m, pose, RIGHT_FOREARM, RIGHT_ARM);
+        writeBend(m, pose, LEFT_FOREARM, LEFT_ARM);
         if (m instanceof PlayerModel<?> pm) syncOverlays(pm);
+    }
+
+    /**
+     * Обертання нижнього сегмента → згин сітки верхньої частини. Ті самі числа, що пішли б у
+     * {@code xRot/yRot/zRot} дочірньої частини, тож простір збігається з рештою кісток.
+     * Зсув і масштаб передпліччя поки не застосовуються (етап 4 плану).
+     */
+    private static boolean writeBend(HumanoidModel<?> m, Pose pose, int lowerBone, int partBone) {
+        if (lowerBone < 0 || !pose.touched(lowerBone)) return false;
+        BoneTransform b = pose.bone(lowerBone);
+        ((BendablePart) (Object) part(m, partBone)).shaurma$setBend(b.rx, b.ry, b.rz);
+        return true;
     }
 
     private static void write(ModelPart p, BoneTransform b) {
@@ -112,7 +134,10 @@ public final class PlayerModelBridge {
         m.rightPants.copyFrom(m.rightLeg);
     }
 
-    /** Повертає частини в позу спокою (на початку setupAnim, якщо попередній кадр їх зсував). */
+    /**
+     * Повертає частини в позу спокою (на початку setupAnim, якщо попередній кадр їх зсував).
+     * {@code resetPose} скидає і згин ({@code MixinModelPartBend}) — модель гравця спільна для всіх.
+     */
     public static void reset(HumanoidModel<?> m) {
         for (int bone : PARTS) part(m, bone).resetPose();
         m.hat.resetPose();
@@ -136,6 +161,22 @@ public final class PlayerModelBridge {
         }
         if (b.sx != 1 || b.sy != 1 || b.sz != 1) ps.scale(safe(b.sx), safe(b.sy), safe(b.sz));
         ps.translate(0, -ROOT_PIVOT_Y / 16f, 0);
+    }
+
+    /**
+     * Скасувати {@link #applyRoot} (точний обернений порядок) — для вільних пропсів ({@code parent: world}),
+     * які живуть у просторі сутності й не мають іти за нахилом/зсувом кореня тіла.
+     */
+    public static void undoRoot(PoseStack ps, Pose pose) {
+        if (pose == null || ROOT < 0 || !pose.touched(ROOT)) return;
+        BoneTransform b = pose.bone(ROOT);
+        ps.translate(0, ROOT_PIVOT_Y / 16f, 0);
+        if (b.sx != 1 || b.sy != 1 || b.sz != 1) ps.scale(1f / safe(b.sx), 1f / safe(b.sy), 1f / safe(b.sz));
+        if (b.rx != 0 || b.ry != 0 || b.rz != 0) {
+            ps.mulPose(new Quaternionf().rotationZYX(b.rz * Mth.DEG_TO_RAD, b.ry * Mth.DEG_TO_RAD, b.rx * Mth.DEG_TO_RAD).conjugate());
+        }
+        ps.translate(0, -ROOT_PIVOT_Y / 16f, 0);
+        ps.translate(-b.px / 16f, b.py / 16f, -b.pz / 16f);
     }
 
     /**

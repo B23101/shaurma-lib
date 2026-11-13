@@ -5,10 +5,13 @@ import dev.shaurmalib.anim.clip.BoneTrack;
 import dev.shaurmalib.anim.clip.Channel;
 import dev.shaurmalib.anim.clip.ClipEvent;
 import dev.shaurmalib.anim.clip.PropSpec;
+import dev.shaurmalib.anim.clip.StateSpec;
+import dev.shaurmalib.anim.io.ClipParser;
 import dev.shaurmalib.anim.molang.MolangContext;
 import dev.shaurmalib.anim.pose.BoneTransform;
 import dev.shaurmalib.anim.pose.Pose;
 import dev.shaurmalib.anim.rig.BoneMask;
+import dev.shaurmalib.anim.rig.BoneNames;
 import dev.shaurmalib.anim.rig.Rig;
 
 import java.util.EnumMap;
@@ -52,6 +55,8 @@ public final class Animator {
     private final AnimLayer[] layers;
     private final Map<Slot, String> bindingActive = new EnumMap<>(Slot.class);
     private final int lookBone;
+    /** Руки гравця (для позначки «руку веде стан»); -1 у geo-ригах без таких кісток. */
+    private final int rArm, lArm;
     private final float[] tmp = new float[3];
 
     private double clock, prevClock;
@@ -63,6 +68,9 @@ public final class Animator {
     private double airStart;
     private boolean wasSwinging;
     private float useSmooth, prevUseSmooth;
+    /** Згладжені «зараз удар/використання» — стан тримання поступається ванільній руці (0..1). */
+    private float holdSwing, prevHoldSwing, holdUse, prevHoldUse;
+    private float frameSwing, frameUse;
     private float lookYawLimit = 180f, lookPitchLimit = 180f;
 
     public Animator(UUID id, Rig rig, ClipLibrary library) {
@@ -74,6 +82,8 @@ public final class Animator {
         int head = rig.indexOf("head");
         if (head < 0) head = rig.indexOf("Head");
         this.lookBone = head;
+        this.rArm = rig.indexOf("right_arm");
+        this.lArm = rig.indexOf("left_arm");
     }
 
     public UUID id() { return id; }
@@ -164,6 +174,11 @@ public final class Animator {
         clock += DT;
 
         if (sink != null) fireEvents(subject, sink);
+        prevHoldSwing = holdSwing;
+        prevHoldUse = holdUse;
+        float k = (float) (1 - Math.exp(-25.0 * DT));
+        holdSwing += ((inputs.swinging ? 1f : 0f) - holdSwing) * k;
+        holdUse += ((inputs.usingItem ? 1f : 0f) - holdUse) * k;
         updateLocomotion();
         reactions();
         if (subject != null && bindings != null) applyBindings(subject, bindings);
@@ -317,6 +332,8 @@ public final class Animator {
      */
     public void evaluate(float partial, Pose base, boolean baseHasLook, Pose out) {
         double fc = prevClock + (clock - prevClock) * clamp01(partial);
+        frameSwing = prevHoldSwing + (holdSwing - prevHoldSwing) * clamp01(partial);
+        frameUse = prevHoldUse + (holdUse - prevHoldUse) * clamp01(partial);
         out.reset();
         if (base != null && base.rig() == rig) {
             for (int i = 0; i < rig.size(); i++) out.bone(i).set(base.bone(i));
@@ -347,10 +364,17 @@ public final class Animator {
                 float t = p.sampleTime(fc);
                 molang.set("query.anim_time", t);
                 AnimationClip clip = p.clip;
+                StateSpec state = p.additive ? null : clip.state();
+                float follow = state == null ? 0 : state.follow(in.sneaking, in.limbSwingAmount * 1.5f);
+                float yield = holdYield(clip);
+                if (state != null && env > 0.01f && yield > 0.01f) {
+                    if (rArm >= 0 && clip.animates(rig.bone(rArm)) && p.mask.weight(rArm) > 0) out.stateRightArm = true;
+                    if (lArm >= 0 && clip.animates(rig.bone(lArm)) && p.mask.weight(lArm) > 0) out.stateLeftArm = true;
+                }
                 for (String name : clip.bones()) {
                     int idx = rig.indexOf(name);
                     if (idx < 0) continue; // кістка пропса — її семплить рендер пропса
-                    float m = p.mask.weight(idx) * p.weight;
+                    float m = p.mask.weight(idx) * p.weight * yield;
                     if (m <= 0) continue;
                     BoneTrack tr = clip.track(name);
                     for (BoneTrack.ChannelType type : BoneTrack.ChannelType.values()) {
@@ -358,6 +382,7 @@ public final class Animator {
                         if (ch == null || !ch.sample(t, molang, tmp)) continue;
                         float w = env * m;
                         if (!p.additive && newerCovers(entries, k, name, idx, type, fc)) w = m;
+                        if (state != null && follow != 0) addFollow(out.bone(idx), type, tmp, follow);
                         apply(out.bone(idx), type, tmp, w, p.additive);
                         out.markTouched(idx);
                         if (idx == lookBone && type == BoneTrack.ChannelType.ROTATION && !p.additive) {
@@ -500,9 +525,27 @@ public final class Animator {
     /** Вага стану локомоції (для налагодження/HUD). */
     public float locomotionWeight(LocomotionSet.State s) { return locoW[s.ordinal()]; }
 
+    /** Стан: поза + сила × рух знизу (обертання й зсув; масштаб стану абсолютний). */
+    private static void addFollow(BoneTransform below, BoneTrack.ChannelType type, float[] v, float f) {
+        if (type == BoneTrack.ChannelType.ROTATION) { v[0] += below.rx * f; v[1] += below.ry * f; v[2] += below.rz * f; }
+        else if (type == BoneTrack.ChannelType.POSITION) { v[0] += below.px * f; v[1] += below.py * f; v[2] += below.pz * f; }
+    }
+
+    /** Стан тримання під час удару/використання поступається ванільній позі (видно змах з предметом у руці). */
+    private float holdYield(AnimationClip clip) {
+        StateSpec h = clip.state();
+        if (h == null) return 1f;
+        float y = 0;
+        if (h.yieldSwing()) y = Math.max(y, frameSwing);
+        if (h.yieldUse()) y = Math.max(y, frameUse);
+        return 1f - y;
+    }
+
     /** Семпл кістки пропса (не з ригу) в кліпі на час t — для рендера пропсів. */
     public boolean samplePropBone(AnimationClip clip, String bone, BoneTrack.ChannelType type, float t, float[] out) {
         BoneTrack tr = clip.track(bone);
+        // кліпи гравця зберігають імена треків у каноні (snake_case): "Lid" у geo → трек "lid"
+        if (tr == null && ClipParser.RIG_PLAYER.equals(clip.rig())) tr = clip.track(BoneNames.player(bone));
         if (tr == null) return false;
         Channel ch = tr.get(type);
         if (ch == null) return false;

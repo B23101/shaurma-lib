@@ -37,6 +37,9 @@ import java.util.Map;
  * Малює пропси кліпа (модель з Blockbench з власною текстурою, або предмет гри) на кістках
  * ванільної моделі гуманоїда. Кістки самого пропса (кришка аптечки, лезо ножиць) анімуються
  * треками того ж кліпа — у Blockbench це просто групи всередині групи пропса.
+ *
+ * <p>Пропс з батьком {@code world} — вільна модель у просторі сутності (3D-ефект навколо гравця):
+ * у Blockbench це група в корені сцени, поза ригом; тут — точка ступнів, без кісток тіла.
  */
 public final class PropRenderer {
 
@@ -44,14 +47,21 @@ public final class PropRenderer {
 
     private static final Map<String, ItemStack> ITEM_CACHE = new HashMap<>();
 
+    /** Третя особа: стек уже містить корінь тіла ({@link PlayerModelBridge#applyRoot}). */
     public static void renderProps(PoseStack ps, MultiBufferSource buffers, int light, LivingEntity entity,
                                    HumanoidModel<?> model, Pose pose) {
+        renderProps(ps, buffers, light, entity, model, pose, true);
+    }
+
+    /** @param rootApplied чи стек уже містить трансформ кореня {@code body} (тоді вільні пропси його скасовують) */
+    public static void renderProps(PoseStack ps, MultiBufferSource buffers, int light, LivingEntity entity,
+                                   HumanoidModel<?> model, Pose pose, boolean rootApplied) {
         if (pose == null || pose.props().isEmpty()) return;
         Animator animator = ShaurmaAnim.find(entity.getUUID());
         if (animator == null) return;
         for (Pose.ActiveProp prop : pose.props()) {
             try {
-                renderProp(ps, buffers, light, entity, model, pose, animator, prop);
+                renderProp(ps, buffers, light, entity, model, pose, animator, prop, rootApplied);
             } catch (RuntimeException ignored) {
                 // кривий пропс не має валити рендер гравця
             }
@@ -59,14 +69,21 @@ public final class PropRenderer {
     }
 
     private static void renderProp(PoseStack ps, MultiBufferSource buffers, int light, LivingEntity entity,
-                                   HumanoidModel<?> model, Pose pose, Animator animator, Pose.ActiveProp prop) {
+                                   HumanoidModel<?> model, Pose pose, Animator animator, Pose.ActiveProp prop,
+                                   boolean rootApplied) {
         PropSpec spec = prop.spec();
+        boolean world = spec.isWorld();
         String parent = spec.parentBone() == null ? "right_arm" : spec.parentBone();
-        int parentIdx = Rig.PLAYER.indexOf(parent);
-        if (parentIdx < 0) return;
+        int parentIdx = world ? -1 : Rig.PLAYER.indexOf(parent);
+        if (!world && parentIdx < 0) return;
+        float[] parentPivot = world ? new float[3] : Rig.PLAYER.pivot(parentIdx);
 
         ps.pushPose();
-        if (parentIdx == PlayerModelBridge.RIGHT_ITEM || parentIdx == PlayerModelBridge.LEFT_ITEM) {
+        if (world) {
+            // простір ModelPart: Y вниз від верху моделі (24 px над ступнями) → точка ступнів
+            if (rootApplied) PlayerModelBridge.undoRoot(ps, pose);
+            ps.translate(0, 24f / 16f, 0);
+        } else if (parentIdx == PlayerModelBridge.RIGHT_ITEM || parentIdx == PlayerModelBridge.LEFT_ITEM) {
             HumanoidArm arm = parentIdx == PlayerModelBridge.RIGHT_ITEM ? HumanoidArm.RIGHT : HumanoidArm.LEFT;
             model.translateToHand(arm, ps);
             float[] a = PlayerModelBridge.itemAnchor(arm);
@@ -83,9 +100,16 @@ public final class PropRenderer {
         float t = prop.clipTime();
         float[] scratch = new float[3];
         if (spec.item() != null) {
-            // предмет гри: власна кістка пропса (ім'я = id пропса) може його зсувати
+            // предмет гри: власна кістка пропса (ім'я = id пропса) може його зсувати, крутити, масштабувати
             BoneTransform b = new BoneTransform();
             boolean any = false;
+            if (animator.samplePropBone(prop.clip(), spec.id(), BoneTrack.ChannelType.SCALE, t, scratch)) {
+                if (Math.abs(scratch[0]) < 1e-4f && Math.abs(scratch[1]) < 1e-4f && Math.abs(scratch[2]) < 1e-4f) {
+                    ps.popPose();
+                    return; // масштаб 0 = сховано (як у Blockbench)
+                }
+                b.sx = scratch[0]; b.sy = scratch[1]; b.sz = scratch[2]; any = true;
+            }
             if (animator.samplePropBone(prop.clip(), spec.id(), BoneTrack.ChannelType.POSITION, t, scratch)) {
                 b.px = scratch[0]; b.py = scratch[1]; b.pz = scratch[2]; any = true;
             }
@@ -103,12 +127,13 @@ public final class PropRenderer {
             ResourceLocation tex = spec.texture() == null ? null : ResourceLocation.tryParse(spec.texture());
             if (mesh != null && tex != null) {
                 ps.mulPose(Axis.ZP.rotationDegrees(180f)); // сцена Blockbench → простір ModelPart
-                RenderType type = spec.emissive() ? RenderType.eyes(tex) : RenderType.entityCutoutNoCull(tex);
+                RenderType type = spec.emissive() ? RenderType.eyes(tex)
+                    : spec.translucent() ? RenderType.entityTranslucent(tex) : RenderType.entityCutoutNoCull(tex);
                 VertexConsumer vc = buffers.getBuffer(type);
                 Matrix4f m4 = ps.last().pose();
                 Matrix3f m3 = ps.last().normal();
                 int lit = spec.emissive() ? LightTexture.FULL_BRIGHT : light;
-                PropBaker.bake(mesh, Rig.PLAYER.pivot(parentIdx),
+                PropBaker.bake(mesh, parentPivot,
                     (bone, type2, out) -> animator.samplePropBone(prop.clip(), bone, type2, t, out),
                     (pos, uv, nx, ny, nz) -> {
                         for (int v = 0; v < 4; v++) {

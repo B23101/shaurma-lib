@@ -10,6 +10,7 @@ import dev.shaurmalib.meta.progress.RankLadder;
 import dev.shaurmalib.meta.stats.StatDef;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import dev.shaurmalib.meta.cosmetics.CosmeticSlot;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.RemotePlayer;
@@ -99,8 +100,9 @@ public class ProfileScreen extends MetaScreen {
             model.setYRot(0);
             model.setXRot(0);
             try {
-                InventoryScreen.renderEntityInInventory(g, vx + vw / 2, vy + vh - 16, 84,
-                        new Quaternionf().rotationZ((float) Math.PI).rotateY((float) Math.toRadians(yaw)), null, model);
+                Preview.render(g, vx + vw / 2, vy + vh - 16, 84, yaw, model,
+                        preview && CosmeticRenderer.preview != null ? CosmeticRenderer.preview.get(CosmeticSlot.AURA) : null,
+                        false, vw);
             } finally {
                 model.yBodyRot = by; model.yBodyRotO = byo; model.yHeadRot = hy; model.yHeadRotO = hyo;
                 model.setYRot(yr);

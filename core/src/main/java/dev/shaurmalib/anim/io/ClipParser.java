@@ -4,8 +4,10 @@ import dev.shaurmalib.anim.clip.AnimationClip;
 import dev.shaurmalib.anim.clip.BoneTrack;
 import dev.shaurmalib.anim.clip.Channel;
 import dev.shaurmalib.anim.clip.ClipEvent;
+import dev.shaurmalib.anim.clip.HoldSpec;
 import dev.shaurmalib.anim.clip.Keyframe;
 import dev.shaurmalib.anim.clip.PropSpec;
+import dev.shaurmalib.anim.clip.StateSpec;
 import dev.shaurmalib.anim.math.Easing;
 import dev.shaurmalib.anim.molang.Molang;
 import dev.shaurmalib.anim.rig.BoneNames;
@@ -97,11 +99,12 @@ public final class ClipParser {
                 Map<String, Object> po = Json.obj(p.getValue());
                 if (po == null) continue;
                 String parent = Json.str(po.get("parent"), player ? "right_arm" : null);
-                if (player && parent != null) parent = BoneNames.player(parent);
+                if (PropSpec.isWorldParent(parent)) parent = PropSpec.WORLD;
+                else if (player && parent != null) parent = BoneNames.player(parent);
                 props.add(new PropSpec(p.getKey(), parent,
                     Json.str(po.get("model"), null), Json.str(po.get("texture"), null), Json.str(po.get("item"), null),
                     visibility(po.get("visible")), Json.str(po.get("hide_held"), null),
-                    Json.bool(po.get("emissive"), false)));
+                    Json.bool(po.get("emissive"), false), Json.bool(po.get("translucent"), false)));
             }
         }
 
@@ -123,7 +126,12 @@ public final class ClipParser {
             (float) Json.num(m.get("camera"), 0),
             (float) Json.num(m.get("camera_rotation"), 0));
 
-        return new AnimationClip(id, rig, length, loop, tracks, events, props, defaults);
+        HoldSpec hold = hold(m.get("hold") != null ? m.get("hold") : a.get("hold"));
+        // стан тримання триває, поки предмет у руці: «once» тут означало б «зіграти й стрибнути назад»
+        if (hold != null && loop == AnimationClip.LoopMode.ONCE) loop = AnimationClip.LoopMode.HOLD;
+        StateSpec state = state(m.get("state") != null ? m.get("state") : a.get("state"), hold);
+        if (state != null && hold == null && loop == AnimationClip.LoopMode.ONCE) loop = AnimationClip.LoopMode.HOLD;
+        return new AnimationClip(id, rig, length, loop, tracks, events, props, defaults, hold, state);
     }
 
     // ── Канали й ключові кадри ───────────────────────────────────────────
@@ -241,6 +249,46 @@ public final class ClipParser {
                 if (ev == null) continue;
                 out.add(new ClipEvent(t, type, Json.str(first(ev, "effect", "value", "name"), ""), ev));
             }
+        }
+    }
+
+    /** {@code "hold": "ns:item"} або {@code {"item": "ns:item" | [...], "hand", "priority", "yield_swing", "yield_use"}}. */
+    private static HoldSpec hold(Object raw) {
+        if (raw == null) return null;
+        Map<String, Object> o = Json.obj(raw);
+        Object itemRaw = o != null ? first(o, "item", "items") : raw;
+        List<String> items = new ArrayList<>();
+        List<Object> list = Json.list(itemRaw);
+        if (list != null) for (Object x : list) addItems(items, Json.str(x, ""));
+        else addItems(items, Json.str(itemRaw, ""));
+        if (items.isEmpty()) return null;
+        if (o == null) return new HoldSpec(items, "main", 0, true, true);
+        return new HoldSpec(items, Json.str(o.get("hand"), "main"), (int) Json.num(o.get("priority"), 0),
+            Json.bool(o.get("yield_swing"), true), Json.bool(o.get("yield_use"), true));
+    }
+
+    /** {@code "state": true} або об'єкт з полями follow_move, follow_sneak, follow_idle, yield_swing, yield_use; стан тримання (hold) — завжди стан. */
+    private static StateSpec state(Object raw, HoldSpec hold) {
+        Map<String, Object> o = Json.obj(raw);
+        StateSpec d = StateSpec.DEFAULT;
+        if (o == null) {
+            boolean on = raw instanceof Boolean b ? b : raw != null;
+            if (!on && hold == null) return null;
+            return hold != null ? new StateSpec(d.followMove(), d.followSneak(), d.followIdle(), hold.yieldSwing(), hold.yieldUse()) : d;
+        }
+        return new StateSpec(
+            (float) Json.num(o.get("follow_move"), d.followMove()),
+            (float) Json.num(o.get("follow_sneak"), d.followSneak()),
+            (float) Json.num(o.get("follow_idle"), d.followIdle()),
+            Json.bool(o.get("yield_swing"), hold == null || hold.yieldSwing()),
+            Json.bool(o.get("yield_use"), hold == null || hold.yieldUse()));
+    }
+
+    private static void addItems(List<String> out, String s) {
+        for (String part : s.split("[,\\s]+")) {
+            String id = part.trim();
+            if (id.isEmpty()) continue;
+            out.add(id.contains(":") ? id : "minecraft:" + id);
         }
     }
 

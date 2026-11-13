@@ -4,6 +4,7 @@ import dev.shaurmalib.anim.clip.AnimationClip;
 import dev.shaurmalib.anim.mesh.GeoMesh;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,13 +26,37 @@ public final class ClipLibrary {
 
     public GeoMesh mesh(String id) { return id == null ? null : meshes.get(id); }
 
-    public void register(AnimationClip clip) { clips.put(clip.id(), clip); }
+    public void register(AnimationClip clip) {
+        clips.put(clip.id(), clip);
+        holdBindings = buildHoldBindings(clips.values());
+    }
 
     public void registerMesh(String id, GeoMesh mesh) { meshes.put(id, mesh); }
 
     public void replaceAll(Map<String, AnimationClip> newClips, Map<String, GeoMesh> newMeshes) {
         this.clips = new ConcurrentHashMap<>(newClips);
         this.meshes = new ConcurrentHashMap<>(newMeshes);
+        this.holdBindings = buildHoldBindings(newClips.values());
+    }
+
+    private volatile List<AnimBinding> holdBindings = List.of();
+
+    /**
+     * Правила зі «станів тримання» кліпів ({@code "hold"} у файлі): перебудовуються при кожному
+     * перезавантаженні ресурсів, тож новий кліп з Blockbench працює після F3+T без жодного коду.
+     */
+    public List<AnimBinding> holdBindings() { return holdBindings; }
+
+    private static List<AnimBinding> buildHoldBindings(Collection<AnimationClip> all) {
+        List<AnimBinding> out = new java.util.ArrayList<>();
+        for (AnimationClip c : all) {
+            dev.shaurmalib.anim.clip.HoldSpec h = c.hold();
+            if (h == null) continue;
+            out.add(AnimBinding.when("hold:" + c.id(), s -> h.matches(s.inputs().mainHandItem, s.inputs().offHandItem))
+                .play(c.id()).slot(Slot.parse(c.defaults().slot(), Slot.HOLD)).priority(h.priority()).rig(c.rig()));
+        }
+        out.sort(java.util.Comparator.comparing(AnimBinding::id));
+        return List.copyOf(out);
     }
 
     public Collection<AnimationClip> all() { return clips.values(); }

@@ -380,8 +380,8 @@ public class WardrobeScreen extends MetaScreen {
         CosmeticRenderer.previewYaw = yawDeg;
         CosmeticRenderer.previewTilt = tilt ? .42f : 0f;
         try {
-            InventoryScreen.renderEntityInInventory(g, cx, fy, (int) size,
-                    new Quaternionf().rotationZ((float) Math.PI).rotateY((float) Math.toRadians(yawDeg)), null, mannequin);
+            // Спільний рендер превʼю: аура позаду моделі, сцена трохи нахилена, кільце вписане у вікно.
+            Preview.render(g, cx, fy, size, yawDeg, mannequin, lk == null ? null : lk.get(CosmeticSlot.AURA), tilt, clw);
         } finally {
             CosmeticRenderer.drawingPreview = false;
             CosmeticRenderer.preview = null;

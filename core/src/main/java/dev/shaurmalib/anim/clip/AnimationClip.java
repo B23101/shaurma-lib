@@ -64,6 +64,8 @@ public final class AnimationClip {
     private final List<ClipEvent> events;
     private final List<PropSpec> props;
     private final Defaults defaults;
+    private final HoldSpec hold;
+    private final StateSpec state;
 
     /**
      * Налаштування, які автор кліпа може задати у файлі (а мод — перекрити в {@code PlayRequest}).
@@ -91,6 +93,20 @@ public final class AnimationClip {
 
     public AnimationClip(String id, String rig, float length, LoopMode loop, Map<String, BoneTrack> tracks,
                          List<ClipEvent> events, List<PropSpec> props, Defaults defaults) {
+        this(id, rig, length, loop, tracks, events, props, defaults, null);
+    }
+
+    /** @param hold «стан тримання» — кліп вмикається сам, поки гравець тримає предмет (null — ні) */
+    public AnimationClip(String id, String rig, float length, LoopMode loop, Map<String, BoneTrack> tracks,
+                         List<ClipEvent> events, List<PropSpec> props, Defaults defaults, HoldSpec hold) {
+        this(id, rig, length, loop, tracks, events, props, defaults, hold, hold != null ? StateSpec.DEFAULT : null);
+    }
+
+    /** @param state кліп-стан: накладається на рух (біг, шифт, idle), поступається удару (null — звичайний кліп) */
+    public AnimationClip(String id, String rig, float length, LoopMode loop, Map<String, BoneTrack> tracks,
+                         List<ClipEvent> events, List<PropSpec> props, Defaults defaults, HoldSpec hold, StateSpec state) {
+        this.hold = hold;
+        this.state = state;
         this.id = id;
         this.rig = rig;
         this.tracks = Collections.unmodifiableMap(tracks);
@@ -109,6 +125,12 @@ public final class AnimationClip {
     public float length() { return length; }
     public LoopMode loop() { return loop; }
     public Defaults defaults() { return defaults; }
+
+    /** Стан тримання або null. */
+    public HoldSpec hold() { return hold; }
+
+    /** Параметри кліпа-стану або null. */
+    public StateSpec state() { return state; }
     public List<ClipEvent> events() { return events; }
     public List<PropSpec> props() { return props; }
     public Set<String> bones() { return tracks.keySet(); }

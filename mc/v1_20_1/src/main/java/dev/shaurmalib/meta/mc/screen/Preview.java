@@ -59,13 +59,56 @@ final class Preview {
         CosmeticRenderer.previewTilt = tilt ? .42f : 0f;
         CosmeticRenderer.previewLift = lift;
         try {
-            InventoryScreen.renderEntityInInventory(g, cx, foot, (int) size,
-                    new Quaternionf().rotationZ((float) Math.PI).rotateY((float) Math.toRadians(yaw)), null, m);
+            render(g, cx, foot, size, yaw, m, look.get(CosmeticSlot.AURA), tilt, clw);
         } finally {
             CosmeticRenderer.drawingPreview = false;
             CosmeticRenderer.preview = null;
             CosmeticRenderer.previewTilt = CosmeticRenderer.previewLift = 0;
             g.disableScissor();
+        }
+    }
+
+    /** Нахил сцени вперед (рад) для превʼю з аурою: кільце на підлозі читається еліпсом, а не лінією. */
+    static final float AURA_PITCH = .30f;
+
+    /**
+     * Єдине місце, де манекен малюється у превʼю (магазин, пропуск, гардероб, профіль): аура — ПЕРШОЮ,
+     * позаду моделі (без запису глибини вона інакше лягала б поверх ніг), уся сцена — манекен разом з
+     * аурою — трохи нахилена вперед, а кільце стиснуте так, щоб влізти у вікно шириною {@code clipW}.
+     * Викликати всередині {@code drawingPreview = true} і зі scissor вікна.
+     */
+    static void render(GuiGraphics g, float cx, float foot, float size, float yawDeg,
+                       net.minecraft.world.entity.LivingEntity entity, Worn aura, boolean tilt, float clipW) {
+        float pitch = tilt || aura != null ? AURA_PITCH : 0f;
+        // Pitch — у просторі екрана (зліва від Z-фліпа), щоб нахилялася вся сцена, а не лише модель.
+        Quaternionf rot = new Quaternionf().rotationX(pitch).rotateZ((float) Math.PI)
+                .rotateY((float) Math.toRadians(yawDeg));
+        if (aura != null) {
+            // Після нахилу передня дуга кільця опускається нижче ніг на r·size·sin(pitch) — піднімаємо
+            // сцену на цю висоту, щоб кільце не зрізало нижнім краєм вікна.
+            float fit = clipW > 0 ? clipW * .44f / size : Float.MAX_VALUE;
+            float r = Math.min(aura.param(CosmeticSlot.AURA, "scale") * 1.22f, fit);
+            foot -= (float) (r * size * Math.sin(pitch));
+        }
+        try {
+            if (aura != null) {
+                var ps = g.pose();
+                ps.pushPose();
+                ps.translate(cx, foot, 50.0);
+                ps.mulPoseMatrix(new org.joml.Matrix4f().scaling(size, size, -size));
+                ps.mulPose(rot);
+                Minecraft mc = Minecraft.getInstance();
+                // Радіус кільця ≈ 1.22 · scale блока; у вікні лишаємо по ~6% поля з боків.
+                float fitBlocks = clipW > 0 ? clipW * .44f / size : Float.MAX_VALUE;
+                CosmeticRenderer.drawPreviewAuraBehind(ps, g.bufferSource(), aura, yawDeg, 0f,
+                        (mc.level == null ? 0 : mc.level.getGameTime()) + mc.getFrameTime(), fitBlocks);
+                ps.popPose();
+                g.flush();
+                CosmeticRenderer.previewAuraSeparate = true;
+            }
+            InventoryScreen.renderEntityInInventory(g, (int) cx, (int) foot, (int) size, rot, null, entity);
+        } finally {
+            CosmeticRenderer.previewAuraSeparate = false;
         }
     }
 

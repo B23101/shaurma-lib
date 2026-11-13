@@ -14,13 +14,32 @@ import java.util.List;
  * </ul>
  *
  * @param id          ім'я пропса в кліпі (зазвичай ім'я групи в Blockbench)
- * @param parentBone  кістка скелета ({@code right_arm}, {@code head}...)
+ * @param parentBone  кістка скелета ({@code right_arm}, {@code head}...) або {@link #WORLD} — вільна модель
+ *                    навколо гравця (3D-ефект, предмет на землі): простір сутності, не йде за кістками тіла
  * @param visibility  ступінчасті ключі видимості; порожньо — видимий увесь кліп
  * @param hideHeld    {@code right}/{@code left}/{@code both}/null — сховати ванільний предмет у руці,
  *                    поки пропс видимий (пропс і є той предмет, але анімований)
+ * @param translucent напівпрозора текстура (дим, сяйво, скло) — малюється з альфа-змішуванням
  */
 public record PropSpec(String id, String parentBone, String model, String texture, String item,
-                       List<VisKey> visibility, String hideHeld, boolean emissive) {
+                       List<VisKey> visibility, String hideHeld, boolean emissive, boolean translucent) {
+
+    /** Батько вільного пропса: простір сутності (ступні, Y вгору), без кісток тіла. */
+    public static final String WORLD = "world";
+
+    public PropSpec(String id, String parentBone, String model, String texture, String item,
+                    List<VisKey> visibility, String hideHeld, boolean emissive) {
+        this(id, parentBone, model, texture, item, visibility, hideHeld, emissive, false);
+    }
+
+    /** {@code world}/{@code none}/{@code entity}/{@code free} — пропс не прив'язаний до кістки. */
+    public static boolean isWorldParent(String parent) {
+        if (parent == null) return false;
+        String p = parent.trim().toLowerCase(java.util.Locale.ROOT);
+        return p.equals(WORLD) || p.equals("none") || p.equals("entity") || p.equals("free") || p.equals("scene");
+    }
+
+    public boolean isWorld() { return isWorldParent(parentBone); }
 
     public record VisKey(float time, boolean visible) {}
 

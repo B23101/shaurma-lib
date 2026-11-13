@@ -28,6 +28,11 @@ public final class Pose {
     public float firstPersonPitch;
     public float[] firstPersonOffset = AnimationClip.Defaults.DEFAULT_FP_OFFSET;
     public boolean hideRightHeld, hideLeftHeld;
+    /**
+     * Кліп-стан веде цю руку: адаптер прибирає ванільну позу «тримаю предмет» (рука трохи вперед), щоб
+     * поза зі стану стояла як у Blockbench, а не на 18° вище. Змах при ходьбі/шифт лишаються в базі.
+     */
+    public boolean stateRightArm, stateLeftArm;
     /** Камера першої особи за головою: вага позиції і повороту (0 — камера ванільна). */
     public float cameraWeight, cameraRotWeight;
     /** Голова без процедурного погляду (камера сама і є погляд — щоб не рахувати його двічі). */
@@ -78,6 +83,7 @@ public final class Pose {
         firstPersonPitch = 0;
         firstPersonOffset = AnimationClip.Defaults.DEFAULT_FP_OFFSET;
         hideRightHeld = hideLeftHeld = false;
+        stateRightArm = stateLeftArm = false;
         cameraWeight = cameraRotWeight = 0;
         headNoLook.identity();
     }

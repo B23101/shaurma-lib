@@ -112,7 +112,8 @@ public final class ShaurmaAnim {
 
     /** Тік однієї сутності (викликає адаптер раз на ігровий тік). */
     public static void tick(AnimSubject subject) {
-        subject.animator().tick(subject, BINDINGS, BROADCAST);
+        List<AnimBinding> data = CLIPS.holdBindings();
+        subject.animator().tick(subject, data.isEmpty() ? BINDINGS : withData(data), BROADCAST);
     }
 
     // ── Програвання ──────────────────────────────────────────────────────
@@ -162,6 +163,15 @@ public final class ShaurmaAnim {
     public static void unbind(String id) { BINDINGS.removeIf(x -> x.id().equals(id)); }
 
     public static List<AnimBinding> bindings() { return List.copyOf(BINDINGS); }
+
+    /** Правила мода + «стани тримання» з файлів кліпів (без копіювання списків щотіка). */
+    private static Iterable<AnimBinding> withData(List<AnimBinding> data) {
+        return () -> new Iterator<>() {
+            final Iterator<AnimBinding> a = BINDINGS.iterator(), b = data.iterator();
+            @Override public boolean hasNext() { return a.hasNext() || b.hasNext(); }
+            @Override public AnimBinding next() { return a.hasNext() ? a.next() : b.next(); }
+        };
+    }
 
     public static void onEvent(AnimEventSink sink) { SINKS.add(sink); }
 

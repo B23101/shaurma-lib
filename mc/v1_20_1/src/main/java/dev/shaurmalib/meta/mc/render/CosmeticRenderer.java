@@ -56,6 +56,8 @@ public final class CosmeticRenderer {
     public static Look preview;
     public static boolean drawingPreview;
     public static float previewLift, previewLean, previewYaw, previewTilt;
+    /** true — аура вже намальована ДО манекена (Preview.figure), шар її не дублює поверх моделі. */
+    public static boolean previewAuraSeparate;
 
     private static final class PetState {
         double x, y, z, lastX, lastZ;
@@ -270,10 +272,29 @@ public final class CosmeticRenderer {
         }
     }
 
+    /**
+     * Аура прев'ю, намальована ДО манекена. Адитивне світіння без запису глибини, що йде шаром ПІСЛЯ
+     * моделі, лягало поверх ніг (задня половина пентаграми й полум'я «просвічували» крізь тіло).
+     * Якщо ж малювати його першим, непрозорий манекен просто перекриває те, що за ним.
+     * {@code m} — вже у просторі манекена (як у renderEntityInInventory), початок координат — ноги.
+     */
+    public static void drawPreviewAuraBehind(PoseStack m, MultiBufferSource v, Worn aura, float yaw, float tilt, float time,
+                                             float fitRadiusBlocks) {
+        m.pushPose();
+        m.mulPose(Axis.YP.rotationDegrees(180f)); // як LivingEntityRenderer.setupRotations при bodyYaw=0
+        m.mulPose(Axis.YP.rotationDegrees(-(yaw + 180f)));
+        if (tilt != 0f) m.mulPose(Axis.XP.rotationDegrees((float) Math.toDegrees(tilt)));
+        // Радіус кільця ≈ 1.22 · scale блока: стискаємо аури, що не влазять у вікно превʼю.
+        float scale = Math.min(aura.param(CosmeticSlot.AURA, "scale"), fitRadiusBlocks / 1.22f);
+        AuraRenderer.draw(auraType(aura), m, v.getBuffer(MetaRenderTypes.GLOW), time, aura.color,
+                scale, 1f, true, false);
+        m.popPose();
+    }
+
     /** У прев'ю аура й улюбленець малюються прямо на манекені (у світі його нема). */
     private static void previewExtras(PoseStack m, MultiBufferSource v, AbstractClientPlayer p, Look look, float partial) {
         Worn aura = look.get(CosmeticSlot.AURA);
-        if (aura != null) {
+        if (aura != null && !previewAuraSeparate) {
             m.pushPose();
             m.translate(0, 1.501, 0);
             m.scale(-1f, -1f, 1f);

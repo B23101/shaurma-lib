@@ -11,7 +11,9 @@
     "MixinItemInHandRendererAnim",
     "MixinPlayerRendererAnim",
     "MixinCameraAnim",
-    "MixinGameRendererAnimRoll"
+    "MixinGameRendererAnimRoll",
+    "MixinModelPartBend",
+    "MixinModelPartCubeBend"
   ],
   "injectors": {
     "defaultRequire": 1
