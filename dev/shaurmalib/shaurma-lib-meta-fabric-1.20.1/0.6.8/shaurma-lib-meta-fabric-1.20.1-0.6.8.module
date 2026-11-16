@@ -27,11 +27,11 @@
         {
           "name": "shaurma-lib-meta-fabric-1.20.1-0.6.8.jar",
           "url": "shaurma-lib-meta-fabric-1.20.1-0.6.8.jar",
-          "size": 356820,
-          "sha512": "824286222c646ba55643c52673f8f0df59e205ea04e6fca7ec0ca687ce26b52e8804cb97b1e583e92ba6a7c07665115e8a227b2e219538b64f753eefc35ca092",
-          "sha256": "c596161df318107a0717e235ff2b04e444661fba884d2f1e824d689922dd865e",
-          "sha1": "e892f755a39001c24cbfab4b5c0eb2b823784901",
-          "md5": "b18cfbe999c3e53380398319cb00abe9"
+          "size": 356880,
+          "sha512": "c09b4fe31ebde356c19a058b9d1173736f4ebe84ce21d4114c443e3a47a69058f5b0636484b08296349645bdb391c0ffa8968918b534c4da6570353314b4a92c",
+          "sha256": "f41880f489e41dc0ba471f70b755501ab9b26cb4c3e1e678bf69414428ae9185",
+          "sha1": "93a621b991aea90aaeb9b836ecd4af3b276e1331",
+          "md5": "02348f71d88b235eaaf36816b96b66dc"
         }
       ]
     },
@@ -64,11 +64,11 @@
         {
           "name": "shaurma-lib-meta-fabric-1.20.1-0.6.8.jar",
           "url": "shaurma-lib-meta-fabric-1.20.1-0.6.8.jar",
-          "size": 356820,
-          "sha512": "824286222c646ba55643c52673f8f0df59e205ea04e6fca7ec0ca687ce26b52e8804cb97b1e583e92ba6a7c07665115e8a227b2e219538b64f753eefc35ca092",
-          "sha256": "c596161df318107a0717e235ff2b04e444661fba884d2f1e824d689922dd865e",
-          "sha1": "e892f755a39001c24cbfab4b5c0eb2b823784901",
-          "md5": "b18cfbe999c3e53380398319cb00abe9"
+          "size": 356880,
+          "sha512": "c09b4fe31ebde356c19a058b9d1173736f4ebe84ce21d4114c443e3a47a69058f5b0636484b08296349645bdb391c0ffa8968918b534c4da6570353314b4a92c",
+          "sha256": "f41880f489e41dc0ba471f70b755501ab9b26cb4c3e1e678bf69414428ae9185",
+          "sha1": "93a621b991aea90aaeb9b836ecd4af3b276e1331",
+          "md5": "02348f71d88b235eaaf36816b96b66dc"
         }
       ]
     }

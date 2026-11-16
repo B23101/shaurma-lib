@@ -27,11 +27,11 @@
         {
           "name": "shaurma-lib-anim-fabric-1.20.1-0.6.8.jar",
           "url": "shaurma-lib-anim-fabric-1.20.1-0.6.8.jar",
-          "size": 602708,
-          "sha512": "6ef59320bdeb90fb88d48218acec72645940e79eb568a2cd1a46044daed8f0aa6fbd14ef3531870bf08610771f3ee7a13ff9df11df7f8368b90e823f9023ed57",
-          "sha256": "d7a383f4ed1f41391e3b7e2b08390fcaa17992f247aa785bdcb680cc9b7b8c19",
-          "sha1": "e73564c1eeb693aac094d6e229b56cbf38dd9820",
-          "md5": "539a7118888dfcf4de10db5c841b0c6d"
+          "size": 602768,
+          "sha512": "b37e6ed46035eacfaa46530ff31d707ad4ef1211d3b326bdd4ed1c8844e90477e5a62dad81d4af8a3165e0c2e739c84cfe69e6f9bd600351802ee4d76f76668d",
+          "sha256": "d144769cb9d10d79b3e1cbcde06e807b255b0a4d31cb6b23dffc478f5478a4aa",
+          "sha1": "99edd6383d03b75ac54aaea60b5835976bbbebfa",
+          "md5": "8a25b0ba73ce143e5ee85c496836c010"
         }
       ]
     },
@@ -64,11 +64,11 @@
         {
           "name": "shaurma-lib-anim-fabric-1.20.1-0.6.8.jar",
           "url": "shaurma-lib-anim-fabric-1.20.1-0.6.8.jar",
-          "size": 602708,
-          "sha512": "6ef59320bdeb90fb88d48218acec72645940e79eb568a2cd1a46044daed8f0aa6fbd14ef3531870bf08610771f3ee7a13ff9df11df7f8368b90e823f9023ed57",
-          "sha256": "d7a383f4ed1f41391e3b7e2b08390fcaa17992f247aa785bdcb680cc9b7b8c19",
-          "sha1": "e73564c1eeb693aac094d6e229b56cbf38dd9820",
-          "md5": "539a7118888dfcf4de10db5c841b0c6d"
+          "size": 602768,
+          "sha512": "b37e6ed46035eacfaa46530ff31d707ad4ef1211d3b326bdd4ed1c8844e90477e5a62dad81d4af8a3165e0c2e739c84cfe69e6f9bd600351802ee4d76f76668d",
+          "sha256": "d144769cb9d10d79b3e1cbcde06e807b255b0a4d31cb6b23dffc478f5478a4aa",
+          "sha1": "99edd6383d03b75ac54aaea60b5835976bbbebfa",
+          "md5": "8a25b0ba73ce143e5ee85c496836c010"
         }
       ]
     },
@@ -84,11 +84,11 @@
         {
           "name": "shaurma-lib-anim-fabric-1.20.1-0.6.8-sources.jar",
           "url": "shaurma-lib-anim-fabric-1.20.1-0.6.8-sources.jar",
-          "size": 341213,
-          "sha512": "92012fe9bf6d161fd7fb9dbdd538cf07c17bc1898c52d88288498892f9da6f1619aabcdf6d86796e6c9d6f9815413a3aeb0d6b481e9de2a7a184fc3446f91747",
-          "sha256": "01ef40aab22e6f22cf23c08d281eeff82ecd84fe64449407155e824e2ac9fa5e",
-          "sha1": "6a110b0dd16ccb7808b7c295721d6810b09a0b49",
-          "md5": "abbe6da0c1bcf9b91a6cdabb946071a4"
+          "size": 341382,
+          "sha512": "1b4fbe780875c4f4b0c31e4ac535190d269a40381d61a71de0783760635f3a44653810085f0a87761a8760d6c8c02ffbd905ef6ef19626a3140486cf007448e1",
+          "sha256": "03d4e546354cee418b2320820f9d175e1af5c92b140b0d5428d6079667b8dfe0",
+          "sha1": "b243a5289b871512f1538356122f84057c453f99",
+          "md5": "b4a133d888fc8b1c5441d3258ac45530"
         }
       ]
     }
