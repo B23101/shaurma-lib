@@ -1,0 +1,76 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "dev.shaurmalib",
+    "module": "shaurma-lib-meta-fabric-1.20.1",
+    "version": "0.6.19",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.5.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "shaurma-lib-meta-fabric-1.20.1-0.6.19.jar",
+          "url": "shaurma-lib-meta-fabric-1.20.1-0.6.19.jar",
+          "size": 357314,
+          "sha512": "3a5a3a46d954cb942df1b28def160586cfd175f28dab0f0f919a56c43b7a76f4127431872df93d23fc7c8efb7b96a5f9f61b2bcc58016a12b1743717f21ec795",
+          "sha256": "4815fe4ea529312a2810d3b72a7be800ee5759aa7bcf127792e5ab3bb628cf94",
+          "sha1": "466b564fed58f5b29e01ac3aec408377c994b7e6",
+          "md5": "a6f67557da8f5d1ddb5fa376098e6c73"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "net.fabricmc",
+          "module": "fabric-loader",
+          "version": {
+            "requires": "0.15.11"
+          }
+        },
+        {
+          "group": "net.fabricmc.fabric-api",
+          "module": "fabric-api",
+          "version": {
+            "requires": "0.92.2+1.20.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "shaurma-lib-meta-fabric-1.20.1-0.6.19.jar",
+          "url": "shaurma-lib-meta-fabric-1.20.1-0.6.19.jar",
+          "size": 357314,
+          "sha512": "3a5a3a46d954cb942df1b28def160586cfd175f28dab0f0f919a56c43b7a76f4127431872df93d23fc7c8efb7b96a5f9f61b2bcc58016a12b1743717f21ec795",
+          "sha256": "4815fe4ea529312a2810d3b72a7be800ee5759aa7bcf127792e5ab3bb628cf94",
+          "sha1": "466b564fed58f5b29e01ac3aec408377c994b7e6",
+          "md5": "a6f67557da8f5d1ddb5fa376098e6c73"
+        }
+      ]
+    }
+  ]
+}

@@ -27,11 +27,11 @@
         {
           "name": "shaurma-lib-anim-fabric-1.20.1-0.6.18.jar",
           "url": "shaurma-lib-anim-fabric-1.20.1-0.6.18.jar",
-          "size": 609975,
-          "sha512": "9a46db358675a80aa24a0e65535aa73c7d267fd80589ea6041ef2b42388d4c74595a9b53b08776073ed1c630c716846081d14465ce9bedcff506d78fd4cee5c7",
-          "sha256": "430178ae404d3c259a96c0fded9c98972b0e753a0a5bc15ef2b30c0763c51b61",
-          "sha1": "c769f467320e1643247512eb7abdd7ef8a77f917",
-          "md5": "bf038671525df749e58fb77503bb00f6"
+          "size": 608588,
+          "sha512": "dc57bc983603ed03499ecab9afd337dc9aa4d81d6204616daca69ad6765296f1f86cf5e3ecfb101a8a769b3658855758735eb3204f1f642e817796738020eb94",
+          "sha256": "bda6844705cfab0bd96b80572aabee221892676d895085911ff30d066ffa20e8",
+          "sha1": "68cfb196e91c158c7ea0ab95d20c1fe26160a59e",
+          "md5": "41c44ed59b0977845daf272ee5624641"
         }
       ]
     },
@@ -64,11 +64,11 @@
         {
           "name": "shaurma-lib-anim-fabric-1.20.1-0.6.18.jar",
           "url": "shaurma-lib-anim-fabric-1.20.1-0.6.18.jar",
-          "size": 609975,
-          "sha512": "9a46db358675a80aa24a0e65535aa73c7d267fd80589ea6041ef2b42388d4c74595a9b53b08776073ed1c630c716846081d14465ce9bedcff506d78fd4cee5c7",
-          "sha256": "430178ae404d3c259a96c0fded9c98972b0e753a0a5bc15ef2b30c0763c51b61",
-          "sha1": "c769f467320e1643247512eb7abdd7ef8a77f917",
-          "md5": "bf038671525df749e58fb77503bb00f6"
+          "size": 608588,
+          "sha512": "dc57bc983603ed03499ecab9afd337dc9aa4d81d6204616daca69ad6765296f1f86cf5e3ecfb101a8a769b3658855758735eb3204f1f642e817796738020eb94",
+          "sha256": "bda6844705cfab0bd96b80572aabee221892676d895085911ff30d066ffa20e8",
+          "sha1": "68cfb196e91c158c7ea0ab95d20c1fe26160a59e",
+          "md5": "41c44ed59b0977845daf272ee5624641"
         }
       ]
     },
@@ -84,11 +84,11 @@
         {
           "name": "shaurma-lib-anim-fabric-1.20.1-0.6.18-sources.jar",
           "url": "shaurma-lib-anim-fabric-1.20.1-0.6.18-sources.jar",
-          "size": 350021,
-          "sha512": "b5dc90fbc7017694da81bc9d958aef1901612adfeb1896a41e609db44c0b68bd2769c1512a495d45549e938d1bdfa0a5c4a890a29650a9a8145a6d03ee5e6b16",
-          "sha256": "acf995cc51a3c3ee47a6035b14b38527dd17174cd5647961d64b402122611d79",
-          "sha1": "ab7753bafa691c95f019c273df4e767ac411b576",
-          "md5": "8e5ded05859d553fac2458cedf1469a8"
+          "size": 348648,
+          "sha512": "f19db8d6eb38f3695b123f89140795cdd4bff23474f9abff707ed566c68a705d789632b6c2ac1029e2e906b8ec06bc6a378cbca32e4a81571049225fd9defcf5",
+          "sha256": "9c255b68aaa007d67b7c163ed03c41eff28ef824372a237f34748e26c6e1803d",
+          "sha1": "cba79c0f07c02343e3ce46541f0e071a3364f113",
+          "md5": "ff2585bfba957d3b5229020879498ca2"
         }
       ]
     }
