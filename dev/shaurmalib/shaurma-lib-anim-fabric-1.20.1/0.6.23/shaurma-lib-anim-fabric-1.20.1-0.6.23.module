@@ -1,0 +1,96 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "dev.shaurmalib",
+    "module": "shaurma-lib-anim-fabric-1.20.1",
+    "version": "0.6.23",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.5.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "shaurma-lib-anim-fabric-1.20.1-0.6.23.jar",
+          "url": "shaurma-lib-anim-fabric-1.20.1-0.6.23.jar",
+          "size": 613022,
+          "sha512": "10234c0e52e88577fb902b0569a3f62abae8853c845ec576f4e3c611db15e73443aa0fde5f5699e1078a4109eb07362751f8ec866a671ebdee5005e924085fb4",
+          "sha256": "0cabd18238fe1b41db70ec18cfc7723c8b5f640c689c951058a2ff6e8afb0880",
+          "sha1": "8dbd599b3368d9258415f316f67c8c0cd8d39d20",
+          "md5": "adbeec279f7200e59e14c994084b4525"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 17,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "net.fabricmc",
+          "module": "fabric-loader",
+          "version": {
+            "requires": "0.15.11"
+          }
+        },
+        {
+          "group": "net.fabricmc.fabric-api",
+          "module": "fabric-api",
+          "version": {
+            "requires": "0.92.2+1.20.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "shaurma-lib-anim-fabric-1.20.1-0.6.23.jar",
+          "url": "shaurma-lib-anim-fabric-1.20.1-0.6.23.jar",
+          "size": 613022,
+          "sha512": "10234c0e52e88577fb902b0569a3f62abae8853c845ec576f4e3c611db15e73443aa0fde5f5699e1078a4109eb07362751f8ec866a671ebdee5005e924085fb4",
+          "sha256": "0cabd18238fe1b41db70ec18cfc7723c8b5f640c689c951058a2ff6e8afb0880",
+          "sha1": "8dbd599b3368d9258415f316f67c8c0cd8d39d20",
+          "md5": "adbeec279f7200e59e14c994084b4525"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "shaurma-lib-anim-fabric-1.20.1-0.6.23-sources.jar",
+          "url": "shaurma-lib-anim-fabric-1.20.1-0.6.23-sources.jar",
+          "size": 352699,
+          "sha512": "f25d79a43b208d51450351bbe39f5cddc061bdf98ee4f81260fed9e19df479edc06717a7969b634f46bdbf6045a6636953e4dd376dadcdbe3fefea05b6f1c819",
+          "sha256": "02ba9c2b1e00a305e7febb2f3570348fa3301a97630b952ee9f9c2f7d31bfeb5",
+          "sha1": "c21587ea2d5f485e8bdbfba0fa3cf311a4c6607f",
+          "md5": "b5de712805f80955ec98f0e100651e64"
+        }
+      ]
+    }
+  ]
+}
