@@ -1,0 +1,96 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "dev.shaurmalib",
+    "module": "shaurma-lib-fabric-1.21.1",
+    "version": "0.6.28",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.5.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "shaurma-lib-fabric-1.21.1-0.6.28.jar",
+          "url": "shaurma-lib-fabric-1.21.1-0.6.28.jar",
+          "size": 765091,
+          "sha512": "6b91e3edc1351a7cc8ad2b9081f3e7b67ba9f82ec55f9a3345555ad1d918d54091d4cf039e2b31af3826457c717d2987e1150f0638781469e2d858db1c9e8322",
+          "sha256": "757378cd2c0218de82aed32aa1ae98448362f2d19c913f03d51a6e1971226435",
+          "sha1": "d4e20b64eabc2db2d66f8b5f2b1332ca541d59fd",
+          "md5": "8bae42e9f6e77b28e401d87ad7d4886b"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "net.fabricmc",
+          "module": "fabric-loader",
+          "version": {
+            "requires": "0.18.4"
+          }
+        },
+        {
+          "group": "net.fabricmc.fabric-api",
+          "module": "fabric-api",
+          "version": {
+            "requires": "0.116.8+1.21.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "shaurma-lib-fabric-1.21.1-0.6.28.jar",
+          "url": "shaurma-lib-fabric-1.21.1-0.6.28.jar",
+          "size": 765091,
+          "sha512": "6b91e3edc1351a7cc8ad2b9081f3e7b67ba9f82ec55f9a3345555ad1d918d54091d4cf039e2b31af3826457c717d2987e1150f0638781469e2d858db1c9e8322",
+          "sha256": "757378cd2c0218de82aed32aa1ae98448362f2d19c913f03d51a6e1971226435",
+          "sha1": "d4e20b64eabc2db2d66f8b5f2b1332ca541d59fd",
+          "md5": "8bae42e9f6e77b28e401d87ad7d4886b"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "shaurma-lib-fabric-1.21.1-0.6.28-sources.jar",
+          "url": "shaurma-lib-fabric-1.21.1-0.6.28-sources.jar",
+          "size": 435620,
+          "sha512": "3c7b9ab35757ee21478cffdffde5753329234d2fc798e88c7b51967e4fe7129adf75b6dcfe692f67e37e6df3a8c3aea4f9c655662d72ce8c86c0bb7c212d25a1",
+          "sha256": "51a68f5b8fe6f30d933b699c7c1a8196e74fd7880ca83962745d4af597a31e28",
+          "sha1": "1e3786a96743beed6426e3bf4b73f2455360f5c3",
+          "md5": "5daafde74af47558bc3dbe9d398aea68"
+        }
+      ]
+    }
+  ]
+}
